@@ -1,0 +1,24 @@
+Thank you. Your reservation is now confirmed!
+
+Booking ID: %s
+
+Your Itinerary
+-------------------------------------------------------------
+Flight %s
+Date: %s
+
+From: %s
+To: %s
+Departure Time: %s
+Duration: %s
+
+Flight Number: %s
+Aircraft: %s
+Class: %s
+Seat: %s
+-------------------------------------------------------------
+Thank you for using our service. If you have 
+any questions about your flight or reservation
+please contact us by calling +1 319-834-0276
+or email us at hawkair2020@gmail.com.
+Have a nice day!

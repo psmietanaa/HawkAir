@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+    body {
+        margin-top: 10px;
+    }
+    
+    table {
+        border-collapse: collapse;
+    }
+
+    td, th {
+        text-align: left;
+        padding-top: 4px;
+        padding-bottom: 4px;
+        width: 150px;
+    }
+    
+    #tableone {
+        color: #FFCE07;
+        background-color: #FFFFFF;
+    }
+
+    #tabletwo tr:nth-child(odd) {
+        background-color: #DDDDDD;
+    }
+    </style>
+</head>
+
+<body>
+    <img src="https://i.imgur.com/8kOruHF.png" alt="" width="200" height="">
+    <hr width="600px" align="left">
+    <h2>Thank you. Your reservation is now confirmed!</h2>
+    <h4>Booking ID: %s</h4>
+    <p>
+    <h4>Your Itinerary</h4>
+    <hr width="600px" align="left">
+    
+    <table id="tableone">
+        <tr>
+            <th>Flight %s</th>
+            <th style="width: 450px;">Date: %s</th>
+        </tr>
+    </table>
+    <p>
+    <table id="tabletwo">
+        <tr>
+            <th>From</th>
+            <th>To</th>
+            <th>Departure Time</th>
+            <th>Duration</th>
+        </tr>
+        <tr>
+            <td>%s</td>
+            <td>%s</td>
+            <td>%s</td>
+            <td>%s</td>
+        </tr>
+        <tr>
+            <th>Flight Number</th>
+            <th>Aircraft</th>
+            <th>Class</th>
+            <th>Seat</th>
+        </tr>
+        <tr>
+            <td>%s</td>
+            <td>%s</td>
+            <td>%s</td>
+            <td>%s</td>
+        </tr>
+    </table>
+    <hr width="600px" align="left">
+    <p>
+    Thank you for using our service. If you have any questions about your flight or reservation<br>
+    please contact us by calling <a href="tel:3198340276">+1 319-834-0276</a> or email us at <a href="mailto:hawkair2020@gmail.com?Subject=Question" target="_top">hawkair2020@gmail.com</a><br>
+    Have a nice day!
+</body>
+</html>

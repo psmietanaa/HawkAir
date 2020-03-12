@@ -1,0 +1,14 @@
+/** Navigation pills spacing **/
+.nav-pills a {
+    margin-left: 10px;
+}
+
+/** Active pill is gold **/
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+    background-color: #FFCE07;
+}
+
+/** FontAwesome padding **/
+i {
+  margin-right: 2px;
+}
