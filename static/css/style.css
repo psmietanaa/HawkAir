@@ -1,0 +1,42 @@
+/** Navigation pills spacing **/
+.nav-pills a {
+    margin-left: 10px;
+}
+
+/** FontAwesome icons padding **/
+i {
+  margin-right: 2px;
+}
+
+/** Active pill is gold with black text **/
+#activePill {
+    background-color: #FFCE07;
+    color: #262626
+}
+
+/** Footer **/
+#footer {
+    background-color: #262626;
+    color: #C9C9C9;
+}
+
+#footerHeading {
+    color: #FFFFFF;
+}
+
+#footerLine {
+    background-color: #FFCE07;
+}
+
+#footerText {
+    color: #C9C9C9;
+}
+
+#footerAddress {
+    color: #C9C9C9;
+}
+
+#copyrights {
+    background-color: #FFCE07;
+    color: #262626;
+}
