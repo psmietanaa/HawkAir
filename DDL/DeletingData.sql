@@ -1,0 +1,10 @@
+Delete from admin;
+Delete from aircrafts;
+Delete from airports;
+Delete from bookings;
+Delete from contactus;
+Delete from flights;
+Delete from news;
+Delete from payments;
+Delete from schedule;
+Delete from users;
