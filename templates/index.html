@@ -32,20 +32,6 @@
 
 <!-- Actual Page Content -->
 {% block content %}
-    
-    <!-- Keep the current tab active on page reload -->
-    <script>
-        $(function() {
-            $('a[data-toggle="tab"]').on('click', function(e) {
-                window.localStorage.setItem('activeTab', $(e.target).attr('href'));
-            });
-            var activeTab = window.localStorage.getItem('activeTab');
-            if (activeTab) {
-                $('#myPill a[href="' + activeTab + '"]').tab('show');
-                window.localStorage.removeItem("activeTab");
-            }
-        });
-    </script>
     <div class="container py-5">
         <!-- Main Navigation -->
         <h3>Welcome to HawkAir!</h3>
@@ -229,33 +215,5 @@
                 </div>
             {%endfor%}
         </div>
-
-        <!-- Magic JS to deep linking pills-->
-        <script>
-            $(document).ready(() => {
-                let url = location.href.replace(/\/$/, "");
-                
-                if (location.hash) {
-                    const hash = url.split("#");
-                    $('#myPill a[href="#' + hash[1] + '"]').tab("show");
-                    url = location.href.replace(/\/#/, "#");
-                    history.replaceState(null, null, url);
-                    setTimeout(() => {
-                        $(window).scrollTop(0);
-                    }, 400);
-                } 
-                
-                $('a[data-toggle="tab"]').on("click", function() {
-                    let newUrl;
-                    const hash = $(this).attr("href");
-                    if (hash == "#home") {
-                        newUrl = url.split("#")[0];
-                    } else {
-                        newUrl = url.split("#")[0] + hash;
-                    }
-                    history.replaceState(null, null, newUrl);
-                });
-            });
-        </script>
     </div>
 {% endblock %}

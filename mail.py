@@ -1,12 +1,6 @@
-import ssl
-import smtplib
 import textwrap
-from email.header import Header
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-
-sender = "hawkair2020@gmail.com"
-password = "H@wkAir2020"
+from flask_mail import *
+from run import app, mail
 
 # This function validates booking email parameters
 def validate_booking(BookingID, flights):
@@ -70,82 +64,6 @@ def build_booking_plaintext(BookingID, flights):
     please contact us by calling +1 319-834-0276
     or email us at hawkair2020@gmail.com.
     Have a nice day!"""
-    return textwrap.dedent(header) + textwrap.dedent(body) + textwrap.dedent(footer)
-
-# This function builds the plaintext template used to send support information
-def build_support_plaintext(firstName, lastName, email, subject, message):
-    # Build header of the email
-    header = """\
-    A user has a question!
-    -------------------------------------------------------------
-    """
-    # Build body of the email
-    body = """\
-    First Name: %s
-    Last Name: %s
-    Email: %s
-    
-    Subject: %s
-    Message: %s
-    -------------------------------------------------------------
-    """
-    body = body % (firstName, lastName, email, subject, message)
-    # Build footer of the email
-    footer = """\
-    We will try to get back to you soon as possible. 
-    Due to limited number of workers and huge 
-    demand for flying tickets, we usually respond 
-    in 2-3 business days to your inquiry. If you 
-    have an urgent matter, please call us or 
-    see us in person by visiting our local office.
-    Have a nice day!"""
-    return textwrap.dedent(header) + textwrap.dedent(body) + textwrap.dedent(footer)
-
-# This function builds the HTML template used to send support information
-def build_support_html(firstName, lastName, email, subject, message):
-    # Build header of the email    
-    header = """\
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <style>
-        body {
-            margin-top: 10px;
-        }
-        </style>
-    </head>
-    
-    <body>
-        <img src="https://i.imgur.com/8kOruHF.png" alt="" width="200">
-        <hr width="600px" align="left">
-        <h3>A user has a question!</h3>
-    """
-    # Build body of the email
-    body = """\
-    <p>First Name: %s
-    <br/>
-    Last Name: %s
-    <br/>
-    Email: %s
-    <br/>
-    <br/>
-    Subject: %s
-    <br/>
-    Message: %s
-    </p>
-    <hr width="600px" align="left">
-    """
-    body = body % (firstName, lastName, email, subject, message)
-    # Build footer of the email    
-    footer = """\
-    <p>
-    We will try to get back to you soon as possible. Due to limited number of workers and huge <br>
-    demand for flying tickets, we usually respond in 2-3 business days to your inquiry. If you <br>
-    have an urgent matter, please call us or see us in person by visiting our local office. <br>
-    Have a nice day!
-    </p>
-    </body>
-    </html>"""
     return textwrap.dedent(header) + textwrap.dedent(body) + textwrap.dedent(footer)
 
 # This function builds the HTML template used to send booking confirmations
@@ -244,57 +162,102 @@ def build_booking_html(BookingID, flights):
     </html>"""
     return textwrap.dedent(header) + textwrap.dedent(body) + textwrap.dedent(footer)
 
-# This function takes three parameters:
-# Receiver - receiver of the email
+# This function builds the plaintext template used to send support information
+def build_support_plaintext(firstName, lastName, email, subject, message):
+    # Build header of the email
+    header = """\
+    A user has a question!
+    -------------------------------------------------------------
+    """
+    # Build body of the email
+    body = """\
+    First Name: %s
+    Last Name: %s
+    Email: %s
+    
+    Subject: %s
+    Message: %s
+    -------------------------------------------------------------
+    """
+    body = body % (firstName, lastName, email, subject, message)
+    # Build footer of the email
+    footer = """\
+    We will try to get back to you soon as possible. 
+    Due to limited number of workers and huge 
+    demand for flying tickets, we usually respond 
+    in 2-3 business days to your inquiry. If you 
+    have an urgent matter, please call us or 
+    see us in person by visiting our local office.
+    Have a nice day!"""
+    return textwrap.dedent(header) + textwrap.dedent(body) + textwrap.dedent(footer)
+
+# This function builds the HTML template used to send support information
+def build_support_html(firstName, lastName, email, subject, message):
+    # Build header of the email    
+    header = """\
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+        body {
+            margin-top: 10px;
+        }
+        </style>
+    </head>
+    
+    <body>
+        <img src="https://i.imgur.com/8kOruHF.png" alt="" width="200">
+        <hr width="600px" align="left">
+        <h3>A user has a question!</h3>
+    """
+    # Build body of the email
+    body = """\
+    <p><strong>First Name:</strong> %s
+    <br/>
+    <strong>Last Name:</strong> %s
+    <br/>
+    <strong>Email:</strong> %s
+    <br/>
+    <br/>
+    <strong>Subject:</strong> %s
+    <br/>
+    <strong>Message:</strong> %s
+    </p>
+    <hr width="600px" align="left">
+    """
+    body = body % (firstName, lastName, email, subject, message)
+    # Build footer of the email
+    footer = """\
+    <p>
+    We will try to get back to you soon as possible. Due to limited number of workers and huge <br>
+    demand for flying tickets, we usually respond in 2-3 business days to your inquiry. If you <br>
+    have an urgent matter, please call us or see us in person by visiting our local office. <br>
+    Have a nice day!
+    </p>
+    </body>
+    </html>"""
+    return textwrap.dedent(header) + textwrap.dedent(body) + textwrap.dedent(footer)
+
+# Function used to send emails
+# It takes three parameters:
 # Subject - subject of the email
+# Receiver - receiver of the email
 # Plaintext - plain text content of the email
 # HTML - HTML content of the email
-def send_mail(receiver, subject, plaintext, html=None):
+def send_mail(subject, receiver, plaintext, html=None):
     try:
         # Fill out the email fields
-        message = MIMEMultipart("alternative")
-        message['Subject'] = Header(subject, "utf-8")
-        message['From'] = Header("HawkAir", "utf-8")
-        message['To'] = Header(receiver, "utf-8")
-        # Turn these into plain/html MIMEText objects
-        part1 = MIMEText(plaintext, "plain", "utf-8")
+        message = Message()
+        message.subject = subject
+        message.sender = ("HawkAir", app.config.get("MAIL_USERNAME"))
+        message.add_recipient(receiver)
+        # Add HTML/plain-text parts to  message
+        message.body = plaintext
         if html is not None:
-            part2 = MIMEText(html, "html", "utf-8")
-        # Add HTML/plain-text parts to MIMEMultipart message
-        # The email client will try to render the last part first
-        message.attach(part1)
-        if html is not None:
-            message.attach(part2)
-        # Create secure connection with server and send email
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-            server.login(sender, password)
-            server.sendmail(sender, receiver, message.as_string())
-        print("Email sent succesfully!")
-        return 200
+            message.html = html
+        # Send email
+        with app.app_context():
+            mail.send(message)
+        return "200"
     except Exception as e:
-        print(e)
-        return 500
-
-
-################################ Booking ###################################
-#BookingID = "000014"
-#flights = [["Tuesday, May 14, 2020", "ORD", "JFK", "14:00", "2:08h", "AA2470", "Boeing 737", "Economy", "26C"],
-           #["Tuesday, May 14, 2020", "JFK", "MIA", "18:40", "3:02h", "AA5570", "Boeing 777", "Economy", "34A"]]
-
-#validate_booking(BookingID, flights)
-#plaintext = build_booking_plaintext(BookingID, flights)
-#html = build_booking_html(BookingID, flights)
-#send_mail("szoszon007@gmail.com", "Your Booking Confirmation", plaintext, html)
-
-################################ Support ###################################
-#firstName = "Piotr"
-#lastName = "Smietana"
-#email = "szoszon007@gmail.com"
-#subject = "Payment method rejected"
-#message = "Hi! I can't pay for a flight using my credit card. Can you tell me how to fix it? Thanks!"
-
-#validate_support(firstName, lastName, email, subject, message)
-#plaintext = build_support_plaintext(firstName, lastName, email, subject, message)
-#html = build_support_html(firstName, lastName, email, subject, message)
-#send_mail("szoszon007@gmail.com", "Support Question", plaintext, html)
+        return "500"

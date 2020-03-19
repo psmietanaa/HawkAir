@@ -5,10 +5,12 @@ from wtforms.fields.html5 import DateField
 from wtforms.validators import Email, EqualTo, InputRequired, Length, Regexp, Optional
 from wtforms_validators import Alpha, AlphaSpace, AlphaNumeric, Integer
 
+# Regex for validating the forms
 textRegex = re.compile("\s*\w*[!@#$%()=+-:;'\",.?]*")
 streetRegex = re.compile("\s*\w*[.]*")
 phoneRegex = re.compile("\s*\d*[-+.]*")
 
+# Data used in the forms
 titles = [("", ""), ("Mr", "Mr"), ("Ms", "Ms"), ("Mrs", "Mrs"), ("Mx", "Mx")]
 sexes = [("Male", "Male"), ("Female", "Female")]
 securityQuestions = [("What was your favorite sport in high school?", "What was your favorite sport in high school?"),
