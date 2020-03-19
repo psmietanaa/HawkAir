@@ -24,7 +24,6 @@
 	
 	<!-- FontAwesome Icons -->
 	<script src="https://kit.fontawesome.com/cc7047dfc4.js" crossorigin="anonymous"></script>
-    
 </head>
 
 <!-- Body -->
@@ -41,13 +40,9 @@
     <footer class="footer py-5" id="footer">
         <!-- Set footer margins and alignment -->
         <div class="container text-center text-md-left">
-            <div class="row justify-content-md-center">
-                
-                <!-- Empty Column -->
-                <div class="col mx-auto"></div>
-                
+            <div class="row justify-content-md-center"> 
                 <!-- General -->
-                <div class="col mx-auto">
+                <div class="col-md-2">
                     <h6><a id="footerHeading">General</a></h6>
                     <hr class="mt-0 mb-3 d-inline-block mx-auto" id="footerLine" style="width: 55px;">
                     <p><a id="footerText" href="/">Home</a></p>
@@ -56,34 +51,38 @@
                 </div>
 
                 <!-- Advanced -->
-                <div class="col mx-auto">
+                <div class="col-md-2">
                     <h6><a id="footerHeading">Advanced</a></h6>
                     <hr class="mt-0 mb-3 d-inline-block mx-auto" id="footerLine" style="width: 70px;">
-                    <p><a id="footerText" href="#">Multi-City</a></p>
-                    <p><a id="footerText" href="#">Flight Status</a></p>
-                    <p><a id="footerText" href="/login">Login / Sign Up</a></p>
+                    <p><a id="footerText" href="/multicity">Multi-City</a></p>
+                    <p><a id="footerText" href="/#your-trip" onClick="(function(){window.open('/#your-trip', '_self');location.reload();})();">Your Trip</a></p>
+                    <p><a id="footerText" href="/#flight-status-date" onClick="(function(){window.open('/#flight-status-date', '_self');location.reload();})();">Flight Status</a></p>
                 </div>
 
                 <!-- More -->
-                <div class="col mx-auto">
+                <div class="col-md-2">
                     <h6><a id="footerHeading">More</a></h6>
                     <hr class="mt-0 mb-3 d-inline-block mx-auto" id="footerLine" style="width: 38px;">
-                    <p><a id="footerText" href="#" target="_blank">Admin</a></p>
+                    <p><a id="footerText" href="/admin">Admin</a></p>
                     <p><a id="footerText" href="https://uiowa.edu/" target="_blank">University of Iowa</a></p>
                     <p><a id="footerText" href="https://myui.uiowa.edu/my-ui/courses/details.page?id=902210&ci=158672" target="_blank">Course Page</a></p>
                 </div>
                 
                 <!-- Our Address -->
-                <div class="mx-auto">
+                <div class="col-md-2">
                     <!-- Content -->
                     <h6><a id="footerHeading">Our Address</a></h6>
                     <hr class="mt-0 mb-3 d-inline-block mx-auto" id="footerLine" style="width: 90px;">
-                    <p id="footerAddress">HawkAir<br>2 West Washington St.<br>Iowa City, IA 52242<br>United States</p>
+                    <p id="footerAddress">
+                        <strong>HawkAir</strong>
+                        <br>
+                        2 West Washington St.
+                        <br>
+                        Iowa City, IA 52242
+                        <br>
+                        United States
+                    </p>
                 </div>
-                
-                <!-- Empty Column -->
-                <div class="col mx-auto"></div>
-
             </div>
         </div>
     </footer>
@@ -94,6 +93,13 @@
             <div class="text-center py-3">Copyright © 2020 <strong>HawkAir</strong></div>
         </div>
     </footer>
+    
+    <!-- Depress buttons after being clicked -->
+    <script>
+        $(".btn").mouseup(function() {
+          $(this).blur();
+        })
+    </script>
 </body>
 
 </html>

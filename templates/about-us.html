@@ -22,7 +22,7 @@
                     <a class="nav-item nav-link" id="pill" href="/"><i class="fas fa-home"></i> Home </a>
                     <a class="nav-item nav-link active" id="activePill" href="/about-us"><i class="far fa-question-circle"></i> About Us </a>
                     <a class="nav-item nav-link" id="pill" href="/contact-us"><i class="far fa-id-card"></i> Contact Us </a>
-                    <a class="nav-item nav-link" id="pill" href="/login"><i class="fas fa-user"></i> Login / Sign Up </a>
+                    <a class="nav-item nav-link" id="pill" href="/login"><i class="fas fa-user"></i> Login / Register </a>
                 </div>
             </nav>
 		</div>
@@ -31,26 +31,78 @@
 
 <!-- Actual Page Content -->
 {% block content %}
-    <div class="container">
-        <h1>About Us</h1>
-        <br>
-        <h1>About Us</h1>
-        <br>
-        <h1>About Us</h1>
-        <br>
-        <h1>About Us</h1>
-        <br>
-        <h1>About Us</h1>
-        <br>
-        <h1>About Us</h1>
-        <br>
-        <h1>About Us</h1>
-        <br>
-        <h1>About Us</h1>
-        <br>
-        <h1>About Us</h1>
-        <br>
-        <h1>About Us</h1>
-        <br>
+    <div class="container py-5">
+        <!-- History and Our Goals -->
+        <div class="row pb-2">
+            <div class="col-md-8">
+                <h3>History</h3>
+                <p style="text-align:justify">Hawk Air is an airplane company that was established in January, 2020. Ever since, we have been growing rapidly, so we decided to create a website for our company. 
+                We offer a lot of daily flights to many countries and cities. We are also partners in the Frequent Flyer program and we have a huge amount of customers. Many people trust our services!
+                </p>
+                <h3 class="pt-2">Our Goals</h3>
+                <p style="text-align:justify">Every year, nearly 2 million travelers trust Hawk Air to get them where they’re going. 
+                To us, travel is about more than just bringing people to a place. It’s about bringing people together.
+                </p>
+            </div>
+            <div class="col-md-4">
+                <img class="mx-auto" src="/static/images/airplane.png" width="350" height="250"/>
+            </div>
+        </div> 
+        
+        <!-- Highlights -->
+        <h3>Highlights</h3>
+        <p>Some of our recent highlights include:</p>
+        <div class="row pb-2">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <h5 class="card-header">Ecology</h5>
+                    <div class="card-body">
+                        <p class="card-text" style="text-align:justify">
+                            We’re just as committed connecting the world as we are to protecting it and our journey to carbon neutrality starts now. 
+                            We’ve invested $1 million toward driving innovation, reducing carbon emissions and waste, and establishing new projects for a more sustainable future.
+                        </p>
+                    </div>
+                    <div class="card-footer"><a href="#" class="btn btn-warning btn-sm">Read More</a></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <h5 class="card-header">Diversity</h5>
+                    <div class="card-body">
+                        <p class="card-text" style="text-align:justify">
+                            We can’t connect the world unless we reflect it. That’s why Hawk Air is committed to promoting diversity in our hiring, 
+                            seeing the world from a multicultural perspective, and incorporating comprehensivity into everything we do.
+                        </p>
+                    </div>
+                    <div class="card-footer"><a href="#" class="btn btn-warning btn-sm">Read More</a></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <h5 class="card-header">Giving Back</h5>
+                    <div class="card-body">
+                        <p class="card-text" style="text-align:justify">
+                            Connecting people has been at the core of everything we do since Hawk Air founding in 2020. 
+                            That’s why we’re committed to giving back 1% of our annual profits to the places where we live, work and serve
+                        </p>
+                    </div>
+                    <div class="card-footer"><a href="#" class="btn btn-warning btn-sm">Read More</a></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- But Seriously -->
+        <div class="row align-items-center pt-4">
+            <div class="col-md-8">
+                <h3>But Seriously</h3>
+                <p style="text-align:justify">This website was created for a Database Systems course at the University of Iowa named CS:4400. 
+                    The course is led by Professor Raman Aravamudhan and TA Audry Kibonge. The website was designed and created by Jacob Seedorff, 
+                    Piotr Smietana, and Sriram Srinivasan using Python, MySQL, Flask, Bootstrap, and some JavaScript.
+                </p>
+            </div>
+            <div class="col-md-4">
+                <img class="img-fluid rounded mx-auto d-block" src="/static/images/uiowa.png" width="350" height="150"/>
+            </div>
+        </div>
     </div>
 {% endblock %}

@@ -1,5 +1,6 @@
 <!-- This line loads base.html which is present on every page -->
 {% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
 
 <!-- Get the title of this page -->
 {% block title %}
@@ -22,7 +23,7 @@
                     <a class="nav-item nav-link" id="pill" href="/"><i class="fas fa-home"></i> Home </a>
                     <a class="nav-item nav-link" id="pill" href="/about-us"><i class="far fa-question-circle"></i> About Us </a>
                     <a class="nav-item nav-link active" id="activePill" href="/contact-us"><i class="far fa-id-card"></i> Contact Us </a>
-                    <a class="nav-item nav-link" id="pill" href="/login"><i class="fas fa-user"></i> Login / Sign Up </a>
+                    <a class="nav-item nav-link" id="pill" href="/login"><i class="fas fa-user"></i> Login / Register </a>
                 </div>
             </nav>
 		</div>
@@ -31,26 +32,65 @@
 
 <!-- Actual Page Content -->
 {% block content %}
-    <div class="container">
-        <h1>Contact Us</h1>
-        <br>
-        <h1>Contact Us</h1>
-        <br>
-        <h1>Contact Us</h1>
-        <br>
-        <h1>Contact Us</h1>
-        <br>
-        <h1>Contact Us</h1>
-        <br>
-        <h1>Contact Us</h1>
-        <br>
-        <h1>Contact Us</h1>
-        <br>
-        <h1>Contact Us</h1>
-        <br>
-        <h1>Contact Us</h1>
-        <br>
-        <h1>Contact Us</h1>
-        <br>
+    <div class="container py-5">
+        <!-- History and Our Goals -->
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Contact Us</h3>
+                <p style="text-align:justify">Currently, Hawk Air only offers support over the counter and telephone. 
+                    If you have any questions or concerns regarding your flight reservation, please contact us by calling <a href="tel:{{ data.phoneNumber }}">{{ data.phoneNumber }}</a> 
+                    or visit one of our local branches. We are here to help!
+                </p>
+                <p style="text-align:justify">You can also fill out a contact form and leave us a message. We will try to get back to you soon as possible. 
+                    Due to limited number of workers and huge demand for flying tickets, we usually respond in 2-3 business days to your inquiry. 
+                    If you have an urgent matter, please call us or see us in person by visiting our local office.
+                </p>
+            </div>
+            <div class="col-md-4">
+                <img class="mx-auto" src="/static/images/support.png" width="350" height="250"/>
+            </div>
+        </div>
+        
+        <!-- Contact Form and Our Office-->
+        <div class="row align-items-center pt-1">
+            <div class="col-md-8">
+                <form method="POST">
+                    <h3>Contact Form</h3>
+                    <p>Please use the following form to contact us:</p>
+                    {{ form.hidden_tag() }}
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            {{ wtf.form_field(form.firstName, class='form-control', placeholder='') }}
+                        </div>
+                        <div class="form-group col-md-6">
+                            {{ wtf.form_field(form.lastName, class='form-control', placeholder='') }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            {{ wtf.form_field(form.email, class='form-control', placeholder='') }}
+                        </div>
+                        <div class="form-group col-md-6">
+                            {{ wtf.form_field(form.subject, class='form-control', placeholder='') }}
+                        </div>
+                    </div>
+                    {{ wtf.form_field(form.message, class='form-control', plzaceholder='') }}
+                    {{ wtf.form_field(form.submit, class='form-control btn-warning my-4', placeholder='') }}
+                </form>
+            </div>
+            
+            <!-- Our Office-->
+            <div class="col-md-4 text-center">
+                <h3>Our Office</h3>
+                <p><strong>HawkAir</strong>
+                    <br>
+                    2 West Washington St.
+                    <br>
+                    Iowa City, IA 52242
+                    <br>
+                    United States
+                </p>
+            </div> 
+        </div>
     </div>
 {% endblock %}
