@@ -1,0 +1,17 @@
+ToDoList:
+
+Changes:
+- ER password is max 64 characters
+
+Implement:
+- Payments
+- Print receipt
+- Email receipt
+
+- My trips
+- Trip Cancellation and Change
+
+Low priority
+- Password change policy
+- User Id / Password retrieval policy
+- Admin portal

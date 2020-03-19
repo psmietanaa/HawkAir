@@ -1,0 +1,53 @@
+<!-- This line loads base.html which is present on every page -->
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+<!-- Get the title of this page -->
+{% block title %}
+    {% if title %}
+        {{ title }}
+    {% else %}
+        Welcome to HawkAir!
+    {% endif %}
+{% endblock %}
+
+<!-- Navigation -->
+{% block navigation %}
+	<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #262626;">
+		<div class="container">
+			<a class="navbar-brand" href="/">
+				<img src="/static/images/logo.svg" width="220" height="60">
+			</a>
+			<nav class="nav nav-pills">
+                <div class="navbar-nav">
+                    <a class="nav-item nav-link" id="pill" href="/"><i class="fas fa-home"></i> Home </a>
+                    <a class="nav-item nav-link" id="pill" href="/about-us"><i class="far fa-question-circle"></i> About Us </a>
+                    <a class="nav-item nav-link" id="pill" href="/contact-us"><i class="far fa-id-card"></i> Contact Us </a>
+                    <a class="nav-item nav-link" id="pill" href="/login"><i class="fas fa-user"></i> Login / Register </a>
+                </div>
+            </nav>
+		</div>
+	</nav>
+{% endblock %}
+
+<!-- Actual Page Content -->
+{% block content %}
+    <div class="container py-5">
+        <!-- Spacers -->
+        <div class="col-xs-12" style="height:50px;"></div>
+        <div class="col-xs-12" style="height:50px;"></div>
+        <div class="row justify-content-md-center">
+            <div class="col-md-5">
+                <!-- Admin Login Form -->
+                <form method="POST">
+                    <h3 class="text-center">Admin Log In</h3>
+                    <p class="text-center">Please use the following form to log in.<br>This form is designed for administrators and employees only!</p>
+                    {{ form.hidden_tag() }}
+                    {{ wtf.form_field(form.username, class='form-control', placeholder='') }}
+                    {{ wtf.form_field(form.password, class='form-control', placeholder='') }}
+                    {{ wtf.form_field(form.submit, class='form-control btn-warning my-4', placeholder='') }}
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

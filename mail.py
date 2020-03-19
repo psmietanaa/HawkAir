@@ -1,15 +1,9 @@
-import ssl
-import smtplib
 import textwrap
-from email.header import Header
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+from flask_mail import *
+from run import app, mail
 
-sender = "hawkair2020@gmail.com"
-password = "H@wkAir2020"
-
-# This function validates all parameters used in this script
-def validate(BookingID, flights):
+# This function validates booking email parameters
+def validate_booking(BookingID, flights):
     if not isinstance(BookingID, str):
         raise TypeError("BookingID has to be a string")
     if len(flights) == 0:
@@ -18,9 +12,21 @@ def validate(BookingID, flights):
         if len(flight) != 9:
             raise ValueError("A flight must have 9 parameters")
 
+# This function validates support email parameters
+def validate_support(firstName, lastName, email, subject, message):
+    if not isinstance(firstName, str):
+        raise TypeError("firstName has to be a string")
+    if not isinstance(lastName, str):
+        raise TypeError("lastName has to be a string")
+    if not isinstance(email, str):
+        raise TypeError("email has to be a string")
+    if not isinstance(subject, str):
+        raise TypeError("subject has to be a string")
+    if not isinstance(message, str):
+        raise TypeError("message has to be a string")
+
 # This function builds the plaintext template used to send booking confirmations
-# Templete inside the static folder
-def build_plaintext(BookingID, flights):
+def build_booking_plaintext(BookingID, flights):
     # Build header of the email
     header = """\
     Thank you. Your reservation is now confirmed!
@@ -61,8 +67,7 @@ def build_plaintext(BookingID, flights):
     return textwrap.dedent(header) + textwrap.dedent(body) + textwrap.dedent(footer)
 
 # This function builds the HTML template used to send booking confirmations
-# Templete inside the static folder
-def build_html(BookingID, flights):
+def build_booking_html(BookingID, flights):
     # Build header of the email    
     header = """\
     <!DOCTYPE html>
@@ -96,7 +101,7 @@ def build_html(BookingID, flights):
     </head>
     
     <body>
-        <img src="https://i.imgur.com/8kOruHF.png" alt="" width="200" height="">
+        <img src="https://i.imgur.com/8kOruHF.png" alt="" width="200">
         <hr width="600px" align="left">
         <h2>Thank you. Your reservation is now confirmed!</h2>
         <h4>Booking ID: %s</h4>
@@ -152,49 +157,107 @@ def build_html(BookingID, flights):
     Thank you for using our service. If you have any questions about your flight or reservation<br>
     please contact us by calling <a href="tel:3198340276">+1 319-834-0276</a> or email us at <a href="mailto:hawkair2020@gmail.com?Subject=Question" target="_top">hawkair2020@gmail.com</a><br>
     Have a nice day!
+    </p>
     </body>
     </html>"""
     return textwrap.dedent(header) + textwrap.dedent(body) + textwrap.dedent(footer)
 
-# This function takes three parameters:
-# Receiver - receiver of the email
+# This function builds the plaintext template used to send support information
+def build_support_plaintext(firstName, lastName, email, subject, message):
+    # Build header of the email
+    header = """\
+    A user has a question!
+    -------------------------------------------------------------
+    """
+    # Build body of the email
+    body = """\
+    First Name: %s
+    Last Name: %s
+    Email: %s
+    
+    Subject: %s
+    Message: %s
+    -------------------------------------------------------------
+    """
+    body = body % (firstName, lastName, email, subject, message)
+    # Build footer of the email
+    footer = """\
+    We will try to get back to you soon as possible. 
+    Due to limited number of workers and huge 
+    demand for flying tickets, we usually respond 
+    in 2-3 business days to your inquiry. If you 
+    have an urgent matter, please call us or 
+    see us in person by visiting our local office.
+    Have a nice day!"""
+    return textwrap.dedent(header) + textwrap.dedent(body) + textwrap.dedent(footer)
+
+# This function builds the HTML template used to send support information
+def build_support_html(firstName, lastName, email, subject, message):
+    # Build header of the email    
+    header = """\
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+        body {
+            margin-top: 10px;
+        }
+        </style>
+    </head>
+    
+    <body>
+        <img src="https://i.imgur.com/8kOruHF.png" alt="" width="200">
+        <hr width="600px" align="left">
+        <h3>A user has a question!</h3>
+    """
+    # Build body of the email
+    body = """\
+    <p><strong>First Name:</strong> %s
+    <br/>
+    <strong>Last Name:</strong> %s
+    <br/>
+    <strong>Email:</strong> %s
+    <br/>
+    <br/>
+    <strong>Subject:</strong> %s
+    <br/>
+    <strong>Message:</strong> %s
+    </p>
+    <hr width="600px" align="left">
+    """
+    body = body % (firstName, lastName, email, subject, message)
+    # Build footer of the email
+    footer = """\
+    <p>
+    We will try to get back to you soon as possible. Due to limited number of workers and huge <br>
+    demand for flying tickets, we usually respond in 2-3 business days to your inquiry. If you <br>
+    have an urgent matter, please call us or see us in person by visiting our local office. <br>
+    Have a nice day!
+    </p>
+    </body>
+    </html>"""
+    return textwrap.dedent(header) + textwrap.dedent(body) + textwrap.dedent(footer)
+
+# Function used to send emails
+# It takes three parameters:
 # Subject - subject of the email
+# Receiver - receiver of the email
 # Plaintext - plain text content of the email
 # HTML - HTML content of the email
-def send_mail(receiver, subject, plaintext, html):
+def send_mail(subject, receiver, plaintext, html=None):
     try:
         # Fill out the email fields
-        message = MIMEMultipart("alternative")
-        message['Subject'] = Header(subject, 'utf-8')
-        message['From'] = Header("HawkAir", 'utf-8')
-        message['To'] = Header(receiver, 'utf-8')
-        # Turn these into plain/html MIMEText objects
-        part1 = MIMEText(plaintext, "plain", 'utf-8')
-        part2 = MIMEText(html, "html", 'utf-8')
-        # Add HTML/plain-text parts to MIMEMultipart message
-        # The email client will try to render the last part first
-        message.attach(part1)
-        message.attach(part2)
-        # Create secure connection with server and send email
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-            server.login(sender, password)
-            server.sendmail(sender, receiver, message.as_string())
-        print("Email sent succesfully!")
-        return 200
+        message = Message()
+        message.subject = subject
+        message.sender = ("HawkAir", app.config.get("MAIL_USERNAME"))
+        message.add_recipient(receiver)
+        # Add HTML/plain-text parts to  message
+        message.body = plaintext
+        if html is not None:
+            message.html = html
+        # Send email
+        with app.app_context():
+            mail.send(message)
+        return "200"
     except Exception as e:
-        print(e)
-        return 503
-
-############################################################################
-################################# Test #####################################
-############################################################################
-BookingID = "000014"
-flights = [["Tuesday, May 14, 2020", "ORD", "JFK", "14:00", "2:08h", "AA2470", "Boeing 737", "Economy", "26C"],
-           ["Tuesday, May 14, 2020", "JFK", "MIA", "18:40", "3:02h", "AA5570", "Boeing 777", "Economy", "34A"]]
-
-validate(BookingID, flights)
-plaintext = build_plaintext(BookingID, flights)
-html = build_html(BookingID, flights)
-
-send_mail("piotrsmietana1998@gmail.com", "Your Booking Information", plaintext, html)
+        return "500"

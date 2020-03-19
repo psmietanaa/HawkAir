@@ -6,47 +6,142 @@
 	<!-- Required meta tags -->
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="shortcut icon" href="static/images/favicon.ico">
+	<link rel="shortcut icon" href="/static/images/favicon.ico">
 	
-	<!-- Bootstrap CSS -->
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-	<title>{% block title %}{% endblock %}</title>
+    <!-- Title is passed to render template -->
+    <title>{% block title %}{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+	<link rel="stylesheet" type='text/css' href="/static/css/bootstrap.min.css">
+    
+    <!-- Custom CSS -->
+	<link rel="stylesheet" type='text/css' href="/static/css/style.css"/>
+    
+    <!-- Optional JavaScript -->
+	<script src="/static/js/jquery-3.4.1.slim.min.js"></script>
+	<script src="/static/js/popper.min.js"></script>
+	<script src="/static/js/bootstrap.min.js"></script>
 	
 	<!-- FontAwesome Icons -->
 	<script src="https://kit.fontawesome.com/cc7047dfc4.js" crossorigin="anonymous"></script>
-	
-	<!-- Custom CSS -->
-	<link rel="stylesheet" type='text/css' href='/static/style.css'/>
 </head>
 
 <!-- Body -->
 <body>
-	<!-- Navigation -->
-	<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #262626;">
-		<div class="container">
-			<a class="navbar-brand" href="#">
-				<img src="static/images/logo.svg" width="250" height="50" class="d-inline-block align-top" alt="">
-			</a>
-			<div class="nav nav-pills" id="navbarResponsive">
-				<div class="navbar-nav ml-auto">
-					<a class="nav-item nav-link active" href="#"><i class="fas fa-home"></i> Home <span class="sr-only">(current)</span></a>
-                    <a class="nav-item nav-link" href="#"><i class="far fa-id-card"></i> About Us </a>
-                    <a class="nav-item nav-link" href="#"><i class="far fa-id-card"></i> Contact Us </a>
-					<a class="nav-item nav-link" href="#"><i class="fas fa-user"></i> Login / Sign Up </a>
-					
-				</div>
-			</div>
-		</div>
-	</nav>
-	
-	<!-- Page Content -->
+    <!-- Navigation -->
+	{% block navigation %}
+	{% endblock %}
+    
+    <!-- Page Content-->
 	{% block content %}
 	{% endblock %}
-	
-	<!-- Optional JavaScript -->
-	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    
+    <!-- Footer -->
+    <footer class="footer py-5" id="footer">
+        <!-- Set footer margins and alignment -->
+        <div class="container text-center text-md-left">
+            <div class="row justify-content-md-center"> 
+                <!-- General -->
+                <div class="col-md-2">
+                    <h6><a id="footerHeading">General</a></h6>
+                    <hr class="mt-0 mb-3 d-inline-block mx-auto" id="footerLine" style="width: 55px;">
+                    <p><a id="footerText" href="/">Home</a></p>
+                    <p><a id="footerText" href="/about-us">About Us</a></p>
+                    <p><a id="footerText" href="/contact-us">Contact Us</a></p>
+                </div>
+
+                <!-- Advanced -->
+                <div class="col-md-2">
+                    <h6><a id="footerHeading">Advanced</a></h6>
+                    <hr class="mt-0 mb-3 d-inline-block mx-auto" id="footerLine" style="width: 70px;">
+                    <p><a id="footerText" href="/multicity">Multi-City</a></p>
+                    <p><a id="footerText" href="/#your-trip" onClick="(function(){window.open('/#your-trip', '_self');location.reload();})();">Your Trip</a></p>
+                    <p><a id="footerText" href="/#flight-status-date" onClick="(function(){window.open('/#flight-status-date', '_self');location.reload();})();">Flight Status</a></p>
+                </div>
+
+                <!-- More -->
+                <div class="col-md-2">
+                    <h6><a id="footerHeading">More</a></h6>
+                    <hr class="mt-0 mb-3 d-inline-block mx-auto" id="footerLine" style="width: 38px;">
+                    <p><a id="footerText" href="/admin">Admin</a></p>
+                    <p><a id="footerText" href="https://uiowa.edu/" target="_blank">University of Iowa</a></p>
+                    <p><a id="footerText" href="https://myui.uiowa.edu/my-ui/courses/details.page?id=902210&ci=158672" target="_blank">Course Page</a></p>
+                </div>
+                
+                <!-- Our Address -->
+                <div class="col-md-2">
+                    <!-- Content -->
+                    <h6><a id="footerHeading">Our Address</a></h6>
+                    <hr class="mt-0 mb-3 d-inline-block mx-auto" id="footerLine" style="width: 90px;">
+                    <p id="footerAddress">
+                        <strong>HawkAir</strong>
+                        <br>
+                        2 West Washington St.
+                        <br>
+                        Iowa City, IA 52242
+                        <br>
+                        United States
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Copyrights -->
+    <footer class="footer" id="copyrights">
+        <div class="container">
+            <div class="text-center py-3">Copyright © 2020 <strong>HawkAir</strong></div>
+        </div>
+    </footer>
+    
+    <!-- Depress buttons after being clicked -->
+    <script>
+        $(".btn").mouseup(function() {
+          $(this).blur();
+        })
+    </script>
+    
+    <!-- Magic JS to deep linking pills-->
+    <script>
+        $(document).ready(() => {
+            let url = location.href.replace(/\/$/, "");
+            
+            if (location.hash) {
+                const hash = url.split("#");
+                $('#myPill a[href="#' + hash[1] + '"]').tab("show");
+                url = location.href.replace(/\/#/, "#");
+                history.replaceState(null, null, url);
+                setTimeout(() => {
+                    $(window).scrollTop(0);
+                }, 400);
+            } 
+            
+            $('a[data-toggle="tab"]').on("click", function() {
+                let newUrl;
+                const hash = $(this).attr("href");
+                if (hash == "#home") {
+                    newUrl = url.split("#")[0];
+                } else {
+                    newUrl = url.split("#")[0] + hash;
+                }
+                history.replaceState(null, null, newUrl);
+            });
+        });
+    </script>
+    
+    <!-- Keep the current tab active on page reload -->
+    <script>
+        $(function() {
+            $('a[data-toggle="tab"]').on('click', function(e) {
+                window.localStorage.setItem('activeTab', $(e.target).attr('href'));
+            });
+            var activeTab = window.localStorage.getItem('activeTab');
+            if (activeTab) {
+                $('#myPill a[href="' + activeTab + '"]').tab('show');
+                window.localStorage.removeItem("activeTab");
+            }
+        });
+    </script>
 </body>
 
 </html>

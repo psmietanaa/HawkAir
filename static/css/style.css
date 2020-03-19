@@ -1,0 +1,94 @@
+/** Navigation spacing **/
+.nav-pills a {
+    margin-left: 0px;
+    margin-right: 10px;
+}
+
+/** FontAwesome padding **/
+i {
+  margin-right: 2px;
+}
+
+/** Minimum size of the page content **/
+body > div.container {
+    min-height:700px !important;
+}
+
+/** Active pill is gold **/
+.nav-pills .nav-link.active, .navbar-dark .navbar-nav .nav-link.active {
+    background-color: #FFCE07;
+    color: #262626
+}
+
+/** Other pills are grey **/
+.nav-pills .nav-link {
+    background-color: #262626;
+    color: #C9C9C9
+}
+
+/** Make buttons gold **/
+.btn-warning {
+    background-color: #FFCE07;
+    color: #262626;
+    border-color: #FFCE07;
+}
+
+/** Ref links are gold by default **/
+a, a:hover {
+    color: #FFCE07;
+}
+
+/** Jumbotron **/
+.jumbotron {
+    background-color: #F4F4F4;
+    padding-top: 30px;
+    padding-right: 30px;
+    padding-bottom: 30px;
+    padding-left: 30px;
+}
+
+/** Jumbotron your trip fix **/
+#your-trip > div, #flight-status-date > div {
+    background-color: #F4F4F4;
+    padding-top: 30px;
+    padding-right: 30px;
+    padding-bottom: 40px;
+    padding-left: 30px;
+}
+
+/** Footer Background **/
+#footer {
+    background-color: #262626;
+    color: #C9C9C9;
+}
+
+/** Footer Headings **/
+#footerHeading {
+    color: #FFFFFF;
+}
+
+/** Footer Address and Text **/
+#footerText, #footerAddress {
+    color: #C9C9C9;
+}
+
+/** Footer Lines and Copyrights **/
+#copyrights, #footerLine {
+    background-color: #FFCE07;
+    color: #262626;
+}
+
+/** Group forms spacing **/
+.form-group {
+    margin-bottom: 10px;
+}
+
+/** Errors in the forms are red **/
+.has-error > label, .has-error > p, .has-error > input, .has-error > select{
+    color: red;
+}
+
+/** Errors in the forms are red **/
+.has-error > input, .has-error > select, .has-error > textarea {
+    border: 1px solid red;
+}

@@ -1,42 +1,219 @@
+<!-- This line loads base.html which is present on every page -->
 {% extends "base.html" %}
-{% block title %}Welcome to HawkAir!{% endblock %}
+{% import "bootstrap/wtf.html" as wtf %}
 
+<!-- Get the title of this page -->
+{% block title %}
+    {% if title %}
+        {{ title }}
+    {% else %}
+        Welcome to HawkAir!
+    {% endif %}
+{% endblock %}
+
+<!-- Navigation -->
+{% block navigation %}
+	<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #262626;">
+		<div class="container">
+			<a class="navbar-brand" href="/">
+				<img src="/static/images/logo.svg" width="220" height="60">
+			</a>
+			<nav class="nav nav-pills">
+                <div class="navbar-nav">
+                    <a class="nav-item nav-link active" id="activePill" href="/"><i class="fas fa-home"></i> Home </a>
+                    <a class="nav-item nav-link" id="pill" href="/about-us"><i class="far fa-question-circle"></i> About Us </a>
+                    <a class="nav-item nav-link" id="pill" href="/contact-us"><i class="far fa-id-card"></i> Contact Us </a>
+                    <a class="nav-item nav-link" id="pill" href="/login"><i class="fas fa-user"></i> Login / Register </a>
+                </div>
+            </nav>
+		</div>
+	</nav>
+{% endblock %}
+
+<!-- Actual Page Content -->
 {% block content %}
-<h1>Test</h1>
-<br>
-<h1>Test</h1>
-<br>
-<h1>Test</h1>
-<br>
-<h1>Test</h1>
-<br>
-<h1>Test</h1>
-<br>
-<h1>Test</h1>
-<br>
-<h1>Test</h1>
-<br>
-<h1>Test</h1>
-<br>
-<h1>Test</h1>
-<br>
-<h1>Test</h1>
-<br>
-<h1>Test</h1>
-<br>
-<h1>Test</h1>
-<br>
-<h1>Test</h1>
-<br>
-<h1>Test</h1>
-<br>
-<h1>Test</h1>
-<br>
-<h1>Test</h1>
-<br>
-<h1>Test</h1>
-<br>
-<h1>Test</h1>
-<br>
-<h1>Test</h1>
+    <div class="container py-5">
+        <!-- Main Navigation -->
+        <h3>Welcome to HawkAir!</h3>
+        <p>Use this panel to book a round or one way trip, look up your trips, and check a flight status.</p>
+        <ul class="nav nav-pills mb-3" id="myPill">
+            <li class="nav-item">
+                <a class="nav-link active" href="#round-trip" data-toggle="tab">Round trip</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#one-way" data-toggle="tab">One way</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#your-trip" data-toggle="tab">Your Trip</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#flight-status-date" data-toggle="tab">Flight Status (Date)</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#flight-status-number" data-toggle="tab">Flight Status (Number)</a>
+            </li>
+        </ul>
+        
+        <!-- Navigation Content -->
+        <div class="tab-content">
+            <!-- Round Trip -->
+            <div class="tab-pane active" id="round-trip">
+                <div class="jumbotron">
+                    <form method="POST">
+                        {{ roundtrip.hidden_tag() }}
+                        <div class="row">
+                            <div class="form-group col-md-4">
+                                {{ wtf.form_field(roundtrip.fromCity1, class='form-control', placeholder='') }}
+                            </div>
+                            <div class="form-group col-md-4">
+                                {{ wtf.form_field(roundtrip.toCity1, class='form-control', placeholder='') }}
+                            </div>
+                            <div class="form-group col-md-4">
+                                {{ wtf.form_field(roundtrip.passengers1, class='form-control', placeholder='') }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-4">
+                                {{ wtf.form_field(roundtrip.departDate1, class='form-control', placeholder='') }}
+                            </div>
+                            <div class="form-group col-md-4">
+                                {{ wtf.form_field(roundtrip.returnDate1, class='form-control', placeholder='') }}
+                            </div>
+                            <div class="form-group col-md-4 pt-4">
+                                {{ wtf.form_field(roundtrip.submit1, class='form-control btn-warning mt-2', placeholder='') }}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- One Way -->
+            <div class="tab-pane" id="one-way">
+                <div class="jumbotron">
+                    <form method="POST">
+                        {{ oneway.hidden_tag() }}
+                        <div class="row">
+                            <div class="form-group col-md-4">
+                                {{ wtf.form_field(oneway.fromCity2, class='form-control', placeholder='') }}
+                            </div>
+                            <div class="form-group col-md-4">
+                                {{ wtf.form_field(oneway.toCity2, class='form-control', placeholder='') }}
+                            </div>
+                            <div class="form-group col-md-4">
+                                {{ wtf.form_field(oneway.passengers2, class='form-control', placeholder='') }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-4">
+                                {{ wtf.form_field(oneway.departDate2, class='form-control', placeholder='') }}
+                            </div>
+                            <div class="form-group col-md-4">
+                            </div>
+                            <div class="form-group col-md-4 pt-4">
+                                {{ wtf.form_field(oneway.submit2, class='form-control btn-warning mt-2', placeholder='') }}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Your Trip -->
+            <div class="tab-pane" id="your-trip">
+                <div class="jumbotron">
+                    <form method="POST">
+                        {{ yourtrip.hidden_tag() }}
+                        <div class="row">
+                            <div class="form-group col-md-4">
+                                {{ wtf.form_field(yourtrip.firstName3, class='form-control', placeholder='') }}
+                            </div>
+                            <div class="form-group col-md-4">
+                                {{ wtf.form_field(yourtrip.lastName3, class='form-control', placeholder='') }}
+                            </div>
+                            <div class="form-group col-md-4">
+                                {{ wtf.form_field(yourtrip.bookingNumber3, class='form-control', placeholder='') }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-4">
+                            </div>
+                            <div class="form-group col-md-4">
+                            </div>
+                            <div class="form-group col-md-4 pt-4">
+                                {{ wtf.form_field(yourtrip.submit3, class='form-control btn-warning mt-2', placeholder='') }}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Flight Status -->
+            <div class="tab-pane" id="flight-status-date">
+                <div class="jumbotron">
+                    <form method="POST">
+                        {{ flightstatusDate.hidden_tag() }}
+                        <div class="row">
+                            <div class="form-group col-md-4">
+                                {{ wtf.form_field(flightstatusDate.fromCity4, class='form-control', placeholder='') }}
+                            </div>
+                            <div class="form-group col-md-4">
+                                {{ wtf.form_field(flightstatusDate.toCity4, class='form-control', placeholder='') }}
+                            </div>
+                            <div class="form-group col-md-4">
+                                {{ wtf.form_field(flightstatusDate.date4, class='form-control', placeholder='') }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-4">
+                            </div>
+                            <div class="form-group col-md-4">
+                            </div>
+                            <div class="form-group col-md-4 pt-4">
+                                {{ wtf.form_field(flightstatusDate.submit4, class='form-control btn-warning mt-2', placeholder='') }}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="tab-pane" id="flight-status-number">
+                <div class="jumbotron">
+                    <form method="POST">
+                        {{ flightstatusNumber.hidden_tag() }}
+                        <div class="row">
+                            <div class="form-group col-md-4">
+                                {{ wtf.form_field(flightstatusNumber.flightNumber5, class='form-control', placeholder='') }}
+                            </div>
+                            <div class="form-group col-md-4">
+                                {{ wtf.form_field(flightstatusNumber.date5, class='form-control', placeholder='') }}
+                            </div>
+                            <div class="form-group col-md-4 pt-4">
+                                {{ wtf.form_field(flightstatusNumber.submit5, class='form-control btn-warning mt-2', placeholder='') }}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- News -->
+        <h3>News</h3>
+        <p>Check out some of our recent news and offers:</p>
+        <div class="row">
+            <!-- For loop -->
+            {%for i in range(0, 3)%} 
+                <div class="col-md-4 pb-4">
+                    <div class="card h-100">
+                        <img class="card-img-top" src="{{ news[i].picture }}" alt="">
+                        <div class="card-body">
+                            <h4 class="card-title">{{ news[i].headline }}</h4>
+                            <p class="card-text" style="text-align:justify">{{ news[i].content }}</p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="#" class="btn btn-warning btn-sm">Read More</a>
+                        </div>
+                    </div>
+                </div>
+            {%endfor%}
+        </div>
+    </div>
 {% endblock %}
