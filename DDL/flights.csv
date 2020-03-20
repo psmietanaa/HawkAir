@@ -1,6 +1,0 @@
-FlightID,AircraftID,From,To,DepartTime,Duration,FlightStatus,PriceFirstClass,PriceEconomy,BookedFirstClassSeats,BookedEconomySeats
-AA2470,Airbus 319,ORD,LAX,18:00,2:08,"""On time""",650,350,0,0
-AA5306,CRJ 700,ORD,DFW,11:22,2:02,On time,400,200,0,0
-AA6846,Boeing 737,ORD,JFK,9:04,2:40,On time,520,230,0,0
-AA4594,Airbus 319,ORD,DEN,7:57,1:52,On time,240,160,0,0
-AA8737,Boeing 787,ORD,MIA,12:34,3:15,On time,370,250,0,0
