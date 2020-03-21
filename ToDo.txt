@@ -6,10 +6,20 @@ Implement:
 - Print receipt
 - Email receipt
 
-- My trips
+- Your trips
+- Flight status
+
+- My trips (User Dashboard)
 - Trip Cancellation and Change
 
-Low priority
+- User ID retrieval policy
 - Password change policy
-- User Id / Password retrieval policy
 - Admin portal
+- Page not found (404)
+
+Phase 2:
+- Hub system
+
+Phase 3:
+- HawkAdvantage
+- Seat selection
