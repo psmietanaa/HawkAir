@@ -1,9 +1,7 @@
 ToDoList:
 
-Changes:
-- ER password is max 64 characters
-
 Implement:
+- Buying flights
 - Payments
 - Print receipt
 - Email receipt
