@@ -2,35 +2,7 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 
-<!-- Get the title of this page -->
-{% block title %}
-    {% if title %}
-        {{ title }}
-    {% else %}
-        Welcome to HawkAir!
-    {% endif %}
-{% endblock %}
-
-<!-- Navigation -->
-{% block navigation %}
-	<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #262626;">
-		<div class="container">
-			<a class="navbar-brand" href="/">
-				<img src="/static/images/logo.svg" width="220" height="60">
-			</a>
-			<nav class="nav nav-pills">
-                <div class="navbar-nav">
-                    <a class="nav-item nav-link active" id="activePill" href="/"><i class="fas fa-home"></i> Home </a>
-                    <a class="nav-item nav-link" id="pill" href="/about-us"><i class="far fa-question-circle"></i> About Us </a>
-                    <a class="nav-item nav-link" id="pill" href="/contact-us"><i class="far fa-id-card"></i> Contact Us </a>
-                    <a class="nav-item nav-link" id="pill" href="/login"><i class="fas fa-user"></i> Login / Register </a>
-                </div>
-            </nav>
-		</div>
-	</nav>
-{% endblock %}
-
-<!-- Actual Page Content -->
+<!-- Page Content -->
 {% block content %}
     <div class="container py-5">
         <!-- Main Navigation -->
@@ -203,10 +175,10 @@
             {%for i in range(0, 3)%} 
                 <div class="col-md-4 pb-4">
                     <div class="card h-100">
-                        <img class="card-img-top" src="{{ news[i].picture }}" alt="">
+                        <img class="card-img-top" src="{{ news[i].Picture }}" alt="">
                         <div class="card-body">
-                            <h4 class="card-title">{{ news[i].headline }}</h4>
-                            <p class="card-text" style="text-align:justify">{{ news[i].content }}</p>
+                            <h4 class="card-title">{{ news[i].Headline }}</h4>
+                            <p class="card-text" style="text-align:justify">{{ news[i].Content }}</p>
                         </div>
                         <div class="card-footer">
                             <a href="#" class="btn btn-warning btn-sm">Read More</a>

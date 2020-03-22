@@ -1,0 +1,34 @@
+<!-- This line loads base.html which is present on every page -->
+{% extends "base.html" %}
+
+<!-- Navigation -->
+{% block navigation %}
+	<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #262626;">
+		<div class="container">
+			<a class="navbar-brand" href="/">
+				<img src="/static/images/logo.svg" width="220" height="60">
+			</a>
+			<nav class="nav nav-pills">
+                <div class="navbar-nav">
+                    <a class="nav-item nav-link" id="pill" href="/"><i class="fas fa-home"></i> Home </a>
+                    <a class="nav-item nav-link" id="pill" href="/about-us"><i class="far fa-question-circle"></i> About Us </a>
+                    <a class="nav-item nav-link" id="pill" href="/contact-us"><i class="far fa-id-card"></i> Contact Us </a>
+                    <a class="nav-item nav-link" id="pill" href="/login"><i class="fas fa-user"></i> Login / Register </a>
+                </div>
+            </nav>
+		</div>
+	</nav>
+{% endblock %}
+
+<!-- Actual Page Content -->
+{% block content %}
+    <div class="container py-5">
+        <!-- Spacers -->
+            <div class="row justify-content-md-center">
+                <a href="/">
+                    <img src="/static/images/403.png">
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -31,7 +31,7 @@ CREATE TABLE `HawkAir`.`Users` (
     `HawkAdvantage` TINYINT(1) NOT NULL DEFAULT 0,
     `Miles` INT NOT NULL DEFAULT 0,
     PRIMARY KEY (`UserID`))
-ENGINE = InnoDB;
+ENGINE = InnoDB AUTO_INCREMENT=100001;
 
 -- -----------------------------------------------------
 -- Table `HawkAir`.`Payments`
@@ -50,7 +50,7 @@ ENGINE = InnoDB;
 -- Table `HawkAir`.`Bookings`
 -- -----------------------------------------------------
 CREATE TABLE `HawkAir`.`Bookings` (
-    `BookingID` INT NOT NULL,
+    `BookingID` VARCHAR(6) NOT NULL,
     `SeatNumber` VARCHAR(5) NULL,
     `Class` VARCHAR(20) NOT NULL,
     `UserID` INT NOT NULL,
@@ -133,7 +133,13 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `HawkAir`.`ContactUs`
 -- -----------------------------------------------------
-CREATE TABLE `HawkAir`.`ContactUs` (
+CREATE TABLE IF NOT EXISTS `HawkAir`.`ContactUs` (
+    `Company` VARCHAR(45) NOT NULL,
+    `Street` VARCHAR(100) NOT NULL,
+    `City` VARCHAR(45) NOT NULL,
+    `State` VARCHAR(45) NOT NULL,
+    `ZipCode` VARCHAR(10) NOT NULL,
+    `Country` VARCHAR(45) NOT NULL,
     `Phone` VARCHAR(20) NOT NULL,
     `Email` VARCHAR(100) NOT NULL)
 ENGINE = InnoDB;
@@ -142,11 +148,11 @@ ENGINE = InnoDB;
 -- Insert Statements
 -- -----------------------------------------------------
 INSERT INTO `HawkAir`.`Users` VALUES
-(NULL,'','Roger','','McCubbin','','Male','1980-01-21','1087 Windy Ridge Road','Fort Wayne','46802','IN','United States','260-579-8310','roger-mccubbin1946@yahoo.com','Quinnow','roger12345','What was your favorite sport in high school?','Football',0,0),
-(NULL,'Ms.','Linda','','Knox','','Female','1970-10-12','1345 Lewis Street','Bensenville','60106','IL','United States','630-875-1041','LindaJKnox@teleworm.us','Houghmed','ilovecats97','What is your pet''s name?','Simba',0,0),
-(NULL,'','Jessica','','McCarthy','Jess','Female','1975-08-05','900 Vesta Drive','Chicago','60631','IL','United States','773-727-5516','jessicamccarthy99@amazon.com','Hatc1999','jessisthebest','In what city were you born?','Chicago',1,270),
-(NULL,'Mr.','Howard','William','Doublas','','Male','1976-06-06','3033 West Drive','Chicago','60661','IL','United States','312-525-7519','howdougl@gmail.com','Waseat','howyoudoin1','What was the color of your first car?','Red',0,0),
-(NULL,'','Amanda','','Lewis','','Female','1994-08-03','680 Mutton Town Road','Centralia','98531','WA','United States','360-623-1953','ama-lewis@amazon.com','Crinsonast','ccgroupsc94','What is your favorite team?','Packers',1,1300);
+(NULL,'','Roger','','McCubbin','','Male','1980-01-21','1087 Windy Ridge Road','Fort Wayne','46802','IN','United States','260-579-8310','roger-mccubbin1946@yahoo.com','Quinnow','e45582512e2f8d730ce143a7c5021ef412b87ed7ea6eb5d32ffa64087bb3df69','What was your favorite sport in high school?','Football',0,0),
+(NULL,'Ms.','Linda','','Knox','','Female','1970-10-12','1345 Lewis Street','Bensenville','60106','IL','United States','630-875-1041','LindaJKnox@teleworm.us','Houghmed','75b1d1b804e4bb41b457f521508a01b870e1382370ef8f10a1f7442a13621007','What is your pet''s name?','Simba',0,0),
+(NULL,'','Jessica','','McCarthy','Jess','Female','1975-08-05','900 Vesta Drive','Chicago','60631','IL','United States','773-727-5516','jessicamccarthy99@amazon.com','Hatc1999','011bc4bea60b31e6181e5ff5e4036245b19d11de51f0f815e11e241d680b5bc1','In what city were you born?','Chicago',1,270),
+(NULL,'Mr.','Howard','William','Doublas','','Male','1976-06-06','3033 West Drive','Chicago','60661','IL','United States','312-525-7519','howdougl@gmail.com','Waseat','b3227450338443d6eb075389aa425ab21312178035b62996b842f43985f5e78e','What was the color of your first car?','Red',0,0),
+(NULL,'','Amanda','','Lewis','','Female','1994-08-03','680 Mutton Town Road','Centralia','98531','WA','United States','360-623-1953','ama-lewis@amazon.com','Crinsonast','6a8ea85ce30bbb416b31b1aaaf9ef67ac6b5373a199698d999827565736a8267','What is your favorite team?','Packers',1,1300);
 
 INSERT INTO `HawkAir`.`Flights` VALUES
 ('AA2470','Airbus 319','ORD','LAX','18:00','2:08','On time',650,350,0,0),
@@ -177,8 +183,9 @@ INSERT INTO `HawkAir`.`Aircrafts` VALUES
 ('Boeing 787',20,158),
 ('CRJ 700',8,48);
 
+-- Login:admin Password:password
 INSERT INTO `HawkAir`.`Admin` VALUES
-('Admin', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8');
+('admin','5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8');
 
 INSERT INTO `HawkAir`.`News` VALUES
 ('May Vacation Sale','2020-04-17','/static/images/vacations.png','Save and earn up to 25\,000 bonus miles when you book your flight and hotel together! MileagePlus is your ticket to the world\, with the most ways to earn and use miles and the most award destinations of any U.S. airline loyalty program. Now all you need is more vacation days.'),
@@ -188,4 +195,4 @@ INSERT INTO `HawkAir`.`News` VALUES
 ('Vacation Smarter','2020-03-06','/static/images/savings.png','Go beyond the flight. For a limited time\, SkyMiles Members save up to $350 on any Delta Vacations package worldwide. Plus\, earn bonus miles & use miles on the best getaways\, curated just for you. Terms apply.');
 
 INSERT INTO `HawkAir`.`ContactUs` VALUES
-('319-834-0276', 'hawkair2020@gmail.com');
+('HawkAir','2 West Washington St.','Iowa City','IA','52242','United States','319-834-0276','hawkair2020@gmail.com');

@@ -2,35 +2,7 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 
-<!-- Get the title of this page -->
-{% block title %}
-    {% if title %}
-        {{ title }}
-    {% else %}
-        Welcome to HawkAir!
-    {% endif %}
-{% endblock %}
-
-<!-- Navigation -->
-{% block navigation %}
-	<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #262626;">
-		<div class="container">
-			<a class="navbar-brand" href="/">
-				<img src="/static/images/logo.svg" width="220" height="60">
-			</a>
-			<nav class="nav nav-pills">
-                <div class="navbar-nav">
-                    <a class="nav-item nav-link" id="pill" href="/"><i class="fas fa-home"></i> Home </a>
-                    <a class="nav-item nav-link" id="pill" href="/about-us"><i class="far fa-question-circle"></i> About Us </a>
-                    <a class="nav-item nav-link active" id="activePill" href="/contact-us"><i class="far fa-id-card"></i> Contact Us </a>
-                    <a class="nav-item nav-link" id="pill" href="/login"><i class="fas fa-user"></i> Login / Register </a>
-                </div>
-            </nav>
-		</div>
-	</nav>
-{% endblock %}
-
-<!-- Actual Page Content -->
+<!-- Page Content -->
 {% block content %}
     <div class="container py-5">
         <!-- History and Our Goals -->
@@ -38,7 +10,7 @@
             <div class="col-md-8">
                 <h3>Contact Us</h3>
                 <p style="text-align:justify">Currently, Hawk Air only offers support over the counter and telephone. 
-                    If you have any questions or concerns regarding your flight reservation, please contact us by calling <a href="tel:{{ data.phoneNumber }}">{{ data.phoneNumber }}</a> 
+                    If you have any questions or concerns regarding your flight reservation, please contact us by calling <a href="tel:{{ contact.Phone }}">{{ contact.Phone }}</a> 
                     or visit one of our local branches. We are here to help!
                 </p>
                 <p style="text-align:justify">You can also fill out a contact form and leave us a message. We will try to get back to you soon as possible. 
@@ -51,7 +23,7 @@
             </div>
         </div>
         
-        <!-- Flash Messages Here-->
+        <!-- Flash Messages Here -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -67,7 +39,7 @@
             {% endif %}
         {% endwith %}
         
-        <!-- Contact Form and Our Office-->
+        <!-- Contact Form -->
         <div class="row align-items-center pt-1">
             <div class="col-md-8">
                 <form method="POST">
@@ -98,13 +70,13 @@
             <!-- Our Office-->
             <div class="col-md-4 text-center">
                 <h3>Our Office</h3>
-                <p><strong>HawkAir</strong>
+                <p><strong>{{ contact.Company }}</strong>
                     <br>
-                    2 West Washington St.
+                    {{ contact.Street }}
                     <br>
-                    Iowa City, IA 52242
+                    {{ contact.City }}, {{ contact.State }} {{ contact.ZipCode }}
                     <br>
-                    United States
+                    {{ contact.Country }}
                 </p>
             </div> 
         </div>

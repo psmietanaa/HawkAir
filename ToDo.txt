@@ -15,7 +15,6 @@ Implement:
 - User ID retrieval policy
 - Password change policy
 - Admin portal
-- Page not found (404)
 
 Phase 2:
 - Hub system

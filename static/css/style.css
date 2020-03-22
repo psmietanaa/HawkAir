@@ -73,7 +73,7 @@ a, a:hover {
 }
 
 /** Footer Lines and Copyrights **/
-#copyrights, #footerLine {
+#copyright, #footerLine {
     background-color: #FFCE07;
     color: #262626;
 }
@@ -91,4 +91,8 @@ a, a:hover {
 /** Errors in the forms are red **/
 .has-error > input, .has-error > select, .has-error > textarea {
     border: 1px solid red;
+}
+
+.is-hidden {
+    display: none;
 }
