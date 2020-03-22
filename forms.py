@@ -1,17 +1,20 @@
 import re
 import datetime
-from flask_wtf import FlaskForm 
+from flask_wtf import FlaskForm
 from wtforms import BooleanField, FieldList, Form, FormField, PasswordField, SelectField, StringField, SubmitField, TextAreaField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import Email, EqualTo, InputRequired, Length, Regexp, Optional, ValidationError
 from wtforms_validators import Alpha, AlphaSpace, AlphaNumeric, Integer
+
+# My files
+from __init__ import app, mysql
 
 # Regex for validating the forms
 textRegex = re.compile("\s*\w*[!@#$%()=+-:;'\",.?]*")
 streetRegex = re.compile("\s*\w*[.]*")
 phoneRegex = re.compile("\s*\d*[-+.]*")
 
-# Select options used in the forms
+# Select field options used in the forms
 titles = [("", ""), ("Mr", "Mr"), ("Ms", "Ms"), ("Mrs", "Mrs"), ("Mx", "Mx")]
 sexes = [("Male", "Male"), ("Female", "Female")]
 securityQuestions = [("What was your favorite sport in high school?", "What was your favorite sport in high school?"),
@@ -21,22 +24,28 @@ securityQuestions = [("What was your favorite sport in high school?", "What was 
                      ("In what city were you born?", "In what city were you born?")]
 passengersRange = [(str(i), str(i)) for i in range(1, 10)]
 
+# Get departure and arrival city locations from database
+with app.app_context():
+    cursor = mysql.connection.cursor()
+    cursor.callproc("GetDepartLocations")
+    fromCities = [(city['From'], city['From']) for city in cursor.fetchall()]
+    cursor.nextset()
+    cursor.callproc("GetArrivalLocations")
+    toCities = [(city['To'], city['To']) for city in cursor.fetchall()]
+    cursor.close()
+    
+# Flight status dates
+flightStatusDates = [((datetime.date.today() + datetime.timedelta(days=i)).strftime("%Y-%m-%d"), (datetime.date.today() + datetime.timedelta(days=i)).strftime("%A, %B %d")) for i in range(1, 4)]
+
 # Date must be a future date
 def FutureDate(form, field):
     today = datetime.date.today()
     if field.data < today:
         raise ValidationError("Date must be a future date")
 
-# Date must be within one week
-def RecentDate(form, field):
-    today = datetime.today().date()
-    margin = datetime.timedelta(weeks=1)
-    if today - margin < field.data < today + margin:
-        raise ValidationError("Date must be within one week")
-
 class RoundTripForm(FlaskForm):
-    fromCity1 = SelectField("<strong>From</strong>")
-    toCity1 = SelectField("<strong>To</strong>")
+    fromCity1 = SelectField("<strong>From</strong>", choices=fromCities)
+    toCity1 = SelectField("<strong>To</strong>", choices=toCities)
     passengers1 = SelectField("<strong>Number of passengers</strong>", choices=passengersRange)
     departDate1 = DateField("<strong>Depart</strong>", format="%Y-%m-%d", validators=[InputRequired(), FutureDate])
     returnDate1 = DateField("<strong>Return</strong>", format="%Y-%m-%d", validators=[InputRequired(), FutureDate])
@@ -46,14 +55,14 @@ class RoundTripForm(FlaskForm):
     def validate(self):
         if not Form.validate(self):
             return False
-        elif self.departDate1.data >= self.returnDate1.data:
+        elif self.departDate1.data > self.returnDate1.data:
             self.returnDate1.errors.append("Return date must be after departure date")
             return False
         return True
     
 class OneWayForm(FlaskForm):
-    fromCity2 = SelectField("<strong>From</strong>")
-    toCity2 = SelectField("<strong>To</strong>")
+    fromCity2 = SelectField("<strong>From</strong>", choices=fromCities)
+    toCity2 = SelectField("<strong>To</strong>", choices=toCities)
     passengers2 = SelectField("<strong>Number of passengers</strong>", choices=passengersRange)
     departDate2 = DateField("<strong>Depart</strong>", format="%Y-%m-%d", validators=[InputRequired(), FutureDate])
     submit2 = SubmitField("Search")
@@ -61,18 +70,18 @@ class OneWayForm(FlaskForm):
 class YourTripForm(FlaskForm):
     firstName3 = StringField("<strong>First Name</strong>", validators=[InputRequired(), Length(min=4, max=45), Alpha()])
     lastName3 = StringField("<strong>Last Name</strong>", validators=[InputRequired(), Length(min=4, max=45), Alpha()])
-    bookingNumber3 = StringField("<strong>Booking Number</strong>", validators=[InputRequired(), Integer()])
+    bookingNumber3 = StringField("<strong>Booking Number</strong>", validators=[InputRequired(), Length(min=6, max=6, message="Field must be 6 characters long."), Alpha()])
     submit3 = SubmitField("Search")
 
 class FlightStatusDateForm(FlaskForm):
-    fromCity4 = SelectField("<strong>From</strong>")
-    toCity4 = SelectField("<strong>To</strong>")
-    date4 = DateField("<strong>Depart</strong>", format="%Y-%m-%d", validators=[InputRequired(), RecentDate])
+    fromCity4 = SelectField("<strong>From</strong>", choices=fromCities)
+    toCity4 = SelectField("<strong>To</strong>", choices=toCities)
+    date4 = SelectField("<strong>Date</strong>", choices=flightStatusDates)
     submit4 = SubmitField("Search")
 
 class FlightStatusNumberForm(FlaskForm):
     flightNumber5 = StringField("<strong>Flight Number</strong>", validators=[InputRequired(), Length(min=6, max=6, message="Field must be 6 characters long."), AlphaNumeric()])
-    date5 = DateField("<strong>Depart</strong>", format="%Y-%m-%d", validators=[InputRequired(), RecentDate])
+    date5 = SelectField("<strong>Date</strong>", choices=flightStatusDates)
     submit5 = SubmitField("Search")
 
 class ContactForm(FlaskForm):
@@ -112,8 +121,8 @@ class RegisterForm(FlaskForm):
     submit = SubmitField("Register")
 
 class MulticityFlight(Form):
-    fromCity = SelectField("<strong>From *</strong>")
-    toCity = SelectField("<strong>To *</strong>")
+    fromCity = SelectField("<strong>From *</strong>", choices=fromCities)
+    toCity = SelectField("<strong>To *</strong>", choices=toCities)
     departDate = DateField("<strong>Depart *</strong>", format="%Y-%m-%d", validators=[InputRequired(), FutureDate])
     
 class MulticityForm(FlaskForm):

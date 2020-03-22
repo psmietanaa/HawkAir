@@ -1,6 +1,8 @@
 import textwrap
-from flask_mail import *
-from run import app, mail
+from flask_mail import Message
+
+# My files
+from __init__ import app, mail
 
 # This function validates booking email parameters
 def validate_booking(BookingID, flights):
@@ -249,7 +251,7 @@ def send_mail(subject, receiver, plaintext, html=None):
         # Fill out the email fields
         message = Message()
         message.subject = subject
-        message.sender = ("HawkAir", app.config.get("MAIL_USERNAME"))
+        message.sender = ("HawkAir", "hawkair2020@gmail.com")
         message.add_recipient(receiver)
         # Add HTML/plain-text parts to  message
         message.body = plaintext

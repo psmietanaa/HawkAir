@@ -33,7 +33,7 @@
                             {{ wtf.form_field(form.preferredName, class='form-control', placeholder='') }}
                         </div>
                         <div class="form-group col-md-4">
-                            {{ wtf.form_field(form.dateOfBirth, class='form-control', placeholder='') }}
+                            {{ wtf.form_field(form.dateOfBirth, class='form-control', min="0001-01-01", max="9999-12-31", placeholder='') }}
                         </div>
                         <div class="form-group col-md-4">
                             {{ wtf.form_field(form.sex, class='form-control', placeholder='') }}

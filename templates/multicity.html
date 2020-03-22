@@ -26,7 +26,7 @@
                                         {{ wtf.form_field(subform.toCity, class='form-control', placeholder='') }}
                                     </div>
                                     <div class="form-group col-md-3">
-                                        {{ wtf.form_field(subform.departDate, class='form-control', placeholder='') }}
+                                        {{ wtf.form_field(subform.departDate, class='form-control', min="0001-01-01", max="9999-12-31", placeholder='') }}
                                     </div>
                                     <div class="form-group col-md-3 pt-4">
                                         <button class="btn btn-warning btn-md my-2 btn-block remove is-hidden" type="button">Remove</button>
