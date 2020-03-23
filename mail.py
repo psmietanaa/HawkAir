@@ -2,7 +2,7 @@ import textwrap
 from flask_mail import Message
 
 # My files
-from __init__ import app, mail
+from run import app, mail
 
 # This function validates booking email parameters
 def validate_booking(BookingID, flights):

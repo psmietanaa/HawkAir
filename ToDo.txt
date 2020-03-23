@@ -9,7 +9,6 @@ Implement:
 - Your trips
 - Flight status
 
-- My trips (User Dashboard)
 - Trip Cancellation and Change
 
 - User ID retrieval policy

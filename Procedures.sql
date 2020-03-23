@@ -1,4 +1,3 @@
--- Query 1-3 --
 DELIMITER //
 CREATE PROCEDURE SearchFlights(IN fromCity VARCHAR(3), IN toCity VARCHAR(3), IN passengers INT, IN weekDay VARCHAR(9))
 BEGIN
@@ -9,9 +8,6 @@ BEGIN
 END //
 DELIMITER ;
 
--- CALL SearchFlights('ORD', 'JFK', 5, 'Monday')
-
--- Query 4 --
 DELIMITER //
 CREATE PROCEDURE GetFare(IN flightNumber VARCHAR(6))
 BEGIN
@@ -21,9 +17,6 @@ BEGIN
 END //
 DELIMITER ;
 
--- CALL GetFare('AA6846')
-
--- Query 5 --
 DELIMITER //
 CREATE PROCEDURE GetSeats(IN flightNumber VARCHAR(6))
 BEGIN
@@ -33,23 +26,15 @@ BEGIN
 END //
 DELIMITER ;
 
--- CALL GetSeats('AA6846')
-
--- Query 6 --
 DELIMITER //
 CREATE PROCEDURE FindTrip(IN fName VARCHAR(45), IN lName VARCHAR(45), IN bookingNumber VARCHAR(6))
 BEGIN
-    SELECT bookings.FlightID
-    FROM bookings, users
-    WHERE bookings.UserID = users.UserID AND users.FirstName = fname AND users.LastName = lname AND bookings.BookingID = bookingNumber;
+    SELECT bookings.BookingID, flights.From, flights.To, flights.DepartTime, flights.Duration, flights.FlightID, flights.AircraftID, bookings.Class, bookings.SeatNumber
+    FROM bookings, flights, users
+    WHERE bookings.UserID = users.UserID AND bookings.FlightID = flights.FlightID AND users.FirstName = fname AND users.LastName = lname AND bookings.BookingID = bookingNumber;
 END //
 DELIMITER ;
 
--- INSERT INTO `HawkAir`.`Bookings` VALUES
--- ('MXCDSA', '16B', 'FirstClass', 100001, 'AA6846')
--- CALL FindTrip('Roger', 'McCubbin', 'MXCDSA')
-
--- Query 7 --
 DELIMITER //
 CREATE PROCEDURE GetFlightsStatusDate(IN fromCity VARCHAR(3), IN toCity VARCHAR(3), IN weekDay VARCHAR(9))
 BEGIN
@@ -60,9 +45,6 @@ BEGIN
 END //
 DELIMITER ;
 
--- CALL GetFlightsStatusDate('ORD', 'JFK', 'Monday')
-
--- Query 8 --
 DELIMITER //
 CREATE PROCEDURE GetFlightsStatusNumber(IN flightNumber VARCHAR(6), IN weekDay VARCHAR(9))
 BEGIN
@@ -73,23 +55,15 @@ BEGIN
 END //
 DELIMITER ;
 
--- CALL GetFlightsStatusNumber('AA6846', 'Monday')
-
--- Query 9 --
 DELIMITER //
-CREATE PROCEDURE ValidateUser(IN user VARCHAR(45), IN pass VARCHAR(64))
+CREATE PROCEDURE ValidateUser(IN user VARCHAR(45))
 BEGIN
-    SELECT UserID
+    SELECT UserID, Password
     FROM users
-    WHERE (UserID = user AND Password = pass)
-    OR (Username = user AND Password = pass);
+    WHERE UserID = user OR Username = user;
 END //
 DELIMITER ;
 
--- CALL ValidateUser('100001', 'e45582512e2f8d730ce143a7c5021ef412b87ed7ea6eb5d32ffa64087bb3df69')
--- CALL ValidateUser('Quinnow', 'e45582512e2f8d730ce143a7c5021ef412b87ed7ea6eb5d32ffa64087bb3df69')
-
--- Query 10 --
 DELIMITER //
 CREATE PROCEDURE ValidateAdmin(IN user VARCHAR(45), IN pass VARCHAR(64))
 BEGIN
@@ -99,54 +73,34 @@ BEGIN
 END //
 DELIMITER ;
 
--- CALL ValidateAdmin('admin', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8')
-
--- Query 11 --
--- MISSING --
-
--- Query 12 --
 DELIMITER //
-CREATE PROCEDURE MyTrips(IN userNumber INT)
+CREATE PROCEDURE MyInfo(IN user VARCHAR(45))
 BEGIN
     SELECT *
-    FROM bookings
-    WHERE UserID = userNumber;
+    FROM users
+    WHERE users.Username = user;
 END //
 DELIMITER ;
 
--- CALL MyTrips(100001)
-
--- Query 13 --
--- MISSING --
-
--- Query 14 --
--- MISSING --
-
--- Query 24 --
 DELIMITER //
-CREATE PROCEDURE GetNews(IN count INT)
+CREATE PROCEDURE MyTrips(IN user VARCHAR(45))
 BEGIN
-    SELECT Headline, Picture, Content
-    FROM news
-    ORDER BY Date DESC
-    LIMIT count;
+    SELECT bookings.BookingID, flights.From, flights.To, flights.DepartTime, flights.Duration, flights.FlightID, flights.AircraftID, bookings.Class, bookings.SeatNumber
+    FROM bookings, flights, users
+    WHERE bookings.UserID = users.UserID AND bookings.FlightID = flights.FlightID AND users.Username = user;
 END //
 DELIMITER ;
 
--- CALL GetNews(3)
-
--- Query 25 --
+-- Create --
 DELIMITER //
-CREATE PROCEDURE GetContactDetails()
+CREATE PROCEDURE CreateUser(IN Title VARCHAR(6), IN FirstName VARCHAR(45), IN MiddleName VARCHAR(45), IN LastName VARCHAR(45), IN PreferredName VARCHAR(45), IN Sex VARCHAR(6), IN DOB Date, IN Street VARCHAR(100), IN City VARCHAR(45), IN ZipCode VARCHAR(10), IN State VARCHAR(45), IN Country VARCHAR(45), IN Phone VARCHAR(20), IN Email VARCHAR(100), IN Username VARCHAR(45), IN Pass VARCHAR(64), IN SecurityQuestion VARCHAR(100), IN SecurityAnswer VARCHAR(45))
 BEGIN
-    SELECT *
-    FROM contactus;
+    INSERT INTO users VALUES
+    (NULL, Title, FirstName, MiddleName, LastName, PreferredName, Sex, DOB, Street, City, ZipCode, State, Country, Phone, Email, Username, Pass, SecurityQuestion, SecurityAnswer, 1, 0);
 END //
 DELIMITER ;
 
--- CALL GetContactDetails()
-
--- Getters Here --
+-- Read --
 DELIMITER //
 CREATE PROCEDURE GetDepartLocations()
 BEGIN
@@ -160,3 +114,25 @@ BEGIN
     SELECT DISTINCT `To` FROM flights;
 END //
 DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE GetNews(IN count INT)
+BEGIN
+    SELECT Headline, Picture, Content
+    FROM news
+    ORDER BY Date DESC
+    LIMIT count;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE GetContactDetails()
+BEGIN
+    SELECT *
+    FROM contactus;
+END //
+DELIMITER ;
+
+-- Update --
+
+-- Delete --

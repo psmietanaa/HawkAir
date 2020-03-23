@@ -5,19 +5,18 @@
 <!-- Page Content -->
 {% block content %}
     <div class="container py-5">
-        <!-- Multicity -->
+        <!-- Multicity Form -->
         <h3 class="text-center">Multi-City</h3>
         <p class="text-center">Please use the following form to search for multi-city flights.<br>Required fields are marked with *</p>
         <div class="row justify-content-end pb-3 pl-5">
             <div class="col-md-10">
-                <!-- Multicity Form -->
                 <form method="POST">
                     {{ form.hidden_tag() }}
                     <!-- Subform -->
                     <div id="subforms-container" class="pt-4">
                         {% for subform in form.flights %}
                             <div id="flights-{{ loop.index0 }}-form" class="subform" data-index="{{ loop.index0 }}">
-                                <h5 id="flightHeading">Flight {{ loop.index0 + 1}}</h5>
+                                <h5 id="flightHeading">Flight {{ loop.index }}</h5>
                                 <div class="row">
                                     <div class="form-group col-md-3">
                                         {{ wtf.form_field(subform.fromCity, class='form-control', placeholder='') }}

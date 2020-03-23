@@ -5,6 +5,22 @@
 <!-- Page Content -->
 {% block content %}
     <div class="container py-5">
+        <!-- Flash Messages Here -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="row">
+                        <div class="col">
+                            <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
         <!-- Main Navigation -->
         <h3>Welcome to HawkAir!</h3>
         <p>Use this panel to book a round or one way trip, look up your trips, and check a flight status.</p>
@@ -118,7 +134,7 @@
                 </div>
             </div>
             
-            <!-- Flight Status -->
+            <!-- Flight Status Date -->
             <div class="tab-pane" id="flight-status-date">
                 <div class="jumbotron">
                     <form method="POST">
@@ -147,6 +163,7 @@
                 </div>
             </div>
             
+            <!-- Flight Status Number -->
             <div class="tab-pane" id="flight-status-number">
                 <div class="jumbotron">
                     <form method="POST">
@@ -171,14 +188,13 @@
         <h3>News</h3>
         <p>Check out some of our recent news and offers:</p>
         <div class="row">
-            <!-- For loop -->
-            {%for i in range(0, 3)%} 
+            {%for item in news %} 
                 <div class="col-md-4 pb-4">
                     <div class="card h-100">
-                        <img class="card-img-top" src="{{ news[i].Picture }}" alt="">
+                        <img class="card-img-top" src="{{ item.Picture }}" alt="">
                         <div class="card-body">
-                            <h4 class="card-title">{{ news[i].Headline }}</h4>
-                            <p class="card-text" style="text-align:justify">{{ news[i].Content }}</p>
+                            <h4 class="card-title">{{ item.Headline }}</h4>
+                            <p class="card-text" style="text-align:justify">{{ item.Content }}</p>
                         </div>
                         <div class="card-footer">
                             <a href="#" class="btn btn-warning btn-sm">Read More</a>

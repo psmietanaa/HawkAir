@@ -15,7 +15,7 @@ body > div.container {
 }
 
 /** Active pill is gold **/
-.nav-pills .nav-link.active, .navbar-dark .navbar-nav .nav-link.active {
+.nav-pills .nav-link.active, .navbar-dark .navbar-nav .nav-link.active, .nav-pills .show > .nav-link, .navbar-dark .navbar-nav .show > .nav-link, .dropdown-item:active {
     background-color: #FFCE07;
     color: #262626
 }
@@ -26,14 +26,21 @@ body > div.container {
     color: #C9C9C9
 }
 
-/** Make buttons gold **/
+/** Buttons are gold **/
 .btn-warning {
     background-color: #FFCE07;
     color: #262626;
     border-color: #FFCE07;
 }
 
-/** Ref links are gold by default **/
+/** Buttons are gold **/
+.badge-warning {
+    background-color: #FFCE07;
+    color: #262626;
+    font-weight: 500;
+}
+
+/** Links are gold **/
 a, a:hover {
     color: #FFCE07;
 }
@@ -93,6 +100,34 @@ a, a:hover {
     border: 1px solid red;
 }
 
-.is-hidden {
-    display: none;
+/** Fix for properly rendering tables inside of cards **/
+.card > .table {
+  border-right: 0;
+  border-left: 0;
+  margin-bottom: 0;
+}
+.card > .table:last-child {
+  border-bottom: 0;
+}
+.card > .table:not(.table-sm) th,
+.card > .table:not(.table-sm) td {
+  padding: 0.75rem 1.25rem;
+}
+.card > .table td:first-child,
+.card > .table th:first-child {
+  border-left: 0;
+}
+.card > .table td:last-child,
+.card > .table th:last-child {
+  border-right: 0;
+}
+.card > .table tr:first-child td,
+.card > .table tr:first-child th {
+  border-top: 0;
+}
+.card > .table tr:last-child td {
+  border-bottom: 0;
+}
+.card .card-header + .table {
+  border-top: 0;
 }

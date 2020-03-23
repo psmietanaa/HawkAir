@@ -4,7 +4,7 @@ from flask import *
 # My files
 from forms import *
 from mail import *
-from __init__ import app, mysql
+from run import app, mysql
 
 # This data is avalible on every page
 @app.context_processor
@@ -19,11 +19,25 @@ def globalData():
     except:
         abort(500)
 
+# Before each request check if a logged user is still in the database
+# Prevents deleted and changed account from still being logged in
+@app.before_request
+def before_request():
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.callproc("ValidateUser", [session.get('user')])
+        found = cursor.fetchone()
+        cursor.close()
+    except:
+        abort(500)
+    if not found:
+        session.pop("user", None)
+
 # Home page
 @app.route("/", methods=["GET", "POST"])
 def index():
     try:
-        # Fetch three latest news from database
+        # Get three latest news from database
         cursor = mysql.connection.cursor()
         cursor.callproc("GetNews", [3])
         news = cursor.fetchall()
@@ -62,13 +76,13 @@ def contactUs():
     form = ContactForm()
     # If a user submits the form
     if form.validate_on_submit():
-        # Parse the fields
+        # Parse the form fields
         firstName = form.firstName.data
         lastName = form.lastName.data
         email = form.email.data
         subject = form.subject.data
         message = form.message.data
-        # Build and send the email
+        # Validate, build and send the email
         validate_support(firstName, lastName, email, subject, message)
         plaintext = build_support_plaintext(firstName, lastName, email, subject, message)
         html = build_support_html(firstName, lastName, email, subject, message)
@@ -85,23 +99,103 @@ def contactUs():
 # Login page
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    # Check if user is already logged in
+    if "user" in session:
+        return redirect(url_for("dashboard"))
     # Form displayed on this page
     form = LoginForm()
     # If a user submits the form
     if form.validate_on_submit():
-        hashedPassword = hashlib.sha256(form.password.data.encode()).hexdigest()
-        return form.data
+        try:
+            session.pop("user", None)
+            cursor = mysql.connection.cursor()
+            cursor.callproc("ValidateUser", [form.username.data])
+            found = cursor.fetchone()
+            cursor.close()
+        except:
+            abort(500)
+        # If user is found
+        if found:
+            hashedPassword = hashlib.sha256(form.password.data.encode()).hexdigest()
+            # Check if password matches
+            if hashedPassword == found['Password']:
+                # Check if user ticked remember me
+                if form.remember.data:
+                    # Make the session permanent
+                    session.permanent = True
+                    session['user'] = form.username.data
+                    return redirect(url_for("dashboard"))
+                else:
+                    session.permanent = False
+                    session['user'] = form.username.data
+                    return redirect(url_for("dashboard"))
+            else:
+                flash("Invalid password! Please try again.", "danger")
+        else:
+            flash("Invalid email or password! Please try again.", "danger")
     return render_template("login.html", title="Login / Register", login=True, form=form)
+
+# Logout
+@app.route("/logout")
+def logout():
+    # Delete this users cookie
+    session.pop("user", None)
+    flash("You have been successfully logged out !", "success")
+    return redirect(url_for("index"))
+
+# Dashboard
+@app.route("/dashboard")
+def dashboard():
+    # Check if user is already logged in
+    if "user" in session:
+        try:
+            # Get info and trips for this user
+            cursor = mysql.connection.cursor()
+            cursor.callproc("MyInfo", [session['user']])
+            info = cursor.fetchone()
+            cursor.nextset()
+            cursor.callproc("MyTrips", [session['user']])
+            trips = cursor.fetchall()
+        except:
+            abort(500)
+        # Build flights if trips are not empty
+        if trips:
+            flights = {}
+            for trip in trips:
+                if trip['BookingID'] not in flights:
+                    flights[trip['BookingID']] = []
+                    flights[trip['BookingID']].append([trip['From'], trip['To'], str(trip['DepartTime'])[:-3], str(trip['Duration'])[:-3] + "h", trip['FlightID'], trip['AircraftID'], trip['Class'], trip['SeatNumber']])
+                else:
+                    flights[trip['BookingID']].append([trip['From'], trip['To'], str(trip['DepartTime'])[:-3], str(trip['Duration'])[:-3] + "h", trip['FlightID'], trip['AircraftID'], trip['Class'], trip['SeatNumber']])
+            trips = flights
+        cursor.close()
+        return render_template("dashboard.html", title="Dashboard", dashboard=True, info=info, trips=trips)
+    else:
+        flash("Please log in first!", "warning")
+        return redirect(url_for("login"))
 
 # Register page
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    # Check if user is already logged in
+    if "user" in session:
+        return redirect(url_for("dashboard"))
     # Form displayed on the page
     form = RegisterForm()
     # If a user submits the form
     if form.validate_on_submit():
-        hashedPassword = hashlib.sha256(form.password.data.encode()).hexdigest()
-        return form.data
+        try:
+            data = request.form
+            cursor = mysql.connection.cursor()
+            hashedPassword = hashlib.sha256(form.password.data.encode()).hexdigest()
+            cursor.callproc("CreateUser", [data['title'], data['firstName'], data['middleName'], data['lastName'], data['preferredName'], data['sex'], data['dateOfBirth'], data['street'], data['city'],
+                                           data['zipCode'], data['state'], data['country'], data['phone'], data['email'], data['username'], hashedPassword, data['securityQuestion'], data['securityAnswer']])
+            mysql.connection.commit()
+            cursor.close()
+            flash('Your account has been created! You should be able to log in now.', 'success')
+            return redirect(url_for('login'))
+        except:
+            abort(500)
     return render_template("register.html", title="Register", login=True, form=form)
 
 # Multicity page
@@ -137,11 +231,6 @@ def admin():
         hashedPassword = hashlib.sha256(form.password.data.encode()).hexdigest()
         return form.data
     return render_template("admin.html", title="Admin", form=form)
-
-# Error 403
-@app.errorhandler(403)
-def forbidden(e):
-    return render_template("errors/403.html", title="Forbidden")
 
 # Error 404
 @app.errorhandler(404)

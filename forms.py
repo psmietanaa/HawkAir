@@ -4,10 +4,10 @@ from flask_wtf import FlaskForm
 from wtforms import BooleanField, FieldList, Form, FormField, PasswordField, SelectField, StringField, SubmitField, TextAreaField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import Email, EqualTo, InputRequired, Length, Regexp, Optional, ValidationError
-from wtforms_validators import Alpha, AlphaSpace, AlphaNumeric, Integer
+from wtforms_validators import Alpha, AlphaDash, AlphaNumeric, AlphaSpace, Integer
 
 # My files
-from __init__ import app, mysql
+from run import app, mysql
 
 # Regex for validating the forms
 textRegex = re.compile("\s*\w*[!@#$%()=+-:;'\",.?]*")
@@ -23,6 +23,7 @@ securityQuestions = [("What was your favorite sport in high school?", "What was 
                      ("What is your favorite team?", "What is your favorite team?"),
                      ("In what city were you born?", "In what city were you born?")]
 passengersRange = [(str(i), str(i)) for i in range(1, 10)]
+flightStatusDates = [((datetime.date.today() + datetime.timedelta(days=i)).strftime("%Y-%m-%d"), (datetime.date.today() + datetime.timedelta(days=i)).strftime("%A, %B %d")) for i in range(1, 4)]
 
 # Get departure and arrival city locations from database
 with app.app_context():
@@ -33,15 +34,12 @@ with app.app_context():
     cursor.callproc("GetArrivalLocations")
     toCities = [(city['To'], city['To']) for city in cursor.fetchall()]
     cursor.close()
-    
-# Flight status dates
-flightStatusDates = [((datetime.date.today() + datetime.timedelta(days=i)).strftime("%Y-%m-%d"), (datetime.date.today() + datetime.timedelta(days=i)).strftime("%A, %B %d")) for i in range(1, 4)]
 
 # Date must be a future date
 def FutureDate(form, field):
     today = datetime.date.today()
     if field.data < today:
-        raise ValidationError("Date must be a future date")
+        raise ValidationError("Date must be a future date.")
 
 class RoundTripForm(FlaskForm):
     fromCity1 = SelectField("<strong>From</strong>", choices=fromCities)
@@ -53,10 +51,10 @@ class RoundTripForm(FlaskForm):
     
     # Return date must be after departure date
     def validate(self):
-        if not Form.validate(self):
+        if not FlaskForm.validate(self):
             return False
         elif self.departDate1.data > self.returnDate1.data:
-            self.returnDate1.errors.append("Return date must be after departure date")
+            self.returnDate1.errors.append("Return date must be after departure date.")
             return False
         return True
     
@@ -104,21 +102,41 @@ class RegisterForm(FlaskForm):
     middleName = StringField("<strong>Middle Name</strong>", validators=[Optional(), Length(min=4, max=45), Alpha()])
     lastName = StringField("<strong>Last Name *</strong>", validators=[InputRequired(), Length(min=4, max=45), Alpha()])
     preferredName = StringField("<strong>Preferred Name</strong>", validators=[Optional(), Length(min=4, max=45), Alpha()])
-    dateOfBirth = DateField("<strong>Date of Birth *</strong>", format="%Y-%m-%d", validators=[InputRequired()])
     sex = SelectField("<strong>Sex *</strong>", choices=sexes)
+    dateOfBirth = DateField("<strong>Date of Birth *</strong>", format="%Y-%m-%d", validators=[InputRequired()])    
     street = StringField("<strong>Street *</strong>", validators=[InputRequired(), Length(min=4, max=100), Regexp(streetRegex, "Must only contain alpha characters, numbers, spaces and periods.")])
-    city = StringField("<strong>City *</strong>", validators=[InputRequired(), Length(min=4, max=45), Alpha()])
+    city = StringField("<strong>City *</strong>", validators=[InputRequired(), Length(min=4, max=45), AlphaSpace()])
     zipCode = StringField("<strong>Zip Code *</strong>", validators=[InputRequired(), Length(min=4, max=10), Integer()])
-    state = StringField("<strong>State</strong>", validators=[Optional(), Length(min=4, max=45), Alpha()])
-    country = StringField("<strong>Country *</strong>", validators=[InputRequired(), Length(min=4, max=45), Alpha()])
+    state = StringField("<strong>State</strong>", validators=[Optional(), Length(min=2, max=45), AlphaSpace()])
+    country = StringField("<strong>Country *</strong>", validators=[InputRequired(), Length(min=4, max=45), AlphaSpace()])
+    phone = StringField("<strong>Phone *</strong>", validators=[InputRequired(), Length(min=4, max=200), Regexp(streetRegex, "Must only contain numbers, and some special characters.")])    
     email = StringField("<strong>Email *</strong>", validators=[InputRequired(), Length(min=4, max=100), Email()])
-    phone = StringField("<strong>Phone *</strong>", validators=[InputRequired(), Length(min=4, max=200), Regexp(streetRegex, "Must only contain numbers, and some special characters.")])
     username = StringField("<strong>Username *</strong>", validators=[InputRequired(), Length(min=4, max=45), AlphaNumeric()])
     password = PasswordField("<strong>Password *</strong>", validators=[InputRequired(), Length(min=4, max=64), AlphaNumeric(), EqualTo("repeatPassword", "Passwords must match.")])
     repeatPassword = PasswordField("<strong>Repeat Password *</strong>", validators=[InputRequired(), Length(min=4, max=64), AlphaNumeric()])
     securityQuestion = SelectField("<strong>Security Question *</strong>", choices=securityQuestions)
     securityAnswer = StringField("<strong>Answer *</strong>", validators=[InputRequired(), Length(min=4, max=45), AlphaNumeric()])
     submit = SubmitField("Register")
+    
+    # Check if email already exist in database
+    def validate_email(self, email):
+        with app.app_context():
+            cursor = mysql.connection.cursor()
+            cursor.execute("SELECT * FROM users WHERE Email = \'%s\'" % self.email.data)
+            alreadyExists = cursor.fetchone()
+            cursor.close()
+        if alreadyExists:
+            raise ValidationError("This email is taken. Please choose a different one.")
+    
+    # Check if username already exist in database
+    def validate_username(self, username):
+        with app.app_context():
+            cursor = mysql.connection.cursor()
+            cursor.execute("SELECT * FROM users WHERE Username = \'%s\'" % self.username.data)
+            alreadyExists = cursor.fetchone()
+            cursor.close()
+        if alreadyExists:
+            raise ValidationError("This username is taken. Please choose a different one.")
 
 class MulticityFlight(Form):
     fromCity = SelectField("<strong>From *</strong>", choices=fromCities)

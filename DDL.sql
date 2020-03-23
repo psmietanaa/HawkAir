@@ -1,16 +1,16 @@
 -- -----------------------------------------------------
 -- Schema HawkAir
 -- -----------------------------------------------------
-DROP SCHEMA IF EXISTS `HawkAir` ;
-CREATE SCHEMA `HawkAir` DEFAULT CHARACTER SET utf8 ;
-USE `HawkAir` ;
+DROP SCHEMA IF EXISTS `HawkAir`;
+CREATE SCHEMA `HawkAir` DEFAULT CHARACTER SET utf8;
+USE `HawkAir`;
 
 -- -----------------------------------------------------
 -- Table `HawkAir`.`Users`
 -- -----------------------------------------------------
 CREATE TABLE `HawkAir`.`Users` (
-    `UserID` INT NOT NULL AUTO_INCREMENT,
-    `Title` VARCHAR(6) NOT NULL,
+    `UserID` INT AUTO_INCREMENT,
+    `Title` VARCHAR(3) NOT NULL,
     `FirstName` VARCHAR(45) NOT NULL,
     `MiddleName` VARCHAR(45) NOT NULL,
     `LastName` VARCHAR(45) NOT NULL,
@@ -30,7 +30,8 @@ CREATE TABLE `HawkAir`.`Users` (
     `SecurityAnswer` VARCHAR(45) NOT NULL,
     `HawkAdvantage` TINYINT(1) NOT NULL DEFAULT 0,
     `Miles` INT NOT NULL DEFAULT 0,
-    PRIMARY KEY (`UserID`))
+    PRIMARY KEY (`UserID`),
+    UNIQUE KEY(`Email`, `Password`))
 ENGINE = InnoDB AUTO_INCREMENT=100001;
 
 -- -----------------------------------------------------
@@ -45,12 +46,11 @@ CREATE TABLE `HawkAir`.`Payments` (
     `Name` VARCHAR(100) NOT NULL,
     `UserID` INT NOT NULL,
 	CONSTRAINT `fk_Payment_Users1`
-    FOREIGN KEY (`UserID`)
-    REFERENCES `HawkAir`.`Users` (`UserID`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
+        FOREIGN KEY (`UserID`)
+        REFERENCES `HawkAir`.`Users` (`UserID`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE)
 ENGINE = InnoDB;
-
 
 -- -----------------------------------------------------
 -- Table `HawkAir`.`Airports`
@@ -91,42 +91,20 @@ CREATE TABLE `HawkAir`.`Flights` (
     `BookedEconomySeats` SMALLINT NULL DEFAULT 0,
     PRIMARY KEY (`FlightID`),
     CONSTRAINT `fk_Flights_Airports1`
-    FOREIGN KEY (`To`)
-    REFERENCES `HawkAir`.`Airports` (`Code`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `fk_Flights_Airports2`
-    FOREIGN KEY (`From`)
-    REFERENCES `HawkAir`.`Airports` (`Code`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `fk_Flights_Aircraft1`
-    FOREIGN KEY (`AircraftID`)
-    REFERENCES `HawkAir`.`Aircrafts` (`AircraftID`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
--- -----------------------------------------------------
--- Table `HawkAir`.`Bookings`
--- -----------------------------------------------------
-CREATE TABLE `HawkAir`.`Bookings` (
-    `BookingID` INT NOT NULL AUTO_INCREMENT,
-    `SeatNumber` VARCHAR(5) NULL,
-    `Class` VARCHAR(20) NOT NULL,
-    `UserID` INT NOT NULL,
-    `FlightID` VARCHAR(6) NOT NULL,
-    PRIMARY KEY (`BookingID`),
-    CONSTRAINT `fk_Booking_UserInformation1`
-    FOREIGN KEY (`UserID`)
-    REFERENCES `HawkAir`.`Users` (`UserID`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `fk_Booking_Flights1`
-    FOREIGN KEY (`FlightID`)
-    REFERENCES `HawkAir`.`Flights` (`FlightID`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
+        FOREIGN KEY (`To`)
+        REFERENCES `HawkAir`.`Airports` (`Code`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT `fk_Flights_Airports2`
+        FOREIGN KEY (`From`)
+        REFERENCES `HawkAir`.`Airports` (`Code`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT `fk_Flights_Aircraft1`
+        FOREIGN KEY (`AircraftID`)
+        REFERENCES `HawkAir`.`Aircrafts` (`AircraftID`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------
@@ -142,10 +120,32 @@ CREATE TABLE `HawkAir`.`Schedule` (
     `Sunday` TINYINT(1) NOT NULL,
     `FlightID` VARCHAR(6) NOT NULL,
 	CONSTRAINT `fk_Schedule_Flights1`
-    FOREIGN KEY (`FlightID`)
-    REFERENCES `HawkAir`.`Flights` (`FlightID`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
+        FOREIGN KEY (`FlightID`)
+        REFERENCES `HawkAir`.`Flights` (`FlightID`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `HawkAir`.`Bookings`
+-- -----------------------------------------------------
+CREATE TABLE `HawkAir`.`Bookings` (
+    `BookingID` VARCHAR(6) NOT NULL,
+    `SeatNumber` VARCHAR(5) NULL,
+    `Class` VARCHAR(20) NOT NULL,
+    `UserID` INT NOT NULL,
+    `FlightID` VARCHAR(6) NOT NULL,
+    PRIMARY KEY (`BookingID`),
+    CONSTRAINT `fk_Booking_UserInformation1`
+        FOREIGN KEY (`UserID`)
+        REFERENCES `HawkAir`.`Users` (`UserID`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT `fk_Booking_Flights1`
+        FOREIGN KEY (`FlightID`)
+        REFERENCES `HawkAir`.`Flights` (`FlightID`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------
@@ -182,32 +182,34 @@ CREATE TABLE IF NOT EXISTS `HawkAir`.`ContactUs` (
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------
--- Creating Triggers
+-- Triggers
 -- -----------------------------------------------------
-    CREATE TRIGGER trigger_booking_insert
-    after insert on bookings
-    for each row
-    update flights
-    set flights.BookedFirstClassSeats = IF(NEW.class = 'FirstClass',flights.BookedFirstClassSeats+1,flights.BookedFirstClassSeats),
-		flights.BookedEconomySeats = IF(NEW.class = 'Economy',flights.BookedEconomySeats+1,flights.BookedEconomySeats)
-    where NEW.FlightID = flights.FlightID
-    ;
+CREATE TRIGGER  trigger_booking_insert
+AFTER INSERT ON bookings FOR EACH ROW 
+    UPDATE flights SET flights.BookedFirstClassSeats = IF(NEW.class = 'FirstClass',
+        flights.BookedFirstClassSeats + 1,
+        flights.BookedFirstClassSeats) , flights.BookedEconomySeats = IF(NEW.class = 'Economy',
+        flights.BookedEconomySeats + 1,
+        flights.BookedEconomySeats)
+    WHERE NEW.FlightID = flights.FlightID
+;
 	
-    CREATE TRIGGER trigger_booking_delete
-    before delete on bookings
-    for each row
-    update flights
-    set flights.BookedFirstClassSeats = IF(OLD.class = 'FirstClass',flights.BookedFirstClassSeats-1,flights.BookedFirstClassSeats),
-		flights.BookedEconomySeats = IF(OLD.class = 'Economy',flights.BookedEconomySeats-1,flights.BookedEconomySeats)
-    where OLD.FlightID = flights.FlightID
-    ;
+CREATE TRIGGER  trigger_booking_delete
+BEFORE DELETE ON bookings FOR EACH ROW 
+    UPDATE flights SET flights.BookedFirstClassSeats = IF(OLD.class = 'FirstClass',
+        flights.BookedFirstClassSeats - 1,
+        flights.BookedFirstClassSeats) , flights.BookedEconomySeats = IF(OLD.class = 'Economy',
+        flights.BookedEconomySeats - 1,
+        flights.BookedEconomySeats)
+    WHERE OLD.FlightID = flights.FlightID
+;
     
-	CREATE TRIGGER trigger_schedule_delete
-    before delete on schedule
-    for each row
-	Delete from flights
-    where FlightID = OLD.FlightID
-    ;
+CREATE TRIGGER  trigger_schedule_delete
+BEFORE DELETE ON schedule FOR EACH ROW 
+    DELETE FROM flights
+    WHERE FlightID = OLD.FlightID
+;
+
 -- -----------------------------------------------------
 -- Insert Statements
 -- -----------------------------------------------------
@@ -240,12 +242,6 @@ INSERT INTO `HawkAir`.`Flights` VALUES
 ('AA4594','Airbus 319','ORD','DEN','7:57','1:52','On time',240,160,0,0),
 ('AA8737','Boeing 787','ORD','MIA','12:34','3:15','On time',370,250,0,0);
 
-INSERT INTO `HawkAir`.`Bookings` VALUES
-(NULL,5,'FirstClass',100001,'AA2470'),
-(NULL,10,'FirstClass',100002,'AA2470'),
-(NULL,15,'FirstClass',100003,'AA6846'),
-(NULL,20,'Economy',100003,'AA8737');
-
 INSERT INTO `HawkAir`.`Schedule` VALUES
 (1,1,1,1,1,1,1,'AA2470'),
 (1,1,1,1,1,1,1,'AA5306'),
@@ -253,13 +249,20 @@ INSERT INTO `HawkAir`.`Schedule` VALUES
 (1,1,1,1,1,1,1,'AA4594'),
 (1,1,1,1,1,1,1,'AA8737');
 
--- Login:admin Password:password
+INSERT INTO `HawkAir`.`Bookings` VALUES
+('ABCDEF',5,'FirstClass',100001,'AA2470'),
+('QWERTY',10,'FirstClass',100002,'AA2470'),
+('ASDFGH',15,'FirstClass',100003,'AA6846'),
+('ZXCVBN',20,'Economy',100003,'AA8737');
+
+-- Login: admin
+-- Password: password
 INSERT INTO `HawkAir`.`Admin` VALUES
 ('admin','5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8');
 
 INSERT INTO `HawkAir`.`News` VALUES
 ('May Vacation Sale','2020-04-17','/static/images/vacations.png','Save and earn up to 25\,000 bonus miles when you book your flight and hotel together! MileagePlus is your ticket to the world\, with the most ways to earn and use miles and the most award destinations of any U.S. airline loyalty program. Now all you need is more vacation days.'),
-('Rent a Car with Avis or Budget','2020-04-03','/static/images/car.png','Save up to 35% off base rates and earn miles. Reserve a car today! No matter the destination\, enjoy a trip that delivers more savings. Save up to 30% off of Budget base rates and earn 1\,000 AAdvantage bonus miles when you rent for 4 or more days. These miles are in addition to your base miles you receive when renting with Budget.'),
+('Rent a Car with Avis or Budget','2020-04-03','/static/images/car.png','Save up to 35% off base rates and earn miles. Reserve a car today! No matter the destination\, enjoy a trip that delivers more savings. Save up to 30% off of Budget base rates and earn 1\,000 AAdvantage bonus miles when you rent for 4 or more days.'),
 ('Fly Nonstop to Poland','2020-03-25','/static/images/poland.png','New service to Krakow from Chicago O''Hare start May 7. Search and book your flights! Pack your bags and explore Europe! Take advantage of great fares and low exchange rates and save first on flights and again on hotels\, dining and shopping when you get there.'),
 ('New Flights to Latin America','2020-03-19','/static/images/latinamerica.png','From a remote beach getaway to modern\, bustling cities\, you''re bound to discover new and exciting places and ideas. Shop Main Cabin deals to Latin America and the Caribbean.'),
 ('Vacation Smarter','2020-03-06','/static/images/savings.png','Go beyond the flight. For a limited time\, SkyMiles Members save up to $350 on any Delta Vacations package worldwide. Plus\, earn bonus miles & use miles on the best getaways\, curated just for you. Terms apply.');
