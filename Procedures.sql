@@ -85,7 +85,7 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE MyTrips(IN user VARCHAR(45))
 BEGIN
-    SELECT bookings.BookingID, flights.From, flights.To, flights.DepartTime, flights.Duration, flights.FlightID, flights.AircraftID, bookings.Class, bookings.SeatNumber
+    SELECT bookings.BookingID, flights.From, flights.To, bookings.FlightDate, flights.DepartTime, flights.FlightID, flights.Duration, bookings.Class, bookings.SeatNumber
     FROM bookings, flights, users
     WHERE bookings.UserID = users.UserID AND bookings.FlightID = flights.FlightID AND users.Username = user;
 END //
@@ -130,6 +130,14 @@ CREATE PROCEDURE GetContactDetails()
 BEGIN
     SELECT *
     FROM contactus;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE GetBookingIDs()
+BEGIN
+    SELECT BookingID
+    FROM bookings;
 END //
 DELIMITER ;
 

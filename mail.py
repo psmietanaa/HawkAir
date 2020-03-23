@@ -48,11 +48,11 @@ def build_booking_plaintext(BookingID, flights):
         
         From: %s
         To: %s
+        Date: %s
         Departure Time: %s
-        Duration: %s
         
         Flight Number: %s
-        Aircraft: %s
+        Duration: %s
         Class: %s
         Seat: %s
         -------------------------------------------------------------
@@ -127,8 +127,8 @@ def build_booking_html(BookingID, flights):
             <tr>
                 <th>From</th>
                 <th>To</th>
+                <th>Date</th>
                 <th>Departure Time</th>
-                <th>Duration</th>
             </tr>
             <tr>
                 <td>%s</td>
@@ -138,7 +138,7 @@ def build_booking_html(BookingID, flights):
             </tr>
             <tr>
                 <th>Flight Number</th>
-                <th>Aircraft</th>
+                <th>Duration</th>
                 <th>Class</th>
                 <th>Seat</th>
             </tr>

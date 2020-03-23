@@ -2,6 +2,7 @@ import hashlib
 from flask import *
 
 # My files
+from helper import *
 from forms import *
 from mail import *
 from run import app, mysql
@@ -62,7 +63,8 @@ def index():
         return flightstatusDate.data
     elif flightstatusNumber.submit5.data and flightstatusNumber.validate_on_submit():
         return flightstatusNumber.data
-    return render_template("index.html", title="Home", index=True, news=news, roundtrip=roundtrip, oneway=oneway, yourtrip=yourtrip, flightstatusDate=flightstatusDate, flightstatusNumber=flightstatusNumber)
+    return render_template("index.html", title="Home", index=True, news=news, roundtrip=roundtrip,
+                           oneway=oneway, yourtrip=yourtrip, flightstatusDate=flightstatusDate, flightstatusNumber=flightstatusNumber)
 
 # About us page
 @app.route("/about-us")
@@ -160,14 +162,7 @@ def dashboard():
             abort(500)
         # Build flights if trips are not empty
         if trips:
-            flights = {}
-            for trip in trips:
-                if trip['BookingID'] not in flights:
-                    flights[trip['BookingID']] = []
-                    flights[trip['BookingID']].append([trip['From'], trip['To'], str(trip['DepartTime'])[:-3], str(trip['Duration'])[:-3] + "h", trip['FlightID'], trip['AircraftID'], trip['Class'], trip['SeatNumber']])
-                else:
-                    flights[trip['BookingID']].append([trip['From'], trip['To'], str(trip['DepartTime'])[:-3], str(trip['Duration'])[:-3] + "h", trip['FlightID'], trip['AircraftID'], trip['Class'], trip['SeatNumber']])
-            trips = flights
+            trips = buildFlights(trips)
         cursor.close()
         return render_template("dashboard.html", title="Dashboard", dashboard=True, info=info, trips=trips)
     else:
@@ -188,8 +183,10 @@ def register():
             data = request.form
             cursor = mysql.connection.cursor()
             hashedPassword = hashlib.sha256(form.password.data.encode()).hexdigest()
-            cursor.callproc("CreateUser", [data['title'], data['firstName'], data['middleName'], data['lastName'], data['preferredName'], data['sex'], data['dateOfBirth'], data['street'], data['city'],
-                                           data['zipCode'], data['state'], data['country'], data['phone'], data['email'], data['username'], hashedPassword, data['securityQuestion'], data['securityAnswer']])
+            cursor.callproc("CreateUser", [data['title'], data['firstName'], data['middleName'], data['lastName'],
+                                           data['preferredName'], data['sex'], data['dateOfBirth'], data['street'], data['city'],
+                                           data['zipCode'], data['state'], data['country'], data['phone'], data['email'],
+                                           data['username'], hashedPassword, data['securityQuestion'], data['securityAnswer']])
             mysql.connection.commit()
             cursor.close()
             flash('Your account has been created! You should be able to log in now.', 'success')
