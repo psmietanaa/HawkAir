@@ -43,51 +43,14 @@ CREATE TABLE `HawkAir`.`Payments` (
     `ExpirationDateYear` SMALLINT NOT NULL,
     `CVV` SMALLINT NOT NULL,
     `Name` VARCHAR(100) NOT NULL,
-    `UserID` INT NOT NULL)
-ENGINE = InnoDB;
-
--- -----------------------------------------------------
--- Table `HawkAir`.`Bookings`
--- -----------------------------------------------------
-CREATE TABLE `HawkAir`.`Bookings` (
-    `BookingID` VARCHAR(6) NOT NULL,
-    `SeatNumber` VARCHAR(5) NULL,
-    `Class` VARCHAR(20) NOT NULL,
     `UserID` INT NOT NULL,
-    `FlightID` VARCHAR(6) NOT NULL)
+	CONSTRAINT `fk_Payment_Users1`
+    FOREIGN KEY (`UserID`)
+    REFERENCES `HawkAir`.`Users` (`UserID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
--- -----------------------------------------------------
--- Table `HawkAir`.`Flights`
--- -----------------------------------------------------
-CREATE TABLE `HawkAir`.`Flights` (
-    `FlightID` VARCHAR(6) NOT NULL,
-    `AircraftID` VARCHAR(20) NOT NULL,
-    `From` VARCHAR(3) NOT NULL,
-    `To` VARCHAR(3) NOT NULL,
-    `DepartTime` TIME NOT NULL,
-    `Duration` TIME NOT NULL,
-    `FlightStatus` VARCHAR(20) NULL DEFAULT 'On Time',
-    `PriceFirstClass` MEDIUMINT NOT NULL,
-    `PriceEconomy` MEDIUMINT NOT NULL,
-    `BookedFirstClassSeats` SMALLINT NULL DEFAULT 0,
-    `BookedEconomySeats` SMALLINT NULL DEFAULT 0,
-    PRIMARY KEY (`FlightID`))
-ENGINE = InnoDB;
-
--- -----------------------------------------------------
--- Table `HawkAir`.`Schedule`
--- -----------------------------------------------------
-CREATE TABLE `HawkAir`.`Schedule` (
-    `Monday` TINYINT(1) NOT NULL,
-    `Tuesday` TINYINT(1) NOT NULL,
-    `Wednesday` TINYINT(1) NOT NULL,
-    `Thursday` TINYINT(1) NOT NULL,
-    `Friday` TINYINT(1) NOT NULL,
-    `Saturday` TINYINT(1) NOT NULL,
-    `Sunday` TINYINT(1) NOT NULL,
-    `FlightID` VARCHAR(6) NOT NULL)
-ENGINE = InnoDB;
 
 -- -----------------------------------------------------
 -- Table `HawkAir`.`Airports`
@@ -109,6 +72,80 @@ CREATE TABLE `HawkAir`.`Aircrafts` (
     `TotalFirstClassSeats` SMALLINT NOT NULL,
     `TotalEconomySeats` SMALLINT NOT NULL,
     PRIMARY KEY (`AircraftID`))
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `HawkAir`.`Flights`
+-- -----------------------------------------------------
+CREATE TABLE `HawkAir`.`Flights` (
+    `FlightID` VARCHAR(6) NOT NULL,
+    `AircraftID` VARCHAR(20) NOT NULL,
+    `From` VARCHAR(3) NOT NULL,
+    `To` VARCHAR(3) NOT NULL,
+    `DepartTime` TIME NOT NULL,
+    `Duration` TIME NOT NULL,
+    `FlightStatus` VARCHAR(20) NULL DEFAULT 'On Time',
+    `PriceFirstClass` MEDIUMINT NOT NULL,
+    `PriceEconomy` MEDIUMINT NOT NULL,
+    `BookedFirstClassSeats` SMALLINT NULL DEFAULT 0,
+    `BookedEconomySeats` SMALLINT NULL DEFAULT 0,
+    PRIMARY KEY (`FlightID`),
+    CONSTRAINT `fk_Flights_Airports1`
+    FOREIGN KEY (`To`)
+    REFERENCES `HawkAir`.`Airports` (`Code`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_Flights_Airports2`
+    FOREIGN KEY (`From`)
+    REFERENCES `HawkAir`.`Airports` (`Code`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_Flights_Aircraft1`
+    FOREIGN KEY (`AircraftID`)
+    REFERENCES `HawkAir`.`Aircrafts` (`AircraftID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `HawkAir`.`Bookings`
+-- -----------------------------------------------------
+CREATE TABLE `HawkAir`.`Bookings` (
+    `BookingID` INT NOT NULL AUTO_INCREMENT,
+    `SeatNumber` VARCHAR(5) NULL,
+    `Class` VARCHAR(20) NOT NULL,
+    `UserID` INT NOT NULL,
+    `FlightID` VARCHAR(6) NOT NULL,
+    PRIMARY KEY (`BookingID`),
+    CONSTRAINT `fk_Booking_UserInformation1`
+    FOREIGN KEY (`UserID`)
+    REFERENCES `HawkAir`.`Users` (`UserID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_Booking_Flights1`
+    FOREIGN KEY (`FlightID`)
+    REFERENCES `HawkAir`.`Flights` (`FlightID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `HawkAir`.`Schedule`
+-- -----------------------------------------------------
+CREATE TABLE `HawkAir`.`Schedule` (
+    `Monday` TINYINT(1) NOT NULL,
+    `Tuesday` TINYINT(1) NOT NULL,
+    `Wednesday` TINYINT(1) NOT NULL,
+    `Thursday` TINYINT(1) NOT NULL,
+    `Friday` TINYINT(1) NOT NULL,
+    `Saturday` TINYINT(1) NOT NULL,
+    `Sunday` TINYINT(1) NOT NULL,
+    `FlightID` VARCHAR(6) NOT NULL,
+	CONSTRAINT `fk_Schedule_Flights1`
+    FOREIGN KEY (`FlightID`)
+    REFERENCES `HawkAir`.`Flights` (`FlightID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------
@@ -145,6 +182,33 @@ CREATE TABLE IF NOT EXISTS `HawkAir`.`ContactUs` (
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------
+-- Creating Triggers
+-- -----------------------------------------------------
+    CREATE TRIGGER trigger_booking_insert
+    after insert on bookings
+    for each row
+    update flights
+    set flights.BookedFirstClassSeats = IF(NEW.class = 'FirstClass',flights.BookedFirstClassSeats+1,flights.BookedFirstClassSeats),
+		flights.BookedEconomySeats = IF(NEW.class = 'Economy',flights.BookedEconomySeats+1,flights.BookedEconomySeats)
+    where NEW.FlightID = flights.FlightID
+    ;
+	
+    CREATE TRIGGER trigger_booking_delete
+    before delete on bookings
+    for each row
+    update flights
+    set flights.BookedFirstClassSeats = IF(OLD.class = 'FirstClass',flights.BookedFirstClassSeats-1,flights.BookedFirstClassSeats),
+		flights.BookedEconomySeats = IF(OLD.class = 'Economy',flights.BookedEconomySeats-1,flights.BookedEconomySeats)
+    where OLD.FlightID = flights.FlightID
+    ;
+    
+	CREATE TRIGGER trigger_schedule_delete
+    before delete on schedule
+    for each row
+	Delete from flights
+    where FlightID = OLD.FlightID
+    ;
+-- -----------------------------------------------------
 -- Insert Statements
 -- -----------------------------------------------------
 INSERT INTO `HawkAir`.`Users` VALUES
@@ -154,13 +218,6 @@ INSERT INTO `HawkAir`.`Users` VALUES
 (NULL,'Mr.','Howard','William','Doublas','','Male','1976-06-06','3033 West Drive','Chicago','60661','IL','United States','312-525-7519','howdougl@gmail.com','Waseat','b3227450338443d6eb075389aa425ab21312178035b62996b842f43985f5e78e','What was the color of your first car?','Red',0,0),
 (NULL,'','Amanda','','Lewis','','Female','1994-08-03','680 Mutton Town Road','Centralia','98531','WA','United States','360-623-1953','ama-lewis@amazon.com','Crinsonast','6a8ea85ce30bbb416b31b1aaaf9ef67ac6b5373a199698d999827565736a8267','What is your favorite team?','Packers',1,1300);
 
-INSERT INTO `HawkAir`.`Flights` VALUES
-('AA2470','Airbus 319','ORD','LAX','18:00','2:08','On time',650,350,0,0),
-('AA5306','CRJ 700','ORD','DFW','11:22','2:02','On time',400,200,0,0),
-('AA6846','Boeing 737','ORD','JFK','9:04','2:40','On time',520,230,0,0),
-('AA4594','Airbus 319','ORD','DEN','7:57','1:52','On time',240,160,0,0),
-('AA8737','Boeing 787','ORD','MIA','12:34','3:15','On time',370,250,0,0);
-
 INSERT INTO `HawkAir`.`Airports` VALUES
 ('ORD','Chicago O''Hare International','Chicago','IL','United States'),
 ('LAX','Los Angeles International','Los Angeles','CA','United States'),
@@ -169,19 +226,32 @@ INSERT INTO `HawkAir`.`Airports` VALUES
 ('DEN','Denver International','Denver','CO','United States'),
 ('MIA','Miami International','Miami','FL','United States');
 
-INSERT INTO `HawkAir`.`Schedule` VALUES
-(1,1,1,1,1,1,1,'AA2470'),
-(1,1,1,1,1,1,1,'AA5306'),
-(1,1,1,1,1,1,1,'AA6846'),
-(1,1,1,1,1,1,1,'AA4594'),
-(1,1,1,1,1,1,1,'AA8737');
-
 INSERT INTO `HawkAir`.`Aircrafts` VALUES
 ('Airbus 319',8,96),
 ('Airbus 330',20,152),
 ('Boeing 737',16,126),
 ('Boeing 787',20,158),
 ('CRJ 700',8,48);
+
+INSERT INTO `HawkAir`.`Flights` VALUES
+('AA2470','Airbus 319','ORD','LAX','18:00','2:08','On time',650,350,0,0),
+('AA5306','CRJ 700','ORD','DFW','11:22','2:02','On time',400,200,0,0),
+('AA6846','Boeing 737','ORD','JFK','9:04','2:40','On time',520,230,0,0),
+('AA4594','Airbus 319','ORD','DEN','7:57','1:52','On time',240,160,0,0),
+('AA8737','Boeing 787','ORD','MIA','12:34','3:15','On time',370,250,0,0);
+
+INSERT INTO `HawkAir`.`Bookings` VALUES
+(NULL,5,'FirstClass',100001,'AA2470'),
+(NULL,10,'FirstClass',100002,'AA2470'),
+(NULL,15,'FirstClass',100003,'AA6846'),
+(NULL,20,'Economy',100003,'AA8737');
+
+INSERT INTO `HawkAir`.`Schedule` VALUES
+(1,1,1,1,1,1,1,'AA2470'),
+(1,1,1,1,1,1,1,'AA5306'),
+(1,1,1,1,1,1,1,'AA6846'),
+(1,1,1,1,1,1,1,'AA4594'),
+(1,1,1,1,1,1,1,'AA8737');
 
 -- Login:admin Password:password
 INSERT INTO `HawkAir`.`Admin` VALUES
