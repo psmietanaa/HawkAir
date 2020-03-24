@@ -1,0 +1,98 @@
+<!-- This line loads base.html which is present on every page -->
+{% extends "base.html" %}
+
+<!-- Page Content -->
+{% block content %}
+    <div class="container py-5">
+        <!-- Header  -->
+        <div class="row pb-2">
+            <div class="col">
+                {% if flights %}
+                    <h3>Select your flight:</h3>
+                {% else %}
+                    <div class="col-xs-12" style="height:50px;"></div>
+                    <h3 class="text-center">We could't find any flights you requested. <br>Click <a href="/" class="badge badge-warning">Here</a> to go back to the homepage.</h3>
+                    <img class="d-block mx-auto pt-3 pb-5" src="/static/images/confused.png">
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Flights list -->
+        {% if flights %}
+        <form method="POST">
+            <div class="accordion" id="myAccordion">
+                {% for i in range(flights | length) %}
+                <div class="card">
+                    <div class="card-header" id="heading-{{ i + 1 }}">
+                        <h2 class="mb-0"><button class="btn btn-warning" type="button" data-toggle="collapse" data-target="#collapse-{{ i + 1 }}">Flight {{ i + 1 }}</button></h2>
+                    </div>
+                    <div id="collapse-{{ i + 1 }}" class="collapse show" aria-labelledby="heading-{{ i + 1 }}" data-parent="#myAccordion">
+                        <div class="card-body">
+                            {% for option in flights[i] %}
+                            <div class="row">
+                                <div class="col-md">
+                                    <div class="card">
+                                        <div class="btn-group btn-group-toggle">
+                                            <table class="table" style="table-layout: fixed;">
+                                                <tr>
+                                                    <th>From</th>
+                                                    <th>To</th>
+                                                    <th>Date</th>
+                                                    <th>Depart Time</th>
+                                                </tr>
+                                                <tr>
+                                                    <td>{{ option['From'] }}</td>
+                                                    <td>{{ option['To'] }}</td>
+                                                    <td>{{ option['Date'] }}</td>
+                                                    <td>{{ option['DepartTime'] }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Flight Number</th>
+                                                    <th>Aircraft</th>
+                                                    <th>Duration</th>
+                                                    <th>Arrival Time</th>
+                                                </tr>
+                                                <tr>
+                                                    <td>{{ option['FlightID'] }}</td>
+                                                    <td>{{ option['AircraftID'] }}</td>
+                                                    <td>{{ option['Duration'] }}</td>
+                                                    <td>{{ option['ArrivalTime'] }}</td>
+                                                </tr>
+                                            </table>
+                                            <div class="card-footer d-flex align-items-center justify-content-center">
+                                                <div class="funkyradio">
+                                                    {% if loop.index == 1 %}
+                                                    <div class="funkyradio-warning">
+                                                        <input type="radio" name="options-{{ i + 1 }}" id="option-{{ loop.index }}" value="{{ option['FlightID'] }}" checked/>
+                                                        <label for="option-{{ loop.index }}">&nbsp;&nbsp;Select&nbsp;&nbsp;&nbsp;</label>
+                                                    </div>
+                                                    {% else %}
+                                                    <div class="funkyradio-warning">
+                                                        <input type="radio" name="options-{{ i + 1 }}" id="option-{{ loop.index }}" value="{{ option['FlightID'] }}" />
+                                                        <label for="option-{{ loop.index }}">&nbsp;&nbsp;Select&nbsp;&nbsp;&nbsp;</label>
+                                                    </div>
+                                                {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Submit -->
+            <div class="row">
+                <div class="col text-right">
+                    <input class="btn btn-warning btn-md px-5 mr-3 my-3" type="submit" value="Continue">
+                </div>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+{% endblock %}

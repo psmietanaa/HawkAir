@@ -5,8 +5,6 @@ from wtforms import BooleanField, FieldList, Form, FormField, PasswordField, Sel
 from wtforms.fields.html5 import DateField
 from wtforms.validators import Email, EqualTo, InputRequired, Length, Regexp, Optional, ValidationError
 from wtforms_validators import Alpha, AlphaDash, AlphaNumeric, AlphaSpace, Integer
-
-# My files
 from run import app, mysql
 
 # Regex for validating the forms
@@ -23,7 +21,7 @@ securityQuestions = [("What was your favorite sport in high school?", "What was 
                      ("What is your favorite team?", "What is your favorite team?"),
                      ("In what city were you born?", "In what city were you born?")]
 passengersRange = [(str(i), str(i)) for i in range(1, 10)]
-flightStatusDates = [((datetime.date.today() + datetime.timedelta(days=i)).strftime("%Y-%m-%d"), (datetime.date.today() + datetime.timedelta(days=i)).strftime("%A, %B %d")) for i in range(1, 4)]
+flightStatusDates = [((datetime.date.today() + datetime.timedelta(days=i)).strftime("%Y-%m-%d"), (datetime.date.today() + datetime.timedelta(days=i)).strftime("%A, %B %d")) for i in range(0, 3)]
 
 # Get departure and arrival city locations from database
 with app.app_context():

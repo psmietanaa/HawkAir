@@ -26,6 +26,7 @@ mysql = MySQL(app)
 
 # Main function
 if __name__ == "__main__":
+    from helper import *
     from forms import *
     from mail import *
     from routes import *

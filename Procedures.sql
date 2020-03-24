@@ -1,7 +1,7 @@
 DELIMITER //
 CREATE PROCEDURE SearchFlights(IN fromCity VARCHAR(3), IN toCity VARCHAR(3), IN passengers INT, IN weekDay VARCHAR(9))
 BEGIN
-    SET @sql = CONCAT('SELECT flights.FlightID FROM aircrafts, flights, schedule WHERE aircrafts.AircraftID = flights.AircraftID AND flights.FlightID = schedule.FlightID AND (aircrafts.TotalEconomySeats - flights.BookedEconomySeats > ', passengers, ' OR aircrafts.TotalFirstClassSeats - flights.BookedFirstClassSeats > ', passengers, ') AND flights.From = ''', fromCity, ''' AND flights.To = ''', toCity, ''' AND schedule.', weekDay, ' = 1;');
+    SET @sql = CONCAT('SELECT flights.From, flights.To, flights.DepartTime, flights.FlightID, flights.AircraftID, flights.Duration FROM aircrafts, flights, schedule WHERE aircrafts.AircraftID = flights.AircraftID AND flights.FlightID = schedule.FlightID AND (aircrafts.TotalEconomySeats - flights.BookedEconomySeats >= ', passengers, ' OR aircrafts.TotalFirstClassSeats - flights.BookedFirstClassSeats >= ', passengers, ') AND flights.From = ''', fromCity, ''' AND flights.To = ''', toCity, ''' AND schedule.', weekDay, ' = 1 ORDER BY flights.DepartTime;');
     PREPARE stmt FROM @sql;
     EXECUTE stmt;
     DEALLOCATE PREPARE stmt;

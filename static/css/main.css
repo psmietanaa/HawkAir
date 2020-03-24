@@ -14,7 +14,7 @@ body > div.container {
     min-height:700px !important;
 }
 
-/** Active pill is gold **/
+/** Active pills are gold **/
 .nav-pills .nav-link.active, .navbar-dark .navbar-nav .nav-link.active, .nav-pills .show > .nav-link, .navbar-dark .navbar-nav .show > .nav-link, .dropdown-item:active {
     background-color: #FFCE07;
     color: #262626
@@ -33,16 +33,30 @@ body > div.container {
     border-color: #FFCE07;
 }
 
-/** Buttons are gold **/
+/** Badges are gold **/
 .badge-warning {
     background-color: #FFCE07;
     color: #262626;
     font-weight: 500;
+    vertical-align: middle;
+    margin-top: -0.3em;
 }
 
 /** Links are gold **/
 a, a:hover {
     color: #FFCE07;
+}
+
+/** List groups headers are gold **/
+.list-group-item.active {
+    background-color: #FFCE07;
+    border-color: #FFCE07;
+    color: #262626
+}
+
+/** Group forms spacing **/
+.form-group {
+    margin-bottom: 10px;
 }
 
 /** Jumbotron **/
@@ -61,6 +75,21 @@ a, a:hover {
     padding-right: 30px;
     padding-bottom: 40px;
     padding-left: 30px;
+}
+
+/** Errors in the forms are red **/
+.has-error > label, .has-error > p, .has-error > input, .has-error > select{
+    color: red;
+}
+
+/** Errors in the forms are red **/
+.has-error > input, .has-error > select, .has-error > textarea {
+    border: 1px solid red;
+}
+
+/** Hidden **/
+.is-hidden {
+    display: none;
 }
 
 /** Footer Background **/
@@ -83,51 +112,4 @@ a, a:hover {
 #copyright, #footerLine {
     background-color: #FFCE07;
     color: #262626;
-}
-
-/** Group forms spacing **/
-.form-group {
-    margin-bottom: 10px;
-}
-
-/** Errors in the forms are red **/
-.has-error > label, .has-error > p, .has-error > input, .has-error > select{
-    color: red;
-}
-
-/** Errors in the forms are red **/
-.has-error > input, .has-error > select, .has-error > textarea {
-    border: 1px solid red;
-}
-
-/** Fix for properly rendering tables inside of cards **/
-.card > .table {
-  border-right: 0;
-  border-left: 0;
-  margin-bottom: 0;
-}
-.card > .table:last-child {
-  border-bottom: 0;
-}
-.card > .table:not(.table-sm) th,
-.card > .table:not(.table-sm) td {
-  padding: 0.75rem 1.25rem;
-}
-.card > .table td:first-child,
-.card > .table th:first-child {
-  border-left: 0;
-}
-.card > .table td:last-child,
-.card > .table th:last-child {
-  border-right: 0;
-}
-.card > .table tr:first-child td,
-.card > .table tr:first-child th {
-  border-top: 0;
-}
-.card > .table tr:last-child td {
-  border-bottom: 0;
-}
-.card .card-header + .table {
-  border-top: 0;
 }

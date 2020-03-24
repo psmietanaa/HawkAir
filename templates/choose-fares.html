@@ -1,0 +1,92 @@
+<!-- This line loads base.html which is present on every page -->
+{% extends "base.html" %}
+
+<!-- Page Content -->
+{% block content %}
+    <div class="container py-5">
+        <!-- Header  -->
+        <div class="row pb-2">
+            <div class="col">
+                <h3>Choose fares for your flights:</h3>
+            </div>
+        </div>
+        
+        <!-- Fare list -->
+        <form method="POST">
+            <div class="accordion" id="myAccordion">
+                {% for key, value in fares.items() %}
+                <div class="card">
+                    <div class="card-header" id="heading-{{ loop.index }}">
+                        <h2 class="mb-0"><button class="btn btn-warning" type="button" data-toggle="collapse" data-target="#collapse-{{ loop.index }}">Flight {{ loop.index }}</button></h2>
+                    </div>
+                    <div id="collapse-{{ loop.index }}" class="collapse show" aria-labelledby="heading-{{ loop.index }}" data-parent="#myAccordion">
+                        <div class="card-body">
+                            
+                            <!-- Economy -->
+                            <div class="row">
+                                <div class="col-md">
+                                    <div class="card">
+                                        <div class="btn-group btn-group-toggle">
+                                            <table class="table" style="table-layout: fixed;">
+                                                <tr>
+                                                    <th>Economy Price</th>
+                                                </tr>
+                                                <tr>
+                                                    <td>${{ value['PriceEconomy'] }}</td>
+                                                </tr>
+                                            </table>
+                                            <div class="card-footer d-flex align-items-center justify-content-center">
+                                                <div class="funkyradio">
+                                                    <div class="funkyradio-warning">
+                                                        <input type="radio" name="options-{{ loop.index * 2 - 1 }}" id="option-{{ loop.index * 2 - 1 }}" value="{{ value['PriceEconomy'] }}" checked>
+                                                        <label for="option-{{ loop.index * 2 - 1}}">&nbsp;&nbsp;Select&nbsp;&nbsp;&nbsp;</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p>
+                                </div>
+                            </div>
+                            
+                            <!-- First Class -->
+                            <div class="row">
+                                <div class="col-md">
+                                    <div class="card">
+                                        <div class="btn-group btn-group-toggle">
+                                            <table class="table" style="table-layout: fixed;">
+                                                <tr>
+                                                    <th>First Class Price</th>
+                                                </tr>
+                                                <tr>
+                                                    <td>${{ value['PriceFirstClass'] }}</td>
+                                                </tr>
+                                            </table>
+                                            <div class="card-footer d-flex align-items-center justify-content-center">
+                                                <div class="funkyradio">
+                                                    <div class="funkyradio-warning">
+                                                        <input type="radio" name="options-{{ loop.index * 2 - 1 }}" id="option-{{ loop.index * 2 }}" value="{{ value['PriceFirstClass'] }}">
+                                                        <label for="option-{{ loop.index * 2 }}">&nbsp;&nbsp;Select&nbsp;&nbsp;&nbsp;</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Submit form -->
+            <div class="row">
+                <div class="col text-right">
+                    <input class="btn btn-warning btn-md px-5 mr-3 my-3" type="submit" value="Continue">
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

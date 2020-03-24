@@ -1,31 +1,6 @@
 import textwrap
 from flask_mail import Message
-
-# My files
 from run import app, mail
-
-# This function validates booking email parameters
-def validate_booking(BookingID, flights):
-    if not isinstance(BookingID, str):
-        raise TypeError("BookingID has to be a string")
-    if len(flights) == 0:
-        raise ValueError("A list of flights cannot be empty")
-    for flight in flights:
-        if len(flight) != 9:
-            raise ValueError("A flight must have 9 parameters")
-
-# This function validates support email parameters
-def validate_support(firstName, lastName, email, subject, message):
-    if not isinstance(firstName, str):
-        raise TypeError("firstName has to be a string")
-    if not isinstance(lastName, str):
-        raise TypeError("lastName has to be a string")
-    if not isinstance(email, str):
-        raise TypeError("email has to be a string")
-    if not isinstance(subject, str):
-        raise TypeError("subject has to be a string")
-    if not isinstance(message, str):
-        raise TypeError("message has to be a string")
 
 # This function builds the plaintext template used to send booking confirmations
 def build_booking_plaintext(BookingID, flights):
