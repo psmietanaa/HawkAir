@@ -86,6 +86,7 @@
                         </div>
                     </div>
                     {{ wtf.form_field(form.submit, class='form-control btn-warning my-2', placeholder='') }}
+                    <input type="hidden" name="next" value="{{ request.args.get('next', '') }}"/>
                 </form>
             </div>
         </div>

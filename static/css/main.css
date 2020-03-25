@@ -113,3 +113,15 @@ a, a:hover {
     background-color: #FFCE07;
     color: #262626;
 }
+
+/** Printing **/
+@media print {
+    #header, #nextSteps, #footer, #copyright { 
+        display: none !important;
+    }
+    
+    body {
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact !important;
+    }
+}

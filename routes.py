@@ -23,11 +23,12 @@ def globalData():
 def before_request():
     try:
         cursor = mysql.connection.cursor()
-        cursor.callproc("ValidateUser", [session.get('user')])
+        cursor.callproc("ValidateUser", [session.get('username')])
         found = cursor.fetchone()
         cursor.close()
         if not found:
-            session.pop("user", None)
+            session.pop("username", None)
+            session.pop("userID", None)
     except:
         abort(500)
 
@@ -53,13 +54,14 @@ def index():
     if roundtrip.submit1.data and roundtrip.validate_on_submit():
         return roundtrip.data
     elif oneway.submit2.data and oneway.validate_on_submit():
+        data = request.form
         # User must be logged in to search flights
-        if "user" not in session:
-            session['selectFlight'] = request.form
+        if "username" not in session:
+            session['selectFlight'] = [{'from': data['fromCity2'], 'to': data['toCity2'], 'passengers': data['passengers2'], 'date': data['departDate2']}]
             flash("Please log in first!", "warning")
             return redirect(url_for("login", next=url_for("selectFlight")))
         else:
-            session['selectFlight'] = request.form
+            session['selectFlight'] = [{'from': data['fromCity2'], 'to': data['toCity2'], 'passengers': data['passengers2'], 'date': data['departDate2']}]
             return redirect(url_for("selectFlight"))
     elif yourtrip.submit3.data and yourtrip.validate_on_submit():
         return yourtrip.data
@@ -73,66 +75,162 @@ def index():
 @app.route("/select-flight", methods=["GET", "POST"])
 def selectFlight(flights = []):
     # If user already selected flights
-    if request.method == 'POST':
-        session['chooseFares'] = request.form
+    if request.method == "POST":
+        flights = session.get("buildFlight", None)
+        data = getValues(request.form)
+        # Update flights based on user seletion
+        chosen = []
+        for i in range(0, len(data)):
+            index = int(data[i])
+            chosen.append(flights[i][index])
+        session['buildFlight'] = chosen
         return redirect(url_for("chooseFares"))
     # Call procedure to search flights
-    if "selectFlight" in session:
+    elif "selectFlight" in session:
         data = session.get("selectFlight", None)
-        session.pop("selectFlight", None)
-        try:
+        flights = []
+        for i in range(0, len(data)):
             # Search for flights
             cursor = mysql.connection.cursor()
-            cursor.callproc("SearchFlights", [data['fromCity2'], data['toCity2'], data['passengers2'], toWeekday(data['departDate2'])])
-            flights = cursor.fetchall()
+            cursor.nextset()
+            cursor.callproc("SearchFlights", [data[i]['from'], data[i]['to'], data[i]['passengers'], toWeekday(data[i]['date'])])
+            flight = cursor.fetchall()
             cursor.close()
-        except:
-            abort(500)
-        # Build flights if trips are not empty
-        if flights:
-            flights = buildFlights(flights, data['departDate2'])
-        return render_template("select-flight.html", title="Select Flights", flights=[flights, [{'From': 'ORD', 'To': 'JFK', 'Date': '03/24/2020', 'DepartTime': '9:04', 'FlightID': 'AA6846', 'AircraftID': 'Boeing 737', 'Duration': '2:40h', 'ArrivalTime': '11:44'}]])
-    return redirect(url_for("index"))
+            # Build flights if flight is not empty
+            if flight:
+                flight = buildFlights(flight, data[i]['date'])
+                flights.append(flight)
+            session['buildFlight'] = flights
+        return render_template("select-flight.html", title="Select Flights", flights=flights)
+    else:
+        return redirect(url_for("index"))
 
 # Choose fares
 @app.route("/choose-fares", methods=["GET", "POST"])
 def chooseFares():
     # If user already chose fares
-    if request.method == 'POST':
-        session['payment'] = request.form
+    if request.method == "POST":
+        data = getValues(request.form)
+        fares = session.get("chooseFares", None)
+        # Update fares based on user seletion
+        chosen = []
+        for i in range(0, len(data)):
+            index = int(data[i])
+            if index % 2 == 0:
+                chosen.append([fares[i][0], "Economy", fares[i][1]])
+            else:
+                chosen.append([fares[i][0], "First Class", fares[i][2]])
+        session['payment'] = chosen
         return redirect(url_for("payment"))
     # Call procedure to get fares
-    if "chooseFares" in session:
-        data = session.get("chooseFares", None)
-        session.pop("chooseFares", None)
-        flights = getValues(data)
+    elif "buildFlight" in session:
+        flights = session.get("buildFlight", None)
         # Get flight fares
-        fares = {}
-        for flightID in flights:
+        fares = []
+        for flight in flights:
             try:
-                data = request.form
                 cursor = mysql.connection.cursor()
-                cursor.callproc("GetFare", [flightID])
+                cursor.callproc("GetFare", [flight['FlightID']])
                 fare = cursor.fetchone()
                 cursor.close()
             except:
                 abort(500)
-            fares[flightID] = fare
-        print(fares, flush=True)
+            fares.append([flight['FlightID'], str(fare['PriceEconomy']), str(fare['PriceFirstClass'])])
+        session['chooseFares'] = fares
         return render_template("choose-fares.html", title="Choose Fares", fares=fares)
-    return redirect(url_for("index"))
+    else:
+        return redirect(url_for("index"))
 
 # Checkout
 @app.route("/payment", methods=["GET", "POST"])
 def payment():
-    # If user already selected payment method
-    if request.method == 'POST':
-        pass
-    # Call procedure to get fares
     if "payment" in session:
         data = session.get("payment", None)
-        return data
-    return redirect(url_for("index"))
+        # Sum up all the flights
+        total = 0
+        for flight in data:
+            total += int(flight[2])
+        # Payment form
+        form = PaymentForm()
+        # If user already entered payment details
+        if form.validate_on_submit():
+            # Authenticate payment
+            authenticatePayment()
+            try:
+                # Get list of all taken bookingIDs
+                cursor = mysql.connection.cursor()
+                cursor.callproc("GetBookingIDs")
+                ids = cursor.fetchall()
+                cursor.close()
+            except:
+                abort(500)
+            # Generate a unique bookingID
+            bookingID = generateBookingID(ids)
+            userID = session.get("userID", None)
+            selectFlight = session.get("selectFlight", None)
+            payment = session.get("payment", None)
+            # Book flights
+            for i in range(0, len(selectFlight)):
+                try:
+                    cursor = mysql.connection.cursor()
+                    cursor.callproc("CreateBooking", [bookingID, selectFlight[i]['date'], payment[i][1], userID, payment[i][0]])
+                    mysql.connection.commit()
+                    cursor.close()
+                except:
+                    abort(500)
+            # If success redirect to confirmation
+            session['bookingID'] = bookingID
+            return redirect(url_for("confirmation"))
+        return render_template("payment.html", title="Payment", total=total, form=form)
+    else:
+        return redirect(url_for("index"))
+
+# confirmation
+@app.route("/confirmation", methods=["GET", "POST"])
+def confirmation():
+    # If a user decides to send an email
+    if request.method == "POST":
+        # Get user details
+        try:
+            # Get info and trips for this user
+            cursor = mysql.connection.cursor()
+            cursor.callproc("MyInfo", [session['username']])
+            info = cursor.fetchone()
+            cursor.nextset()
+            cursor.callproc("GetBooking", [session['bookingID']])
+            bookings = cursor.fetchall()
+            cursor.close()
+        except:
+            abort(500)   
+        # Build bookings if not empty
+        if bookings:
+            bookings = buildTrips(bookings)
+        plaintext = build_booking_plaintext(session['bookingID'], bookings[session['bookingID']])
+        html = build_booking_html(session['bookingID'], bookings[session['bookingID']])
+        response = send_mail("Your Booking Confirmation", info['Email'], plaintext, html)
+        # Check the response and give feedback to the user
+        if response == "200":
+            flash("Email with your booking confirmation has been sent! Check you inbox.", "success")
+            return render_template("confirmation.html", title="Your Booking Confirmation", bookingID=session['bookingID'], bookings=bookings)
+        else: 
+            flash("There was an error when sending the email. Please try again.", "danger")
+            return render_template("confirmation.html", title="Your Booking Confirmation", bookingID=session['bookingID'], bookings=bookings)
+    elif "bookingID" in session:
+        bookingID = session.get("bookingID", None)
+        # Get all booked flights
+        try:
+            cursor = mysql.connection.cursor()
+            cursor.callproc("GetBooking", [bookingID])
+            bookings = cursor.fetchall()
+            cursor.close()
+        except:
+            abort(500)
+        # Build bookings if not empty
+        if bookings:
+            bookings = buildTrips(bookings)
+        return render_template("confirmation.html", title="Your Booking Confirmation", bookingID=bookingID, bookings=bookings)
+    else:
+        return redirect(url_for("index"))
 
 # About us page
 @app.route("/about-us")
@@ -156,7 +254,7 @@ def contactUs():
         plaintext = build_support_plaintext(firstName, lastName, email, subject, message)
         html = build_support_html(firstName, lastName, email, subject, message)
         response = send_mail("Support Question", email, plaintext, html)
-        # Check the response and gives feedback to the user
+        # Check the response and give feedback to the user
         if response == "200":
             flash("Your contact form has been successfully submitted!", "success")
             return redirect(url_for("contactUs"))
@@ -169,14 +267,15 @@ def contactUs():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     # Check if user is already logged in
-    if "user" in session:
+    if "username" in session:
         return redirect(url_for("dashboard"))
     # Form displayed on this page
     form = LoginForm()
     # If a user submits the form
     if form.validate_on_submit():
         try:
-            session.pop("user", None)
+            session.pop("username", None)
+            session.pop("userID", None)
             cursor = mysql.connection.cursor()
             cursor.callproc("ValidateUser", [form.username.data])
             found = cursor.fetchone()
@@ -195,23 +294,27 @@ def login():
                     if next_url:
                         # Make the session permanent
                         session.permanent = True
-                        session['user'] = form.username.data
+                        session['userID'] = found['UserID']
+                        session['username'] = found['Username']
                         return redirect(next_url)
                     else:
                         # Make the session permanent
                         session.permanent = True
-                        session['user'] = form.username.data
+                        session['userID'] = found['UserID']
+                        session['username'] = found['Username']
                         return redirect(url_for("dashboard"))
                 else:
                     if next_url:
                         # Make the session permanent
                         session.permanent = False
-                        session['user'] = form.username.data
+                        session['userID'] = found['UserID']
+                        session['username'] = found['Username']
                         return redirect(next_url)
                     else:
                         # Make the session permanent
                         session.permanent = False
-                        session['user'] = form.username.data
+                        session['userID'] = found['UserID']
+                        session['username'] = found['Username']
                         return redirect(url_for("dashboard"))
             else:
                 flash("Invalid password! Please try again.", "danger")
@@ -223,7 +326,7 @@ def login():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     # Check if user is already logged in
-    if "user" in session:
+    if "username" in session:
         return redirect(url_for("dashboard"))
     # Form displayed on the page
     form = RegisterForm()
@@ -250,30 +353,32 @@ def register():
 @app.route("/dashboard")
 def dashboard():
     # Check if user is already logged in
-    if "user" not in session:
+    if "username" not in session:
         flash("Please log in first!", "warning")
         return redirect(url_for("login", next=request.url))
-    try:
-        # Get info and trips for this user
-        cursor = mysql.connection.cursor()
-        cursor.callproc("MyInfo", [session['user']])
-        info = cursor.fetchone()
-        cursor.nextset()
-        cursor.callproc("MyTrips", [session['user']])
-        trips = cursor.fetchall()
-    except:
-        abort(500)
-    # Build flights if trips are not empty
-    if trips:
-        trips = buildTrips(trips)
-    cursor.close()
-    return render_template("dashboard.html", title="Dashboard", dashboard=True, info=info, trips=trips)
+    else:
+        try:
+            # Get info and trips for this user
+            cursor = mysql.connection.cursor()
+            cursor.callproc("MyInfo", [session['username']])
+            info = cursor.fetchone()
+            cursor.nextset()
+            cursor.callproc("MyTrips", [session['username']])
+            trips = cursor.fetchall()
+            cursor.close()
+        except:
+            abort(500)
+        # Build flights if trips are not empty
+        if trips:
+            trips = buildTrips(trips)
+        return render_template("dashboard.html", title="Dashboard", dashboard=True, info=info, trips=trips)
 
 # Logout
 @app.route("/logout")
 def logout():
     # Delete this users cookie
-    session.pop("user", None)
+    session.pop("username", None)
+    session.pop("userID", None)
     flash("You have been successfully logged out !", "success")
     return redirect(url_for("index"))
 

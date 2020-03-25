@@ -27,9 +27,34 @@ END //
 DELIMITER ;
 
 DELIMITER //
+CREATE PROCEDURE GetBookingIDs()
+BEGIN
+    SELECT DISTINCT BookingID
+    FROM bookings;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE CreateBooking(IN bookingID VARCHAR(6), IN flightDate Date, IN class VARCHAR(20), IN userID VARCHAR(45), IN flightID VARCHAR(6))
+BEGIN
+    INSERT INTO bookings VALUES
+    (bookingID, flightDate, class, NULL, userID, flightID);
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE GetBooking(IN bookingNumber VARCHAR(6))
+BEGIN
+    SELECT bookings.BookingID, flights.From, flights.To, bookings.FlightDate, flights.DepartTime, flights.FlightID, flights.Duration, bookings.Class, bookings.SeatNumber
+    FROM bookings, flights
+    WHERE bookings.FlightID = flights.FlightID and bookings.BookingID = bookingNumber;
+END //
+DELIMITER ;
+
+DELIMITER //
 CREATE PROCEDURE FindTrip(IN fName VARCHAR(45), IN lName VARCHAR(45), IN bookingNumber VARCHAR(6))
 BEGIN
-    SELECT bookings.BookingID, flights.From, flights.To, flights.DepartTime, flights.Duration, flights.FlightID, flights.AircraftID, bookings.Class, bookings.SeatNumber
+    SELECT bookings.BookingID, flights.From, flights.To, bookings.FlightDate, flights.DepartTime, flights.FlightID, flights.Duration, bookings.Class, bookings.SeatNumber
     FROM bookings, flights, users
     WHERE bookings.UserID = users.UserID AND bookings.FlightID = flights.FlightID AND users.FirstName = fname AND users.LastName = lname AND bookings.BookingID = bookingNumber;
 END //
@@ -58,7 +83,7 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE ValidateUser(IN user VARCHAR(45))
 BEGIN
-    SELECT UserID, Password
+    SELECT UserID, Username, Password
     FROM users
     WHERE UserID = user OR Username = user;
 END //
@@ -70,6 +95,14 @@ BEGIN
     SELECT *
     FROM admin
     WHERE Username = user AND Password = pass;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE CreateUser(IN Title VARCHAR(6), IN FirstName VARCHAR(45), IN MiddleName VARCHAR(45), IN LastName VARCHAR(45), IN PreferredName VARCHAR(45), IN Sex VARCHAR(6), IN DOB Date, IN Street VARCHAR(100), IN City VARCHAR(45), IN ZipCode VARCHAR(10), IN State VARCHAR(45), IN Country VARCHAR(45), IN Phone VARCHAR(20), IN Email VARCHAR(100), IN Username VARCHAR(45), IN Pass VARCHAR(64), IN SecurityQuestion VARCHAR(100), IN SecurityAnswer VARCHAR(45))
+BEGIN
+    INSERT INTO users VALUES
+    (NULL, Title, FirstName, MiddleName, LastName, PreferredName, Sex, DOB, Street, City, ZipCode, State, Country, Phone, Email, Username, Pass, SecurityQuestion, SecurityAnswer, 1, 0);
 END //
 DELIMITER ;
 
@@ -91,16 +124,6 @@ BEGIN
 END //
 DELIMITER ;
 
--- Create --
-DELIMITER //
-CREATE PROCEDURE CreateUser(IN Title VARCHAR(6), IN FirstName VARCHAR(45), IN MiddleName VARCHAR(45), IN LastName VARCHAR(45), IN PreferredName VARCHAR(45), IN Sex VARCHAR(6), IN DOB Date, IN Street VARCHAR(100), IN City VARCHAR(45), IN ZipCode VARCHAR(10), IN State VARCHAR(45), IN Country VARCHAR(45), IN Phone VARCHAR(20), IN Email VARCHAR(100), IN Username VARCHAR(45), IN Pass VARCHAR(64), IN SecurityQuestion VARCHAR(100), IN SecurityAnswer VARCHAR(45))
-BEGIN
-    INSERT INTO users VALUES
-    (NULL, Title, FirstName, MiddleName, LastName, PreferredName, Sex, DOB, Street, City, ZipCode, State, Country, Phone, Email, Username, Pass, SecurityQuestion, SecurityAnswer, 1, 0);
-END //
-DELIMITER ;
-
--- Read --
 DELIMITER //
 CREATE PROCEDURE GetDepartLocations()
 BEGIN
@@ -132,15 +155,3 @@ BEGIN
     FROM contactus;
 END //
 DELIMITER ;
-
-DELIMITER //
-CREATE PROCEDURE GetBookingIDs()
-BEGIN
-    SELECT BookingID
-    FROM bookings;
-END //
-DELIMITER ;
-
--- Update --
-
--- Delete --

@@ -1,0 +1,32 @@
+<!-- This line loads base.html which is present on every page -->
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+<!-- Page Content -->
+{% block content %}
+    <div class="container py-5">
+        <!-- Payment  -->
+        <h3 class="text-center">Your total is: <span class="badge badge-warning">${{ total }}</span></h3>
+        <p class="text-center">Please enter your payment details below:</p>
+        <div class="row justify-content-md-center">
+            <div class="col-md-5">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    {{ wtf.form_field(form.cardNumber, class='form-control', placeholder='ex. 1234-1234-1234-1234') }}
+                    {{ wtf.form_field(form.cardType, class='form-control', placeholder='') }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ wtf.form_field(form.expirationMonth, class='form-control', placeholder='') }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ wtf.form_field(form.expirationYear, class='form-control', placeholder='') }}
+                        </div>
+                    </div>
+                    {{ wtf.form_field(form.cvv, class='form-control', placeholder='ex. 123') }}
+                    {{ wtf.form_field(form.name, class='form-control', placeholder='ex. John Doe') }}
+                    {{ wtf.form_field(form.submit, class='form-control btn-warning my-3', placeholder='') }}
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

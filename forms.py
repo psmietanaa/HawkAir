@@ -11,6 +11,7 @@ from run import app, mysql
 textRegex = re.compile("\s*\w*[!@#$%()=+-:;'\",.?]*")
 streetRegex = re.compile("\s*\w*[.]*")
 phoneRegex = re.compile("\s*\d*[-+.]*")
+cardNumberRegex = re.compile("^(\d{4}[- ]){3}\d{4}|\d{16}$")
 
 # Select field options used in the forms
 titles = [("", ""), ("Mr", "Mr"), ("Ms", "Ms"), ("Mrs", "Mrs"), ("Mx", "Mx")]
@@ -20,6 +21,9 @@ securityQuestions = [("What was your favorite sport in high school?", "What was 
                      ("What was the color of your first car?", "What was the color of your first car?"),
                      ("What is your favorite team?", "What is your favorite team?"),
                      ("In what city were you born?", "In what city were you born?")]
+creditCardType = [("Mastercard", "Mastercard"), ("Visa", "Visa")]
+expirationMonths = [(str(i), str(i)) for i in range(1, 13)]
+expirationYears = [(str(datetime.date.today().year + i), str(datetime.date.today().year + i)) for i in range(0, 5)]
 passengersRange = [(str(i), str(i)) for i in range(1, 10)]
 flightStatusDates = [((datetime.date.today() + datetime.timedelta(days=i)).strftime("%Y-%m-%d"), (datetime.date.today() + datetime.timedelta(days=i)).strftime("%A, %B %d")) for i in range(0, 3)]
 
@@ -80,12 +84,29 @@ class FlightStatusNumberForm(FlaskForm):
     date5 = SelectField("<strong>Date</strong>", choices=flightStatusDates)
     submit5 = SubmitField("Search")
 
+class PaymentForm(FlaskForm):
+    cardNumber = StringField("<strong>Card Number</strong>", validators=[InputRequired(), Regexp(cardNumberRegex, message="Must only contain numbers and dashes.")])
+    cardType = SelectField("<strong>Card Type</strong>", choices=creditCardType)
+    expirationMonth = SelectField("<strong>Expiration Month</strong>", choices=expirationMonths)
+    expirationYear = SelectField("<strong>Expiration Year</strong>", choices=expirationYears)
+    cvv = StringField("<strong>CVV</strong>", validators=[InputRequired(), Length(min=3, max=3, message="Field must be 3 digits long."), Integer()])
+    name = StringField("<strong>Name on the Card</strong>", validators=[InputRequired(), Length(min=4, max=100), AlphaSpace()])
+    submit = SubmitField("Pay")
+    
+    # Convert card number
+    def validate(self):
+        if not FlaskForm.validate(self):
+            return False
+        else:
+            self.cardNumber.data = self.cardNumber.data.replace("-", "")
+            return True
+
 class ContactForm(FlaskForm):
     firstName = StringField("<strong>First Name</strong>", validators=[InputRequired(), Length(min=4, max=45), Alpha()])
     lastName = StringField("<strong>Last Name</strong>", validators=[InputRequired(), Length(min=4, max=45), Alpha()])
     email = StringField("<strong>Email</strong>", validators=[InputRequired(), Length(min=4, max=100), Email()])
-    subject = StringField("<strong>Subject</strong>", validators=[InputRequired(), Length(min=4, max=100), Regexp(textRegex, "Input contains illegal characters.")])
-    message = TextAreaField("<strong>Message</strong>", validators=[InputRequired(), Length(min=4, max=1000), Regexp(textRegex, "Input contains illegal characters.")], render_kw={"rows": 6, "cols": 1})
+    subject = StringField("<strong>Subject</strong>", validators=[InputRequired(), Length(min=4, max=100), Regexp(textRegex, message="Input contains illegal characters.")])
+    message = TextAreaField("<strong>Message</strong>", validators=[InputRequired(), Length(min=4, max=1000), Regexp(textRegex, message="Input contains illegal characters.")], render_kw={"rows": 6, "cols": 1})
     submit = SubmitField("Contact Us")
 
 class LoginForm(FlaskForm):
@@ -99,15 +120,15 @@ class RegisterForm(FlaskForm):
     firstName = StringField("<strong>First Name *</strong>", validators=[InputRequired(), Length(min=4, max=45), Alpha()])
     middleName = StringField("<strong>Middle Name</strong>", validators=[Optional(), Length(min=4, max=45), Alpha()])
     lastName = StringField("<strong>Last Name *</strong>", validators=[InputRequired(), Length(min=4, max=45), Alpha()])
-    preferredName = StringField("<strong>Preferred Name</strong>", validators=[Optional(), Length(min=4, max=45), Alpha()])
+    preferredName = StringField("<strong>Preferred Name</strong>", validators=[Optional(), Length(min=1, max=45), Alpha()])
     sex = SelectField("<strong>Sex *</strong>", choices=sexes)
-    dateOfBirth = DateField("<strong>Date of Birth *</strong>", format="%Y-%m-%d", validators=[InputRequired()])    
-    street = StringField("<strong>Street *</strong>", validators=[InputRequired(), Length(min=4, max=100), Regexp(streetRegex, "Must only contain alpha characters, numbers, spaces and periods.")])
+    dateOfBirth = DateField("<strong>Date of Birth *</strong>", format="%Y-%m-%d", validators=[InputRequired()])
+    street = StringField("<strong>Street *</strong>", validators=[InputRequired(), Length(min=4, max=100), Regexp(streetRegex, message="Must only contain alpha characters, numbers, spaces and periods.")])
     city = StringField("<strong>City *</strong>", validators=[InputRequired(), Length(min=4, max=45), AlphaSpace()])
     zipCode = StringField("<strong>Zip Code *</strong>", validators=[InputRequired(), Length(min=4, max=10), Integer()])
     state = StringField("<strong>State</strong>", validators=[Optional(), Length(min=2, max=45), AlphaSpace()])
     country = StringField("<strong>Country *</strong>", validators=[InputRequired(), Length(min=4, max=45), AlphaSpace()])
-    phone = StringField("<strong>Phone *</strong>", validators=[InputRequired(), Length(min=4, max=200), Regexp(streetRegex, "Must only contain numbers, and some special characters.")])    
+    phone = StringField("<strong>Phone *</strong>", validators=[InputRequired(), Length(min=4, max=200), Regexp(streetRegex, message="Must only contain numbers, and some special characters.")])
     email = StringField("<strong>Email *</strong>", validators=[InputRequired(), Length(min=4, max=100), Email()])
     username = StringField("<strong>Username *</strong>", validators=[InputRequired(), Length(min=4, max=45), AlphaNumeric()])
     password = PasswordField("<strong>Password *</strong>", validators=[InputRequired(), Length(min=4, max=64), AlphaNumeric(), EqualTo("repeatPassword", "Passwords must match.")])

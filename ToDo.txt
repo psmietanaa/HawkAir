@@ -1,16 +1,18 @@
 ToDoList:
 
 Implement:
-- Buying flights
-- Payments
-- Print receipt
-- Email receipt
+
+- Round Trip
+- Multi-City
 
 - Your trips
-- Flight status
+- Flight status date
+- Flight status number
 
 - Trip Cancellation and Change
+- Multiple passengers
 
+Low priority:
 - User ID retrieval policy
 - Password change policy
 - Admin portal

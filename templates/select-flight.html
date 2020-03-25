@@ -61,15 +61,15 @@
                                             </table>
                                             <div class="card-footer d-flex align-items-center justify-content-center">
                                                 <div class="funkyradio">
-                                                    {% if loop.index == 1 %}
+                                                    {% if loop.index0 == 0 %}
                                                     <div class="funkyradio-warning">
-                                                        <input type="radio" name="options-{{ i + 1 }}" id="option-{{ loop.index }}" value="{{ option['FlightID'] }}" checked/>
-                                                        <label for="option-{{ loop.index }}">&nbsp;&nbsp;Select&nbsp;&nbsp;&nbsp;</label>
+                                                        <input type="radio" name="flight-{{ i }}" id="option-{{ loop.index0 }}" value="{{ loop.index0 }}" checked/>
+                                                        <label for="option-{{ loop.index0 }}">&nbsp;&nbsp;Select&nbsp;&nbsp;&nbsp;</label>
                                                     </div>
                                                     {% else %}
                                                     <div class="funkyradio-warning">
-                                                        <input type="radio" name="options-{{ i + 1 }}" id="option-{{ loop.index }}" value="{{ option['FlightID'] }}" />
-                                                        <label for="option-{{ loop.index }}">&nbsp;&nbsp;Select&nbsp;&nbsp;&nbsp;</label>
+                                                        <input type="radio" name="flight-{{ i }}" id="option-{{ loop.index0 }}" value="{{ loop.index0 }}" />
+                                                        <label for="option-{{ loop.index0 }}">&nbsp;&nbsp;Select&nbsp;&nbsp;&nbsp;</label>
                                                     </div>
                                                 {% endif %}
                                                 </div>

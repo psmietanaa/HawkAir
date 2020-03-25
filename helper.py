@@ -50,3 +50,7 @@ def getValues(multiDict):
 # Hash a password using SHA256
 def hashPassword(password):
     return hashlib.sha256(password.encode()).hexdigest()
+
+# Authenticate the payment
+def authenticatePayment():
+    pass

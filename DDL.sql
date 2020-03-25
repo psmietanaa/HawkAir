@@ -133,7 +133,7 @@ CREATE TABLE `HawkAir`.`Bookings` (
     `BookingID` VARCHAR(6) NOT NULL,
     `FlightDate` DATE NOT NULL,
     `Class` VARCHAR(20) NOT NULL,
-    `SeatNumber` VARCHAR(5) NULL,
+    `SeatNumber` VARCHAR(5),
     `UserID` INT NOT NULL,
     `FlightID` VARCHAR(6) NOT NULL,
     PRIMARY KEY (`BookingID`),
@@ -215,10 +215,10 @@ BEFORE DELETE ON schedule FOR EACH ROW
 -- Insert Statements
 -- -----------------------------------------------------
 INSERT INTO `HawkAir`.`Users` VALUES
-(NULL,'','Roger','','McCubbin','','Male','1980-01-21','1087 Windy Ridge Road','Fort Wayne','46802','IN','United States','260-579-8310','roger-mccubbin1946@yahoo.com','Quinnow','e45582512e2f8d730ce143a7c5021ef412b87ed7ea6eb5d32ffa64087bb3df69','What was your favorite sport in high school?','Football'),
-(NULL,'Ms.','Linda','','Knox','','Female','1970-10-12','1345 Lewis Street','Bensenville','60106','IL','United States','630-875-1041','LindaJKnox@teleworm.us','Houghmed','75b1d1b804e4bb41b457f521508a01b870e1382370ef8f10a1f7442a13621007','What is your pet''s name?','Simba'),
+(NULL,'','Roger','','McCubbin','','Male','1980-01-21','1087 Windy Ridge Road','Fort Wayne','46802','IN','United States','260-579-8310','roger-mccubbin1946@yahoo.com','Quinnow','e45582512e2f8d730ce143a7c5021ef412b87ed7ea6eb5d32ffa64087bb3df69','What was your favorite sport in high school?','Football',1,0),
+(NULL,'Ms.','Linda','','Knox','','Female','1970-10-12','1345 Lewis Street','Bensenville','60106','IL','United States','630-875-1041','LindaJKnox@teleworm.us','Houghmed','75b1d1b804e4bb41b457f521508a01b870e1382370ef8f10a1f7442a13621007','What is your pet''s name?','Simba',1,0),
 (NULL,'','Jessica','','McCarthy','Jess','Female','1975-08-05','900 Vesta Drive','Chicago','60631','IL','United States','773-727-5516','jessicamccarthy99@amazon.com','Hatc1999','011bc4bea60b31e6181e5ff5e4036245b19d11de51f0f815e11e241d680b5bc1','In what city were you born?','Chicago',1,270),
-(NULL,'Mr.','Howard','William','Doublas','','Male','1976-06-06','3033 West Drive','Chicago','60661','IL','United States','312-525-7519','howdougl@gmail.com','Waseat','b3227450338443d6eb075389aa425ab21312178035b62996b842f43985f5e78e','What was the color of your first car?','Red'),
+(NULL,'Mr.','Howard','William','Doublas','','Male','1976-06-06','3033 West Drive','Chicago','60661','IL','United States','312-525-7519','howdougl@gmail.com','Waseat','b3227450338443d6eb075389aa425ab21312178035b62996b842f43985f5e78e','What was the color of your first car?','Red',1,0),
 (NULL,'','Amanda','','Lewis','','Female','1994-08-03','680 Mutton Town Road','Centralia','98531','WA','United States','360-623-1953','ama-lewis@amazon.com','Crinsonast','6a8ea85ce30bbb416b31b1aaaf9ef67ac6b5373a199698d999827565736a8267','What is your favorite team?','Packers',1,1300);
 
 INSERT INTO `HawkAir`.`Airports` VALUES
@@ -251,9 +251,9 @@ INSERT INTO `HawkAir`.`Schedule` VALUES
 (1,1,1,1,1,1,1,'AA8737');
 
 INSERT INTO `HawkAir`.`Bookings` VALUES
-('ABCDEF','2020-03-24','FirstClass','5A',100001,'AA2470'),
-('QWERTY','2020-03-21','FirstClass','10A',100002,'AA2470'),
-('ASDFGH','2020-03-19','FirstClass','15A',100003,'AA6846'),
+('ABCDEF','2020-03-24','First Class','5A',100001,'AA2470'),
+('QWERTY','2020-03-21','First Class','10A',100002,'AA2470'),
+('ASDFGH','2020-03-19','First Class','15A',100003,'AA6846'),
 ('ZXCVBN','2020-03-31','Economy','20A',100003,'AA8737');
 
 -- Login: admin

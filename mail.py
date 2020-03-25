@@ -6,7 +6,7 @@ from run import app, mail
 def build_booking_plaintext(BookingID, flights):
     # Build header of the email
     header = """\
-    Thank you. Your reservation is now confirmed!
+    Thank you. Your booking is now confirmed!
     
     Booking ID: %s
     
@@ -19,7 +19,6 @@ def build_booking_plaintext(BookingID, flights):
     for index, flight in enumerate(flights):
         b = """\
         Flight %s
-        Date: %s
         
         From: %s
         To: %s
@@ -32,12 +31,12 @@ def build_booking_plaintext(BookingID, flights):
         Seat: %s
         -------------------------------------------------------------
         """
-        b = b % (index + 1, flight[0], flight[1], flight[2], flight[3], flight[4], flight[5], flight[6], flight[7], flight[8])
+        b = b % (index + 1, flight[0], flight[1], flight[2], flight[3], flight[4], flight[5], flight[6], flight[7])
         body += textwrap.dedent(b)
     # Build footer of the email
     footer = """\
     Thank you for using our service. If you have 
-    any questions about your flight or reservation
+    any questions about your flight or booking
     please contact us by calling +1 319-834-0276
     or email us at hawkair2020@gmail.com.
     Have a nice day!"""
@@ -45,7 +44,7 @@ def build_booking_plaintext(BookingID, flights):
 
 # This function builds the HTML template used to send booking confirmations
 def build_booking_html(BookingID, flights):
-    # Build header of the email    
+    # Build header of the email
     header = """\
     <!DOCTYPE html>
     <html>
@@ -80,7 +79,7 @@ def build_booking_html(BookingID, flights):
     <body>
         <img src="https://i.imgur.com/8kOruHF.png" alt="" width="200">
         <hr width="600px" align="left">
-        <h2>Thank you. Your reservation is now confirmed!</h2>
+        <h2>Thank you. Your booking is now confirmed!</h2>
         <h4>Booking ID: %s</h4>
         <p>
         <h4>Your Itinerary</h4>
@@ -94,7 +93,6 @@ def build_booking_html(BookingID, flights):
         <table id="tableone">
         <tr>
             <th>Flight %s</th>
-            <th style="width: 450px;">Date: %s</th>
         </tr>
         </table>
         <p>
@@ -126,12 +124,12 @@ def build_booking_html(BookingID, flights):
         </table>
         <hr width="600px" align="left">
         """
-        b = b % (index + 1, flight[0], flight[1], flight[2], flight[3], flight[4], flight[5], flight[6], flight[7], flight[8])
+        b = b % (index + 1, flight[0], flight[1], flight[2], flight[3], flight[4], flight[5], flight[6], flight[7])
         body += textwrap.dedent(b)
-    # Build footer of the email    
+    # Build footer of the email
     footer = """\
     <p>
-    Thank you for using our service. If you have any questions about your flight or reservation<br>
+    Thank you for using our service. If you have any questions about your flight or booking<br>
     please contact us by calling <a href="tel:3198340276">+1 319-834-0276</a> or email us at <a href="mailto:hawkair2020@gmail.com?Subject=Question" target="_top">hawkair2020@gmail.com</a><br>
     Have a nice day!
     </p>
@@ -170,7 +168,7 @@ def build_support_plaintext(firstName, lastName, email, subject, message):
 
 # This function builds the HTML template used to send support information
 def build_support_html(firstName, lastName, email, subject, message):
-    # Build header of the email    
+    # Build header of the email
     header = """\
     <!DOCTYPE html>
     <html>

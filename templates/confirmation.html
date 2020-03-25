@@ -1,0 +1,91 @@
+<!-- This line loads base.html which is present on every page -->
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+<!-- Page Content -->
+{% block content %}
+    <div class="container py-5">
+        <!-- Flash Messages Here -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="row">
+                        <div class="col">
+                            <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <h3>Thank you. Your booking is now confirmed!</h3>
+        <hr>
+        <!-- Bookings list -->
+        <div class="row">
+            <div class="col-md-8">
+                {% for key, value in bookings.items() %}
+                    <h4><span class="badge badge-warning mt-1 mb-2">Booking ID: {{ key }}</span></h4>
+                    {% for v in value %}
+                        <div class="card">
+                            <h5 class="card-header">Flight {{ loop.index }}</h5>
+                            <table class="table" style="table-layout: fixed;">
+                                <tr>
+                                    <th>From</th>
+                                    <th>To</th>
+                                    <th>Date</th>
+                                    <th>Departure Time</th>
+                                </tr>
+                                <tr>
+                                    <td>{{ v[0] }}</td>
+                                    <td>{{ v[1] }}</td>
+                                    <td>{{ v[2] }}</td>
+                                    <td>{{ v[3] }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Flight Number</th>
+                                    <th>Duration</th>
+                                    <th>Class</th>
+                                    <th>Seat</th>
+                                </tr>
+                                <tr>
+                                    <td>{{ v[4] }}</td>
+                                    <td>{{ v[5] }}</td>
+                                    <td>{{ v[6] }}</td>
+                                    <td>{{ v[7] }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <p>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+            
+            <!-- Profile -->
+            <div class="col-md-4" id="nextSteps">
+                <h4><span class="badge badge-warning mt-1 mb-2">Next Steps:</span></h4>
+                <div class="jumbotron">
+                    <div class="row justify-content-md-center pt-1">
+                        <a class="btn btn-warning btn-lg" onclick="window.print();">
+                            <i class="fas fa-print"></i> Print
+                        </a>
+                    </div>
+                    <form method="POST">
+                        <div class="row justify-content-md-center py-3">
+                            <button class="btn btn-warning btn-lg" type="submit">
+                                <i class="far fa-envelope"></i> Email
+                            </button>
+                        </div>
+                    </form>
+                    <div class="row justify-content-md-center pb-1">
+                        <a href="/dashboard" class="btn btn-warning btn-lg">
+                            <i class="fas fa-columns"></i> Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
