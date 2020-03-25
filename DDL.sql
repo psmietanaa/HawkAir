@@ -20,7 +20,7 @@ CREATE TABLE `HawkAir`.`Users` (
     `Street` VARCHAR(100) NOT NULL,
     `City` VARCHAR(45) NOT NULL,
     `ZipCode` VARCHAR(10) NOT NULL,
-    `State` VARCHAR(45) NULL,
+    `State` VARCHAR(45),
     `Country` VARCHAR(45) NOT NULL,
     `Phone` VARCHAR(20) NOT NULL,
     `Email` VARCHAR(100) NOT NULL,
@@ -28,8 +28,8 @@ CREATE TABLE `HawkAir`.`Users` (
     `Password` VARCHAR(64) NOT NULL,
     `SecurityQuestion` VARCHAR(100) NOT NULL,
     `SecurityAnswer` VARCHAR(45) NOT NULL,
-    `HawkAdvantage` TINYINT(1) NOT NULL DEFAULT 1,
-    `Miles` INT NOT NULL DEFAULT 0,
+    `HawkAdvantage` TINYINT(1) DEFAULT 1,
+    `Miles` INT DEFAULT 0,
     PRIMARY KEY (`UserID`),
     UNIQUE KEY(`Email`, `Password`))
 ENGINE = InnoDB AUTO_INCREMENT=100001;
@@ -59,7 +59,7 @@ CREATE TABLE `HawkAir`.`Airports` (
     `Code` VARCHAR(3) NOT NULL,
     `Name` VARCHAR(45) NOT NULL,
     `City` VARCHAR(45) NOT NULL,
-    `State` VARCHAR(45) NULL,
+    `State` VARCHAR(45),
     `Country` VARCHAR(45) NOT NULL,
     PRIMARY KEY (`Code`))
 ENGINE = InnoDB;
@@ -84,11 +84,11 @@ CREATE TABLE `HawkAir`.`Flights` (
     `To` VARCHAR(3) NOT NULL,
     `DepartTime` TIME NOT NULL,
     `Duration` TIME NOT NULL,
-    `FlightStatus` VARCHAR(20) NULL DEFAULT 'On Time',
+    `FlightStatus` VARCHAR(20) DEFAULT 'On Time',
     `PriceFirstClass` MEDIUMINT NOT NULL,
     `PriceEconomy` MEDIUMINT NOT NULL,
-    `BookedFirstClassSeats` SMALLINT NULL DEFAULT 0,
-    `BookedEconomySeats` SMALLINT NULL DEFAULT 0,
+    `BookedFirstClassSeats` SMALLINT DEFAULT 0,
+    `BookedEconomySeats` SMALLINT DEFAULT 0,
     PRIMARY KEY (`FlightID`),
     CONSTRAINT `fk_Flights_Airports1`
         FOREIGN KEY (`To`)
@@ -136,7 +136,6 @@ CREATE TABLE `HawkAir`.`Bookings` (
     `SeatNumber` VARCHAR(5),
     `UserID` INT NOT NULL,
     `FlightID` VARCHAR(6) NOT NULL,
-    PRIMARY KEY (`BookingID`),
     CONSTRAINT `fk_Booking_UserInformation1`
         FOREIGN KEY (`UserID`)
         REFERENCES `HawkAir`.`Users` (`UserID`)

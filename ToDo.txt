@@ -2,9 +2,6 @@ ToDoList:
 
 Implement:
 
-- Round Trip
-- Multi-City
-
 - Your trips
 - Flight status date
 - Flight status number
@@ -16,6 +13,15 @@ Low priority:
 - User ID retrieval policy
 - Password change policy
 - Admin portal
+
+Jacob:
+- Trigger to update Miles when creating and deleting bookings
+- Trigger to automatically delete old bookings
+- Add more data into flights/airports/schedules
+
+Sriram:
+- Query #11
+- Query #14
 
 Phase 2:
 - Hub system

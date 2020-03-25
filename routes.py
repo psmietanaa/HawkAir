@@ -52,17 +52,32 @@ def index():
     # If a user submits one of the forms
     # Naming has to include a form number at the end to have multiple forms on one page
     if roundtrip.submit1.data and roundtrip.validate_on_submit():
-        return roundtrip.data
-    elif oneway.submit2.data and oneway.validate_on_submit():
-        data = request.form
+        # Build flights based on the form
+        data = roundtrip.data
+        flights = []
+        flights.append({'from': data['fromCity1'], 'to': data['toCity1'], 'passengers': data['passengers1'], 'date': str(data['departDate1'])})
+        flights.append({'from': data['toCity1'], 'to': data['fromCity1'], 'passengers': data['passengers1'], 'date': str(data['returnDate1'])})
         # User must be logged in to search flights
-        if "username" not in session:
-            session['selectFlight'] = [{'from': data['fromCity2'], 'to': data['toCity2'], 'passengers': data['passengers2'], 'date': data['departDate2']}]
+        if "username" in session:
+            session['selectFlight'] = flights
+            return redirect(url_for("selectFlight"))
+        else:
+            session['selectFlight'] = flights
             flash("Please log in first!", "warning")
             return redirect(url_for("login", next=url_for("selectFlight")))
-        else:
-            session['selectFlight'] = [{'from': data['fromCity2'], 'to': data['toCity2'], 'passengers': data['passengers2'], 'date': data['departDate2']}]
+    elif oneway.submit2.data and oneway.validate_on_submit():
+        # Build flights based on the form
+        data = oneway.data
+        flights = []
+        flights.append({'from': data['fromCity2'], 'to': data['toCity2'], 'passengers': data['passengers2'], 'date': str(data['departDate2'])})
+        # User must be logged in to search flights
+        if "username" in session:
+            session['selectFlight'] = flights
             return redirect(url_for("selectFlight"))
+        else:
+            session['selectFlight'] = flights
+            flash("Please log in first!", "warning")
+            return redirect(url_for("login", next=url_for("selectFlight")))
     elif yourtrip.submit3.data and yourtrip.validate_on_submit():
         return yourtrip.data
     elif flightstatusDate.submit4.data and flightstatusDate.validate_on_submit():
@@ -88,6 +103,7 @@ def selectFlight(flights = []):
     # Call procedure to search flights
     elif "selectFlight" in session:
         data = session.get("selectFlight", None)
+        print(data, flush=True)
         flights = []
         for i in range(0, len(data)):
             # Search for flights
@@ -389,7 +405,18 @@ def multicity():
     form = MulticityForm()
     # If a user submits the form
     if form.validate_on_submit():
-        return form.data
+        # Build flights based on the form
+        flights = form.flights.data
+        data = []
+        for flight in flights:
+            data.append({'from': flight['fromCity'], 'to': flight['toCity'], 'passengers': form.passengers.data, 'date': str(flight['departDate'])})
+        if "username" in session:
+            session['selectFlight'] = data
+            return redirect(url_for("selectFlight"))
+        else:
+            session['selectFlight'] = data
+            flash("Please log in first!", "warning")
+            return redirect(url_for("login", next=url_for("selectFlight")))
     return render_template("multicity.html", title="Multi-City", form=form)
 
 # Admin page

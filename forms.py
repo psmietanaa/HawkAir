@@ -46,7 +46,7 @@ def FutureDate(form, field):
 class RoundTripForm(FlaskForm):
     fromCity1 = SelectField("<strong>From</strong>", choices=fromCities)
     toCity1 = SelectField("<strong>To</strong>", choices=toCities)
-    passengers1 = SelectField("<strong>Number of passengers</strong>", choices=passengersRange)
+    passengers1 = SelectField("<strong>Number of Passengers</strong>", choices=passengersRange)
     departDate1 = DateField("<strong>Depart</strong>", format="%Y-%m-%d", validators=[InputRequired(), FutureDate])
     returnDate1 = DateField("<strong>Return</strong>", format="%Y-%m-%d", validators=[InputRequired(), FutureDate])
     submit1 = SubmitField("Search")
@@ -55,6 +55,9 @@ class RoundTripForm(FlaskForm):
     def validate(self):
         if not FlaskForm.validate(self):
             return False
+        elif self.fromCity1.data == self.toCity1.data:
+            self.toCity1.errors.append("From and To cannot be the same.")
+            return False            
         elif self.departDate1.data > self.returnDate1.data:
             self.returnDate1.errors.append("Return date must be after departure date.")
             return False
@@ -66,6 +69,15 @@ class OneWayForm(FlaskForm):
     passengers2 = SelectField("<strong>Number of passengers</strong>", choices=passengersRange)
     departDate2 = DateField("<strong>Depart</strong>", format="%Y-%m-%d", validators=[InputRequired(), FutureDate])
     submit2 = SubmitField("Search")
+    
+    # From and To cannot be the same
+    def validate(self):
+        if not FlaskForm.validate(self):
+            return False
+        elif self.fromCity2.data == self.toCity2.data:
+            self.toCity2.errors.append("From and To cannot be the same.")
+            return False
+        return True
 
 class YourTripForm(FlaskForm):
     firstName3 = StringField("<strong>First Name</strong>", validators=[InputRequired(), Length(min=4, max=45), Alpha()])
@@ -78,6 +90,15 @@ class FlightStatusDateForm(FlaskForm):
     toCity4 = SelectField("<strong>To</strong>", choices=toCities)
     date4 = SelectField("<strong>Date</strong>", choices=flightStatusDates)
     submit4 = SubmitField("Search")
+    
+    # From and To cannot be the same
+    def validate(self):
+        if not FlaskForm.validate(self):
+            return False
+        elif self.fromCity4.data == self.toCity4.data:
+            self.toCity4.errors.append("From and To cannot be the same.")
+            return False
+        return True    
 
 class FlightStatusNumberForm(FlaskForm):
     flightNumber5 = StringField("<strong>Flight Number</strong>", validators=[InputRequired(), Length(min=6, max=6, message="Field must be 6 characters long."), AlphaNumeric()])
@@ -161,6 +182,15 @@ class MulticityFlight(Form):
     fromCity = SelectField("<strong>From *</strong>", choices=fromCities)
     toCity = SelectField("<strong>To *</strong>", choices=toCities)
     departDate = DateField("<strong>Depart *</strong>", format="%Y-%m-%d", validators=[InputRequired(), FutureDate])
+    
+    # From and To cannot be the same
+    def validate(self):
+        if not FlaskForm.validate(self):
+            return False
+        elif self.fromCity.data == self.toCity.data:
+            self.toCity.errors.append("From and To cannot be the same.")
+            return False
+        return True    
     
 class MulticityForm(FlaskForm):
     flights = FieldList(FormField(MulticityFlight), min_entries=1, max_entries=5)

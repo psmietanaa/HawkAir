@@ -87,11 +87,6 @@ a, a:hover {
     border: 1px solid red;
 }
 
-/** Hidden **/
-.is-hidden {
-    display: none;
-}
-
 /** Footer Background **/
 #footer {
     background-color: #262626;
@@ -116,7 +111,7 @@ a, a:hover {
 
 /** Printing **/
 @media print {
-    #header, #nextSteps, #footer, #copyright { 
+    #header, #nextSteps, #footer, #copyright, #noPrintAlert { 
         display: none !important;
     }
     
@@ -124,4 +119,9 @@ a, a:hover {
         -webkit-print-color-adjust: exact;
         color-adjust: exact !important;
     }
+}
+
+/** Hidden **/
+.is-hidden {
+    display: none;
 }
