@@ -30,8 +30,7 @@ CREATE TABLE `HawkAir`.`Users` (
     `SecurityAnswer` VARCHAR(45) NOT NULL,
     `HawkAdvantage` TINYINT(1) DEFAULT 1,
     `Miles` INT DEFAULT 0,
-    PRIMARY KEY (`UserID`),
-    UNIQUE KEY(`Email`, `Password`))
+    PRIMARY KEY (`UserID`, `Email`, `Password`))
 ENGINE = InnoDB AUTO_INCREMENT=100001;
 
 -- -----------------------------------------------------
@@ -186,7 +185,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TRIGGER  trigger_booking_insert
 AFTER INSERT ON bookings FOR EACH ROW 
-    UPDATE flights SET flights.BookedFirstClassSeats = IF(NEW.class = 'FirstClass',
+    UPDATE flights SET flights.BookedFirstClassSeats = IF(NEW.class = 'First Class',
         flights.BookedFirstClassSeats + 1,
         flights.BookedFirstClassSeats) , flights.BookedEconomySeats = IF(NEW.class = 'Economy',
         flights.BookedEconomySeats + 1,
@@ -196,7 +195,7 @@ AFTER INSERT ON bookings FOR EACH ROW
 	
 CREATE TRIGGER  trigger_booking_delete
 BEFORE DELETE ON bookings FOR EACH ROW 
-    UPDATE flights SET flights.BookedFirstClassSeats = IF(OLD.class = 'FirstClass',
+    UPDATE flights SET flights.BookedFirstClassSeats = IF(OLD.class = 'First Class',
         flights.BookedFirstClassSeats - 1,
         flights.BookedFirstClassSeats) , flights.BookedEconomySeats = IF(OLD.class = 'Economy',
         flights.BookedEconomySeats - 1,
