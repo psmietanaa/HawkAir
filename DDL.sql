@@ -184,21 +184,26 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Triggers
 -- -----------------------------------------------------
-CREATE TRIGGER  trigger_booking_insert
+
+CREATE TRIGGER  trigger_booking_flights_insert
 AFTER INSERT ON bookings FOR EACH ROW 
-    UPDATE flights SET flights.BookedFirstClassSeats = IF(NEW.class = 'First Class',
+    UPDATE flights SET 
+    flights.BookedFirstClassSeats = IF(NEW.class = 'First Class',
         flights.BookedFirstClassSeats + 1,
-        flights.BookedFirstClassSeats) , flights.BookedEconomySeats = IF(NEW.class = 'Economy',
+        flights.BookedFirstClassSeats) , 
+	flights.BookedEconomySeats = IF(NEW.class = 'Economy',
         flights.BookedEconomySeats + 1,
         flights.BookedEconomySeats)
     WHERE NEW.FlightID = flights.FlightID
 ;
 	
-CREATE TRIGGER  trigger_booking_delete
+CREATE TRIGGER  trigger_booking_flights_delete
 BEFORE DELETE ON bookings FOR EACH ROW 
-    UPDATE flights SET flights.BookedFirstClassSeats = IF(OLD.class = 'First Class',
+    UPDATE flights SET 
+	flights.BookedFirstClassSeats = IF(OLD.class = 'First Class',
         flights.BookedFirstClassSeats - 1,
-        flights.BookedFirstClassSeats) , flights.BookedEconomySeats = IF(OLD.class = 'Economy',
+        flights.BookedFirstClassSeats) , 
+	flights.BookedEconomySeats = IF(OLD.class = 'Economy',
         flights.BookedEconomySeats - 1,
         flights.BookedEconomySeats)
     WHERE OLD.FlightID = flights.FlightID
@@ -208,6 +213,24 @@ CREATE TRIGGER  trigger_schedule_delete
 BEFORE DELETE ON schedule FOR EACH ROW 
     DELETE FROM flights
     WHERE FlightID = OLD.FlightID
+;
+
+CREATE TRIGGER  trigger_booking_users_insert
+AFTER INSERT ON bookings FOR EACH ROW 
+    UPDATE users,flights set
+	users.miles = IF(new.class = 'First Class',
+        users.miles + floor(flights.PriceFirstClass/10),
+        users.miles + floor(flights.PriceEconomy/10))
+    WHERE NEW.UserID = users.UserID and NEW.FlightID = flights.FlightID
+;
+
+CREATE TRIGGER  trigger_booking_users_delete
+before delete ON bookings FOR EACH ROW 
+    UPDATE users,flights set
+	users.miles = IF(OLD.class = 'First Class',
+        users.miles - floor(flights.PriceFirstClass/10),
+        users.miles - floor(flights.PriceEconomy/10))
+    WHERE OLD.UserID = users.UserID and OLD.FlightID = flights.FlightID
 ;
 
 -- -----------------------------------------------------
@@ -226,34 +249,57 @@ INSERT INTO `HawkAir`.`Airports` VALUES
 ('JFK','John F Kennedy International','New York','NY','United States'),
 ('DFW','Dallas Fort Worth International','Dallas-Fort Worth','TX','United States'),
 ('DEN','Denver International','Denver','CO','United States'),
-('MIA','Miami International','Miami','FL','United States');
+('MIA','Miami International','Miami','FL','United States'),
+('CID','Eastern Iowa','Cedar Rapids','IA','United States'),
+('LGA','La Guardia','New York','NY','United States'),
+('EWR','Newark Liberty International','New York','NY','United States'),
+('MSP','Minneapolis-Saint Paul International','Minneapolis','Minnesota','United States'),
+('BOI','Boise Airport','Boise','Idaho','United States'),
+('FLL','Fort Lauderdale-Hollywood International','Fort Lauderdale','FL','United States'),
+('COS','Colorado Springs','Colorado Springs','Colorado','United States');
 
 INSERT INTO `HawkAir`.`Aircrafts` VALUES
 ('Airbus 319',8,96),
+('Airbus 321',25,175),
 ('Airbus 330',20,152),
 ('Boeing 737',16,126),
 ('Boeing 787',20,158),
-('CRJ 700',8,48);
+('CRJ 700',8,48),
+('CRJ 900',10,55);
 
 INSERT INTO `HawkAir`.`Flights` VALUES
 ('AA2470','Airbus 319','ORD','LAX','18:00','2:08','On time',650,350,0,0),
 ('AA5306','CRJ 700','ORD','DFW','11:22','2:02','On time',400,200,0,0),
 ('AA6846','Boeing 737','ORD','JFK','9:04','2:40','On time',520,230,0,0),
 ('AA4594','Airbus 319','ORD','DEN','7:57','1:52','On time',240,160,0,0),
-('AA8737','Boeing 787','ORD','MIA','12:34','3:15','On time',370,250,0,0);
+('AA8737','Boeing 787','ORD','MIA','12:34','3:15','On time',370,250,0,0),
+('AA2505','Airbus 321','EWR','DEN','5:00','8:10','On time',410,150,0,0),
+('AA4054','Airbus 321','LGA','COS','6:00','7:41','On time',420,160,0,0),
+('AA1597','Airbus 321','LGA','DFW','6:00','4:08','On time',365,130,0,0),
+('AA5303','CRJ 900','CID','FLL','7:01','5:52','On time',240,160,0,0),
+('AA8107','Boeing 737','MSP','BOI','5:05','8:56','On time',250,120,0,0);
 
 INSERT INTO `HawkAir`.`Schedule` VALUES
 (1,1,1,1,1,1,1,'AA2470'),
 (1,1,1,1,1,1,1,'AA5306'),
 (1,1,1,1,1,1,1,'AA6846'),
 (1,1,1,1,1,1,1,'AA4594'),
-(1,1,1,1,1,1,1,'AA8737');
+(1,1,1,1,1,1,1,'AA8737'),
+(1,1,1,1,1,1,1,'AA2505'),
+(1,1,1,1,1,1,1,'AA4054'),
+(1,1,1,1,1,1,1,'AA1597'),
+(1,1,1,1,1,1,1,'AA5303'),
+(1,1,1,1,1,1,1,'AA8107');
 
 INSERT INTO `HawkAir`.`Bookings` VALUES
 ('ABCDEF','Roger McCubbin','2020-03-24','First Class','',100001,'AA2470'),
 ('QWERTY','Linda Knox','2020-03-21','First Class','',100002,'AA2470'),
 ('ASDFGH','Jessica McCarthy','2020-03-19','First Class','',100003,'AA6846'),
-('ZXCVBN','Jessica McCarthy','2020-03-31','Economy','',100003,'AA8737');
+('ZXCVBN','Jessica McCarthy','2020-03-31','Economy','',100003,'AA8737'),
+('ABCDEG','Howard Doublas','2020-03-24','First Class','',100004,'AA2505'),
+('QWERTU','Amanda Lewis','2020-03-21','Economy','',100005,'AA4054'),
+('ASDFGJ','Linda Knox','2020-03-19','Economy','',100002,'AA5303'),
+('ZXCVBM','Howard Doublas','2020-03-31','Economy','',100004,'AA8107');
 
 -- Login: admin
 -- Password: password
