@@ -130,6 +130,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE `HawkAir`.`Bookings` (
     `BookingID` VARCHAR(6) NOT NULL,
+    `Passenger` VARCHAR(100) NOT NULL,
     `FlightDate` DATE NOT NULL,
     `Class` VARCHAR(20) NOT NULL,
     `SeatNumber` VARCHAR(5),
@@ -249,10 +250,10 @@ INSERT INTO `HawkAir`.`Schedule` VALUES
 (1,1,1,1,1,1,1,'AA8737');
 
 INSERT INTO `HawkAir`.`Bookings` VALUES
-('ABCDEF','2020-03-24','First Class','5A',100001,'AA2470'),
-('QWERTY','2020-03-21','First Class','10A',100002,'AA2470'),
-('ASDFGH','2020-03-19','First Class','15A',100003,'AA6846'),
-('ZXCVBN','2020-03-31','Economy','20A',100003,'AA8737');
+('ABCDEF','Roger McCubbin','2020-03-24','First Class','',100001,'AA2470'),
+('QWERTY','Linda Knox','2020-03-21','First Class','',100002,'AA2470'),
+('ASDFGH','Jessica McCarthy','2020-03-19','First Class','',100003,'AA6846'),
+('ZXCVBN','Jessica McCarthy','2020-03-31','Economy','',100003,'AA8737');
 
 -- Login: admin
 -- Password: password

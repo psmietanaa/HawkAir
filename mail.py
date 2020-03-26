@@ -25,10 +25,11 @@ def build_booking_plaintext(BookingID, flights):
         Date: %s
         Departure Time: %s
         
+        Class: %s
+        Passenger: %s
         Flight Number: %s
         Duration: %s
-        Class: %s
-        Seat: %s
+        
         -------------------------------------------------------------
         """
         b = b % (index + 1, flight[0], flight[1], flight[2], flight[3], flight[4], flight[5], flight[6], flight[7])
@@ -110,10 +111,10 @@ def build_booking_html(BookingID, flights):
                 <td>%s</td>
             </tr>
             <tr>
+                <th>Class</th>
+                <th>Passenger</th>
                 <th>Flight Number</th>
                 <th>Duration</th>
-                <th>Class</th>
-                <th>Seat</th>
             </tr>
             <tr>
                 <td>%s</td>
@@ -233,6 +234,6 @@ def send_mail(subject, receiver, plaintext, html=None):
         # Send email
         with app.app_context():
             mail.send(message)
-        return "200"
+        return 200
     except Exception as e:
-        return "500"
+        return 500

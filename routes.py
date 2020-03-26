@@ -57,12 +57,12 @@ def index():
         flights = []
         flights.append({'from': data['fromCity1'], 'to': data['toCity1'], 'passengers': data['passengers1'], 'date': str(data['departDate1'])})
         flights.append({'from': data['toCity1'], 'to': data['fromCity1'], 'passengers': data['passengers1'], 'date': str(data['returnDate1'])})
+        session['selectFlight'] = flights
+        session['passengers'] = int(data['passengers1'])
         # User must be logged in to search flights
         if "username" in session:
-            session['selectFlight'] = flights
             return redirect(url_for("selectFlight"))
         else:
-            session['selectFlight'] = flights
             flash("Please log in first!", "warning")
             return redirect(url_for("login", next=url_for("selectFlight")))
     elif oneway.submit2.data and oneway.validate_on_submit():
@@ -70,12 +70,12 @@ def index():
         data = oneway.data
         flights = []
         flights.append({'from': data['fromCity2'], 'to': data['toCity2'], 'passengers': data['passengers2'], 'date': str(data['departDate2'])})
+        session['selectFlight'] = flights
+        session['passengers'] = int(data['passengers2'])
         # User must be logged in to search flights
         if "username" in session:
-            session['selectFlight'] = flights
             return redirect(url_for("selectFlight"))
         else:
-            session['selectFlight'] = flights
             flash("Please log in first!", "warning")
             return redirect(url_for("login", next=url_for("selectFlight")))
     elif yourtrip.submit3.data and yourtrip.validate_on_submit():
@@ -101,22 +101,24 @@ def selectFlight(flights = []):
         session['buildFlight'] = chosen
         return redirect(url_for("chooseFares"))
     # Call procedure to search flights
-    elif "selectFlight" in session:
+    if "selectFlight" in session:
         data = session.get("selectFlight", None)
-        print(data, flush=True)
         flights = []
         for i in range(0, len(data)):
-            # Search for flights
-            cursor = mysql.connection.cursor()
-            cursor.nextset()
-            cursor.callproc("SearchFlights", [data[i]['from'], data[i]['to'], data[i]['passengers'], toWeekday(data[i]['date'])])
-            flight = cursor.fetchall()
-            cursor.close()
+            try:
+                # Search for flights
+                cursor = mysql.connection.cursor()
+                cursor.nextset()
+                cursor.callproc("SearchFlights", [data[i]['from'], data[i]['to'], data[i]['passengers'], toWeekday(data[i]['date'])])
+                flight = cursor.fetchall()
+                cursor.close()
+            except:
+                abort(500)
             # Build flights if flight is not empty
             if flight:
                 flight = buildFlights(flight, data[i]['date'])
                 flights.append(flight)
-            session['buildFlight'] = flights
+        session['buildFlight'] = flights
         return render_template("select-flight.html", title="Select Flights", flights=flights)
     else:
         return redirect(url_for("index"))
@@ -133,14 +135,15 @@ def chooseFares():
         for i in range(0, len(data)):
             index = int(data[i])
             if index % 2 == 0:
-                chosen.append([fares[i][0], "Economy", fares[i][1]])
+                chosen.append([fares[i][0], "Economy", fares[i][1][1]])
             else:
-                chosen.append([fares[i][0], "First Class", fares[i][2]])
+                chosen.append([fares[i][0], "First Class", fares[i][2][1]])
         session['payment'] = chosen
-        return redirect(url_for("payment"))
+        return redirect(url_for("passengers"))
     # Call procedure to get fares
     elif "buildFlight" in session:
         flights = session.get("buildFlight", None)
+        passengers = session.get("passengers", None)
         # Get flight fares
         fares = []
         for flight in flights:
@@ -151,9 +154,29 @@ def chooseFares():
                 cursor.close()
             except:
                 abort(500)
-            fares.append([flight['FlightID'], str(fare['PriceEconomy']), str(fare['PriceFirstClass'])])
+            print(fare,flush=True)
+            fares.append([flight['FlightID'], [str(fare['PriceEconomy']), str(int(fare['PriceEconomy']) * passengers)], [str(fare['PriceFirstClass']), str(int(fare['PriceFirstClass']) * passengers)]])
         session['chooseFares'] = fares
         return render_template("choose-fares.html", title="Choose Fares", fares=fares)
+    else:
+        return redirect(url_for("index"))
+
+# Passengers
+@app.route("/passengers", methods=["GET", "POST"])
+def passengers():
+    if "passengers" in session:
+        passengers = session.get("passengers", None)
+        # Payment form
+        form = PassengersForm()
+        if len(form.passengers) < passengers:
+            for i in range(0, passengers):
+                form.passengers.append_entry()
+        # If user already entered passengers details
+        if form.validate_on_submit():
+            data = form.passengers.data
+            session['passengers'] = data
+            return redirect(url_for("payment"))
+        return render_template("passengers.html", title="Passengers", passengers=passengers, form=form)
     else:
         return redirect(url_for("index"))
 
@@ -184,16 +207,15 @@ def payment():
             bookingID = generateBookingID(ids)
             userID = session.get("userID", None)
             selectFlight = session.get("selectFlight", None)
+            passengers = session.get("passengers", None)
             payment = session.get("payment", None)
-            # Book flights
+            # Book flights for each passengers
             for i in range(0, len(selectFlight)):
-                try:
+                for j in range(0, len(passengers)):
                     cursor = mysql.connection.cursor()
-                    cursor.callproc("CreateBooking", [bookingID, selectFlight[i]['date'], payment[i][1], userID, payment[i][0]])
+                    cursor.callproc("CreateBooking", [bookingID, passengers[j]['firstName'] + " " + passengers[j]['lastName'], selectFlight[i]['date'], payment[i][1], userID, payment[i][0]])
                     mysql.connection.commit()
                     cursor.close()
-                except:
-                    abort(500)
             # If success redirect to confirmation
             session['bookingID'] = bookingID
             return redirect(url_for("confirmation"))
@@ -217,7 +239,7 @@ def confirmation():
             bookings = cursor.fetchall()
             cursor.close()
         except:
-            abort(500)   
+            abort(500)
         # Build bookings if not empty
         if bookings:
             bookings = buildTrips(bookings)
@@ -225,7 +247,7 @@ def confirmation():
         html = build_booking_html(session['bookingID'], bookings[session['bookingID']])
         response = send_mail("Your Booking Confirmation", info['Email'], plaintext, html)
         # Check the response and give feedback to the user
-        if response == "200":
+        if response == 200:
             flash("Email with your booking confirmation has been sent! Check you inbox.", "success")
             return render_template("confirmation.html", title="Your Booking Confirmation", bookingID=session['bookingID'], bookings=bookings)
         else: 
@@ -271,7 +293,7 @@ def contactUs():
         html = build_support_html(firstName, lastName, email, subject, message)
         response = send_mail("Support Question", email, plaintext, html)
         # Check the response and give feedback to the user
-        if response == "200":
+        if response == 200:
             flash("Your contact form has been successfully submitted!", "success")
             return redirect(url_for("contactUs"))
         else: 
@@ -410,11 +432,11 @@ def multicity():
         data = []
         for flight in flights:
             data.append({'from': flight['fromCity'], 'to': flight['toCity'], 'passengers': form.passengers.data, 'date': str(flight['departDate'])})
+        session['selectFlight'] = data
+        session['passengers'] = int(data['passengers'])
         if "username" in session:
-            session['selectFlight'] = data
             return redirect(url_for("selectFlight"))
         else:
-            session['selectFlight'] = data
             flash("Please log in first!", "warning")
             return redirect(url_for("login", next=url_for("selectFlight")))
     return render_template("multicity.html", title="Multi-City", form=form)

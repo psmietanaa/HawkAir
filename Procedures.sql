@@ -35,17 +35,17 @@ END //
 DELIMITER ;
 
 DELIMITER //
-CREATE PROCEDURE CreateBooking(IN bookingID VARCHAR(6), IN flightDate Date, IN class VARCHAR(20), IN userID VARCHAR(45), IN flightID VARCHAR(6))
+CREATE PROCEDURE CreateBooking(IN bookingID VARCHAR(6), IN passenger VARCHAR(100), IN flightDate Date, IN class VARCHAR(20), IN userID VARCHAR(45), IN flightID VARCHAR(6))
 BEGIN
     INSERT INTO bookings VALUES
-    (bookingID, flightDate, class, NULL, userID, flightID);
+    (bookingID, passenger, flightDate, class, '', userID, flightID);
 END //
 DELIMITER ;
 
 DELIMITER //
 CREATE PROCEDURE GetBooking(IN bookingNumber VARCHAR(6))
 BEGIN
-    SELECT bookings.BookingID, flights.From, flights.To, bookings.FlightDate, flights.DepartTime, flights.FlightID, flights.Duration, bookings.Class, bookings.SeatNumber
+    SELECT bookings.BookingID, flights.From, flights.To, bookings.FlightDate, flights.DepartTime, flights.FlightID, flights.Duration, bookings.Class, bookings.Passenger
     FROM bookings, flights
     WHERE bookings.FlightID = flights.FlightID and bookings.BookingID = bookingNumber;
 END //
@@ -54,7 +54,7 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE FindTrip(IN fName VARCHAR(45), IN lName VARCHAR(45), IN bookingNumber VARCHAR(6))
 BEGIN
-    SELECT bookings.BookingID, flights.From, flights.To, bookings.FlightDate, flights.DepartTime, flights.FlightID, flights.Duration, bookings.Class, bookings.SeatNumber
+    SELECT bookings.BookingID, flights.From, flights.To, bookings.FlightDate, flights.DepartTime, flights.FlightID, flights.Duration, bookings.Class, bookings.Passenger
     FROM bookings, flights, users
     WHERE bookings.UserID = users.UserID AND bookings.FlightID = flights.FlightID AND users.FirstName = fname AND users.LastName = lname AND bookings.BookingID = bookingNumber;
 END //
@@ -118,7 +118,7 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE MyTrips(IN user VARCHAR(45))
 BEGIN
-    SELECT bookings.BookingID, flights.From, flights.To, bookings.FlightDate, flights.DepartTime, flights.FlightID, flights.Duration, bookings.Class, bookings.SeatNumber
+    SELECT bookings.BookingID, flights.From, flights.To, bookings.FlightDate, flights.DepartTime, flights.FlightID, flights.Duration, bookings.Class, bookings.Passenger
     FROM bookings, flights, users
     WHERE bookings.UserID = users.UserID AND bookings.FlightID = flights.FlightID AND users.Username = user;
 END //

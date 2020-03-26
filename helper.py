@@ -26,9 +26,9 @@ def buildTrips(trips):
     for trip in trips:
         if trip['BookingID'] not in flights:
             flights[trip['BookingID']] = []
-            flights[trip['BookingID']].append([trip['From'], trip['To'], trip['FlightDate'].strftime("%m/%d/%Y"), str(trip['DepartTime'])[:-3], trip['FlightID'], str(trip['Duration'])[:-3] + "h", trip['Class'], trip['SeatNumber']])
+            flights[trip['BookingID']].append([trip['From'], trip['To'], trip['FlightDate'].strftime("%m/%d/%Y"), str(trip['DepartTime'])[:-3], trip['Class'], trip['Passenger'], trip['FlightID'], str(trip['Duration'])[:-3] + "h"])
         else:
-            flights[trip['BookingID']].append([trip['From'], trip['To'], trip['FlightDate'].strftime("%m/%d/%Y"), str(trip['DepartTime'])[:-3], trip['FlightID'], str(trip['Duration'])[:-3] + "h", trip['Class'], trip['SeatNumber']])
+            flights[trip['BookingID']].append([trip['From'], trip['To'], trip['FlightDate'].strftime("%m/%d/%Y"), str(trip['DepartTime'])[:-3], trip['Class'], trip['Passenger'], trip['FlightID'], str(trip['Duration'])[:-3] + "h"])
     return flights
 
 # This function generates a BookingID that has not been used

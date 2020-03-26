@@ -121,7 +121,7 @@ a, a:hover {
     }
 }
 
-/** Hidden **/
+/** Hidden elements **/
 .is-hidden {
     display: none;
 }

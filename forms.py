@@ -57,7 +57,7 @@ class RoundTripForm(FlaskForm):
             return False
         elif self.fromCity1.data == self.toCity1.data:
             self.toCity1.errors.append("From and To cannot be the same.")
-            return False            
+            return False
         elif self.departDate1.data > self.returnDate1.data:
             self.returnDate1.errors.append("Return date must be after departure date.")
             return False
@@ -79,6 +79,15 @@ class OneWayForm(FlaskForm):
             return False
         return True
 
+class Passenger(Form):
+    firstName = StringField("<strong>First Name</strong>", validators=[InputRequired(), Length(min=4, max=45), Alpha()])
+    lastName = StringField("<strong>Last Name</strong>", validators=[InputRequired(), Length(min=4, max=45), Alpha()])
+    passport = StringField("<strong>Passport Number</strong>", validators=[InputRequired(), Length(min=6, max=9), AlphaNumeric()])
+    
+class PassengersForm(FlaskForm):
+    passengers = FieldList(FormField(Passenger))
+    submit = SubmitField("Continue")
+
 class YourTripForm(FlaskForm):
     firstName3 = StringField("<strong>First Name</strong>", validators=[InputRequired(), Length(min=4, max=45), Alpha()])
     lastName3 = StringField("<strong>Last Name</strong>", validators=[InputRequired(), Length(min=4, max=45), Alpha()])
@@ -98,7 +107,7 @@ class FlightStatusDateForm(FlaskForm):
         elif self.fromCity4.data == self.toCity4.data:
             self.toCity4.errors.append("From and To cannot be the same.")
             return False
-        return True    
+        return True
 
 class FlightStatusNumberForm(FlaskForm):
     flightNumber5 = StringField("<strong>Flight Number</strong>", validators=[InputRequired(), Length(min=6, max=6, message="Field must be 6 characters long."), AlphaNumeric()])
@@ -190,7 +199,7 @@ class MulticityFlight(Form):
         elif self.fromCity.data == self.toCity.data:
             self.toCity.errors.append("From and To cannot be the same.")
             return False
-        return True    
+        return True
     
 class MulticityForm(FlaskForm):
     flights = FieldList(FormField(MulticityFlight), min_entries=1, max_entries=5)

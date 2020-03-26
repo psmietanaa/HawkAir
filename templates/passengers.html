@@ -1,0 +1,36 @@
+<!-- This line loads base.html which is present on every page -->
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+<!-- Page Content -->
+{% block content %}
+    <div class="container py-5">
+        <div class="row justify-content-md-center">
+            <div class="col-md-8">
+                <!-- Passengers  -->
+                <h3 class="text-center py-4">Please enter passenger details below:</h3>
+                <hr>
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                        <div class="row">
+                            {% for subform in form.passengers %}
+                            <div class="col-md-3 text-center mt-4">
+                                <h4><span class="badge badge-warning mt-1 mb-3 px-2 py-2">Passenger {{ loop.index }} </span></h4>
+                            </div>
+                            <div class="col-md-3">
+                                {{ wtf.form_field(subform.firstName, class='form-control', placeholder='') }}
+                            </div>
+                            <div class="col-md-3">
+                                {{ wtf.form_field(subform.lastName, class='form-control', placeholder='') }}
+                            </div >
+                            <div class="col-md-3">
+                                {{ wtf.form_field(subform.passport, class='form-control', placeholder='') }}
+                            </div >
+                            {% endfor %}
+                        </div>
+                    {{ wtf.form_field(form.submit, class='form-control btn-warning mt-3 mb-5', placeholder='') }}
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

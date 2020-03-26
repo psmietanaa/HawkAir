@@ -7,7 +7,6 @@ Implement:
 - Flight status number
 
 - Trip Cancellation and Change
-- Multiple passengers
 
 Low priority:
 - User ID retrieval policy
@@ -27,5 +26,4 @@ Phase 2:
 - Hub system
 
 Phase 3:
-- HawkAdvantage
 - Seat selection
