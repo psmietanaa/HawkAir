@@ -239,9 +239,9 @@ before delete ON bookings FOR EACH ROW
 INSERT INTO `HawkAir`.`Users` VALUES
 (NULL,'','Roger','','McCubbin','','Male','1980-01-21','1087 Windy Ridge Road','Fort Wayne','46802','IN','United States','260-579-8310','roger-mccubbin1946@yahoo.com','Quinnow','e45582512e2f8d730ce143a7c5021ef412b87ed7ea6eb5d32ffa64087bb3df69','What was your favorite sport in high school?','Football',1,0),
 (NULL,'Ms.','Linda','','Knox','','Female','1970-10-12','1345 Lewis Street','Bensenville','60106','IL','United States','630-875-1041','LindaJKnox@teleworm.us','Houghmed','75b1d1b804e4bb41b457f521508a01b870e1382370ef8f10a1f7442a13621007','What is your pet''s name?','Simba',1,0),
-(NULL,'','Jessica','','McCarthy','Jess','Female','1975-08-05','900 Vesta Drive','Chicago','60631','IL','United States','773-727-5516','jessicamccarthy99@amazon.com','Hatc1999','011bc4bea60b31e6181e5ff5e4036245b19d11de51f0f815e11e241d680b5bc1','In what city were you born?','Chicago',1,270),
+(NULL,'','Jessica','','McCarthy','Jess','Female','1975-08-05','900 Vesta Drive','Chicago','60631','IL','United States','773-727-5516','jessicamccarthy99@amazon.com','Hatc1999','011bc4bea60b31e6181e5ff5e4036245b19d11de51f0f815e11e241d680b5bc1','In what city were you born?','Chicago',1,0),
 (NULL,'Mr.','Howard','William','Doublas','','Male','1976-06-06','3033 West Drive','Chicago','60661','IL','United States','312-525-7519','howdougl@gmail.com','Waseat','b3227450338443d6eb075389aa425ab21312178035b62996b842f43985f5e78e','What was the color of your first car?','Red',1,0),
-(NULL,'','Amanda','','Lewis','','Female','1994-08-03','680 Mutton Town Road','Centralia','98531','WA','United States','360-623-1953','ama-lewis@amazon.com','Crinsonast','6a8ea85ce30bbb416b31b1aaaf9ef67ac6b5373a199698d999827565736a8267','What is your favorite team?','Packers',1,1300);
+(NULL,'','Amanda','','Lewis','','Female','1994-08-03','680 Mutton Town Road','Centralia','98531','WA','United States','360-623-1953','ama-lewis@amazon.com','Crinsonast','6a8ea85ce30bbb416b31b1aaaf9ef67ac6b5373a199698d999827565736a8267','What is your favorite team?','Packers',1,0);
 
 INSERT INTO `HawkAir`.`Airports` VALUES
 ('ORD','Chicago O''Hare International','Chicago','IL','United States'),
@@ -292,14 +292,14 @@ INSERT INTO `HawkAir`.`Schedule` VALUES
 (1,1,1,1,1,1,1,'AA8107');
 
 INSERT INTO `HawkAir`.`Bookings` VALUES
-('ABCDEF','Roger McCubbin','2020-03-24','First Class','',100001,'AA2470'),
-('QWERTY','Linda Knox','2020-03-21','First Class','',100002,'AA2470'),
-('ASDFGH','Jessica McCarthy','2020-03-19','First Class','',100003,'AA6846'),
-('ZXCVBN','Jessica McCarthy','2020-03-31','Economy','',100003,'AA8737'),
-('ABCDEG','Howard Doublas','2020-03-24','First Class','',100004,'AA2505'),
-('QWERTU','Amanda Lewis','2020-03-21','Economy','',100005,'AA4054'),
-('ASDFGJ','Linda Knox','2020-03-19','Economy','',100002,'AA5303'),
-('ZXCVBM','Howard Doublas','2020-03-31','Economy','',100004,'AA8107');
+('ABCDEF','Roger McCubbin','2020-03-24','First Class',NULL,100001,'AA2470'),
+('QWERTY','Linda Knox','2020-03-21','First Class',NULL,100002,'AA2470'),
+('ASDFGH','Jessica McCarthy','2020-03-19','First Class',NULL,100003,'AA6846'),
+('ZXCVBN','Jessica McCarthy','2020-03-31','Economy',NULL,100003,'AA8737'),
+('ABCDEG','Howard Doublas','2020-03-24','First Class',NULL,100004,'AA2505'),
+('QWERTU','Amanda Lewis','2020-03-21','Economy',NULL,100005,'AA4054'),
+('ASDFGJ','Linda Knox','2020-03-19','Economy',NULL,100002,'AA5303'),
+('ZXCVBM','Howard Doublas','2020-03-31','Economy',NULL,100004,'AA8107');
 
 -- Login: admin
 -- Password: password

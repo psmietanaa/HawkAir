@@ -38,7 +38,7 @@ DELIMITER //
 CREATE PROCEDURE CreateBooking(IN bookingID VARCHAR(6), IN passenger VARCHAR(100), IN flightDate Date, IN class VARCHAR(20), IN userID VARCHAR(45), IN flightID VARCHAR(6))
 BEGIN
     INSERT INTO bookings VALUES
-    (bookingID, passenger, flightDate, class, '', userID, flightID);
+    (bookingID, passenger, flightDate, class, NULL, userID, flightID);
 END //
 DELIMITER ;
 
