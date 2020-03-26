@@ -230,7 +230,20 @@ before delete ON bookings FOR EACH ROW
 	users.miles = IF(OLD.class = 'First Class',
         users.miles - floor(flights.PriceFirstClass/10),
         users.miles - floor(flights.PriceEconomy/10))
-    WHERE OLD.UserID = users.UserID and OLD.FlightID = flights.FlightID
+    WHERE OLD.UserID = users.UserID and OLD.FlightID = flights.FlightID and CURDATE() < OLD.FlightDate
+;
+
+-- -----------------------------------------------------
+-- Creating Events
+-- -----------------------------------------------------
+
+CREATE EVENT  event_remove_bookings
+ON SCHEDULE
+	EVERY 1 DAY
+    STARTS (CURDATE() + INTERVAL 1 DAY + INTERVAL 1 SECOND)
+    DO
+    delete from bookings
+    where bookings.FlightDate < CURDATE()
 ;
 
 -- -----------------------------------------------------
