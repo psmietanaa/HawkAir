@@ -4,7 +4,7 @@ from random import choice
 from string import ascii_uppercase
 
 # This function builds flights that are displayed when buying flights
-def buildFlights(flights, date):
+def buildFlight(flights, date):
     results = []
     for flight in flights:
         result = {
@@ -15,7 +15,9 @@ def buildFlights(flights, date):
             'FlightID': flight['FlightID'],
             'AircraftID': flight['AircraftID'],
             'Duration': str(flight['Duration'])[:-3] + "h",
-            'ArrivalTime': str(flight['DepartTime'] + flight['Duration'])[:-3]
+            'ArrivalTime': str(flight['DepartTime'] + flight['Duration'])[:-3],
+            'AvailableEconomySeats': flight['AvailableEconomySeats'],
+            'AvailableFirstClassSeats': flight['AvailableFirstClassSeats']            
         }
         results.append(result)
     return results

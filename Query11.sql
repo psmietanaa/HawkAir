@@ -2,12 +2,12 @@ INSERT INTO `HawkAir`.`Airports` VALUES
 ('KRK', 'Krakow International Airport', 'Krakow', '', 'Poland');
 
 INSERT INTO `HawkAir`.`Flights` VALUES
-('AA5144','Airbus 319','ORD','DEN','14:57','1:52','On time',240,160,0,0),
-('AA8623','Airbus 319','ORD','DEN','19:25','1:52','On time',280,150,0,0),
-('AA3287','Airbus 319','DEN','ORD','10:30','1:52','On time',195,270,0,0),
-('AA6527','Airbus 319','DEN','LAX','10:30','2:00','On time',200,235,0,0),
-('AA3212','CRJ 700','DEN','LAX','6:30','2:00','On time',175,280,0,0),
-('AA1423','Boeing 737','LAX','KRK','13:30','6:00','On time',450,960,0,0);
+('AA5144','Airbus 319','ORD','DEN','14:57','1:52','On time',170,250),
+('AA8623','Airbus 319','ORD','DEN','19:25','1:52','On time',150,280),
+('AA3287','Airbus 319','DEN','ORD','10:30','1:52','On time',195,270),
+('AA6527','Airbus 319','DEN','LAX','10:30','2:00','On time',200,235),
+('AA3212','CRJ 700','DEN','LAX','6:30','2:00','On time',175,280),
+('AA1423','Boeing 737','LAX','KRK','13:30','6:00','On time',450,960);
 
 INSERT INTO `HawkAir`.`Schedule` VALUES
 (1,1,1,1,1,1,1,'AA5144'),

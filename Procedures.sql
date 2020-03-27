@@ -1,10 +1,23 @@
 DELIMITER //
-CREATE PROCEDURE SearchFlights(IN fromCity VARCHAR(3), IN toCity VARCHAR(3), IN passengers INT, IN weekDay VARCHAR(9))
+CREATE PROCEDURE SearchFlights(IN fromCity VARCHAR(3), IN toCity VARCHAR(3), IN weekDay VARCHAR(9))
 BEGIN
-    SET @sql = CONCAT('SELECT flights.From, flights.To, flights.DepartTime, flights.FlightID, flights.AircraftID, flights.Duration FROM aircrafts, flights, schedule WHERE aircrafts.AircraftID = flights.AircraftID AND flights.FlightID = schedule.FlightID AND (aircrafts.TotalEconomySeats - flights.BookedEconomySeats >= ', passengers, ' OR aircrafts.TotalFirstClassSeats - flights.BookedFirstClassSeats >= ', passengers, ') AND flights.From = ''', fromCity, ''' AND flights.To = ''', toCity, ''' AND schedule.', weekDay, ' = 1 ORDER BY flights.DepartTime;');
+    SET @sql = CONCAT('SELECT flights.FlightID FROM flights, schedule WHERE flights.FlightID = schedule.FlightID AND flights.From = ''', fromCity, ''' AND flights.To = ''', toCity, ''' AND schedule.', weekDay, ' = 1 ORDER BY flights.DepartTime;');
     PREPARE stmt FROM @sql;
     EXECUTE stmt;
     DEALLOCATE PREPARE stmt;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE CheckSeats(IN flightNumber VARCHAR(6), IN fDate DATE, IN passengers INT)
+BEGIN
+    SELECT flights.From, flights.To, flights.DepartTime, flights.FlightID, flights.AircraftID, flights.Duration,
+        aircrafts.TotalEconomySeats - (SELECT COUNT(*) FROM bookings WHERE FlightID = flightNumber AND FlightDate = fDate AND Class = 'Economy') AS AvailableEconomySeats,
+        aircrafts.TotalFirstClassSeats - (SELECT COUNT(*) FROM bookings WHERE FlightID = flightNumber AND FlightDate = fDate AND Class = 'First Class') AS AvailableFirstClassSeats
+    FROM aircrafts, flights
+    WHERE aircrafts.AircraftID = flights.AircraftID AND flights.FlightID = flightNumber AND
+        (aircrafts.TotalEconomySeats - (SELECT COUNT(*) FROM bookings WHERE FlightID = flightNumber AND FlightDate = fDate AND Class = 'Economy') >= passengers OR
+        aircrafts.TotalFirstClassSeats - (SELECT COUNT(*) FROM bookings WHERE FlightID = flightNumber AND FlightDate = fDate AND Class = 'First Class') >= passengers);
 END //
 DELIMITER ;
 
@@ -18,11 +31,12 @@ END //
 DELIMITER ;
 
 DELIMITER //
-CREATE PROCEDURE GetSeats(IN flightNumber VARCHAR(6))
+CREATE PROCEDURE GetSeats(IN flightNumber VARCHAR(6), IN fDate DATE)
 BEGIN
-    SELECT aircrafts.TotalEconomySeats - flights.BookedEconomySeats as AvailableEconomySeats, aircrafts.TotalFirstClassSeats - flights.BookedFirstClassSeats as AvailableFirstClassSeats
+    SELECT aircrafts.TotalEconomySeats - (SELECT COUNT(*) FROM bookings WHERE FlightID = flightNumber AND FlightDate = fDate AND Class = 'Economy') AS AvailableEconomySeats, 
+            aircrafts.TotalFirstClassSeats - (SELECT COUNT(*) FROM bookings WHERE FlightID = flightNumber AND FlightDate = fDate AND Class = 'First Class') AS AvailableFirstClassSeats
     FROM aircrafts, flights
-    WHERE flights.FlightID = flightNumber AND aircrafts.AircraftID = flights.AircraftID;
+    WHERE aircrafts.AircraftID = flights.AircraftID AND flights.FlightID = flightNumber;
 END //
 DELIMITER ;
 
@@ -56,27 +70,25 @@ CREATE PROCEDURE FindTrip(IN fName VARCHAR(45), IN lName VARCHAR(45), IN booking
 BEGIN
     SELECT bookings.BookingID, flights.From, flights.To, bookings.FlightDate, flights.DepartTime, flights.FlightID, flights.Duration, bookings.Class, bookings.Passenger
     FROM bookings, flights, users
-    WHERE bookings.UserID = users.UserID AND bookings.FlightID = flights.FlightID AND users.FirstName = fname AND users.LastName = lname AND bookings.BookingID = bookingNumber;
+    WHERE bookings.FlightID = flights.FlightID AND bookings.UserID = users.UserID AND users.FirstName = fname AND users.LastName = lname AND bookings.BookingID = bookingNumber;
 END //
 DELIMITER ;
 
 DELIMITER //
-CREATE PROCEDURE GetFlightsStatusDate(IN fromCity VARCHAR(3), IN toCity VARCHAR(3), IN weekDay VARCHAR(9))
+CREATE PROCEDURE GetFlightsStatusDate(IN fromCity VARCHAR(3), IN toCity VARCHAR(3), IN fDate Date)
 BEGIN
-    SET @sql = CONCAT('SELECT flights.FlightID FROM flights, schedule WHERE flights.FlightID = schedule.FlightID AND flights.From = ''', fromCity, ''' AND flights.To = ''', toCity, ''' AND schedule.', weekDay, ' = 1 ORDER BY flights.DepartTime');
-    PREPARE stmt FROM @sql;
-    EXECUTE stmt;
-    DEALLOCATE PREPARE stmt;
+    SELECT flights.FlightID
+    FROM bookings, flights
+    WHERE bookings.FlightID = flights.FlightID AND flights.From = fromCity AND flights.To = toCity AND bookings.FlightDate = fDate ORDER BY flights.DepartTime;
 END //
 DELIMITER ;
 
 DELIMITER //
-CREATE PROCEDURE GetFlightsStatusNumber(IN flightNumber VARCHAR(6), IN weekDay VARCHAR(9))
+CREATE PROCEDURE GetFlightsStatusNumber(IN flightNumber VARCHAR(6), IN fDate Date)
 BEGIN
-    SET @sql = CONCAT('SELECT flights.FlightID FROM flights, schedule WHERE flights.FlightID = schedule.FlightID AND flights.FlightID = ''', flightNumber, ''' AND schedule.', weekDay, ' = 1 ORDER BY flights.DepartTime');
-    PREPARE stmt FROM @sql;
-    EXECUTE stmt;
-    DEALLOCATE PREPARE stmt;
+    SELECT flights.FlightID
+    FROM bookings, flights
+    WHERE bookings.FlightID = flights.FlightID AND flights.FlightID = flightNumber AND bookings.FlightDate = fDate ORDER BY flights.DepartTime;
 END //
 DELIMITER ;
 
@@ -120,7 +132,7 @@ CREATE PROCEDURE MyTrips(IN user VARCHAR(45))
 BEGIN
     SELECT bookings.BookingID, flights.From, flights.To, bookings.FlightDate, flights.DepartTime, flights.FlightID, flights.Duration, bookings.Class, bookings.Passenger
     FROM bookings, flights, users
-    WHERE bookings.UserID = users.UserID AND bookings.FlightID = flights.FlightID AND users.Username = user;
+    WHERE bookings.FlightID = flights.FlightID AND bookings.UserID = users.UserID AND users.Username = user;
 END //
 DELIMITER ;
 

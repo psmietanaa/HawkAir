@@ -27,6 +27,7 @@
                                 <div class="col-md">
                                     <div class="card">
                                         <div class="btn-group btn-group-toggle">
+                                            {% if fare[1][0] != None and fare[1][1] != None %}
                                             <table class="table" style="table-layout: fixed;">
                                                 <tr>
                                                     <th>Economy Price</th>
@@ -43,6 +44,16 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            {% else %}
+                                            <table class="table" style="table-layout: fixed;">
+                                                <tr>
+                                                    <th>Economy Price</th>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Unavailable</strong></td>
+                                                </tr>
+                                            </table>
+                                            {% endif %}
                                         </div>
                                     </div>
                                     <p>
@@ -54,6 +65,7 @@
                                 <div class="col-md">
                                     <div class="card">
                                         <div class="btn-group btn-group-toggle">
+                                            {% if fare[2][0] != None and fare[2][1] != None %}
                                             <table class="table" style="table-layout: fixed;">
                                                 <tr>
                                                     <th>First Class Price</th>
@@ -70,6 +82,16 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            {% else %}
+                                            <table class="table" style="table-layout: fixed;">
+                                                <tr>
+                                                    <th>First Class Price</th>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Unavailable</strong></td>
+                                                </tr>
+                                            </table>
+                                            {% endif %}
                                         </div>
                                     </div>
                                     <p>
