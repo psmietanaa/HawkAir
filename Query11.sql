@@ -1,23 +1,4 @@
-INSERT INTO `HawkAir`.`Airports` VALUES
-('KRK', 'Krakow International Airport', 'Krakow', '', 'Poland');
-
-INSERT INTO `HawkAir`.`Flights` VALUES
-('AA5144','Airbus 319','ORD','DEN','14:57','1:52','On time',170,250),
-('AA8623','Airbus 319','ORD','DEN','19:25','1:52','On time',150,280),
-('AA3287','Airbus 319','DEN','ORD','10:30','1:52','On time',195,270),
-('AA6527','Airbus 319','DEN','LAX','10:30','2:00','On time',200,235),
-('AA3212','CRJ 700','DEN','LAX','6:30','2:00','On time',175,280),
-('AA1423','Boeing 737','LAX','KRK','13:30','6:00','On time',450,960);
-
-INSERT INTO `HawkAir`.`Schedule` VALUES
-(1,1,1,1,1,1,1,'AA5144'),
-(1,1,1,1,1,1,1,'AA8623'),
-(1,1,1,1,1,1,1,'AA3287'),
-(1,1,1,1,1,1,1,'AA3287'),
-(1,1,1,1,1,1,1,'AA3212'),
-(1,1,1,1,1,1,1,'AA1423');
-
---------------------------------------------------------------------------------------
+-- Query #11
 
 -- 0 connections
 -- Should be one result AA2470
@@ -26,16 +7,16 @@ FROM flights
 WHERE flights.From = 'ORD' AND flights.To = 'LAX';
 
 -- 1 connection
--- Should be one result AA4594 -> AA6527
+-- Should be one result AA8901 -> AA6846
 SELECT f1.FlightID, f2.FlightID
 FROM flights AS f1 JOIN flights AS f2 ON (f1.To = f2.From AND TIMEDIFF(f2.DepartTime, f1.DepartTime + f1.Duration) > '01:00:00' AND TIMEDIFF(f2.DepartTime, f1.DepartTime + f1.Duration) < '5:00:00')
-WHERE f1.From = 'ORD' AND f2.To = 'LAX'
+WHERE f1.From = 'CID' AND f2.To = 'JFK'
 
 -- 2 connections
--- Should be AA4594 -> AA6527 -> AA1423
+-- Should be AA8901 -> AA6846 -> AA6881
 SELECT f1.FlightID, f2.FlightID, f3.FlightID
 FROM ...
-WHERE f1.From = 'ORD' AND f2.To = 'KRK'
+WHERE f1.From = 'CID' AND f2.To = 'MIA'
 
 -- Then we will need a query that checks which flights happen before the returning ones
 -- For example if an outgoing and incoming flight is on the same day, the query should show only options where outgoing flight happens before the returning one
@@ -49,6 +30,9 @@ SELECT *
 FROM flights
 WHERE flights.From = 'DEN' AND flights.To = 'ORD'; 
 -- Results: AA3287
--- Only flight AA4594 is before AA3287 which should be the result.
+-- In conclusion, only flight AA4594 is before AA3287 which should be the result.
 -- It's impossible to take other flights
 
+-- Then we will a query that will combine all these options and display a final result
+-- Yes I found a possible trip and here it is
+-- No I did not find such a trip
