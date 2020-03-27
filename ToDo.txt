@@ -2,10 +2,6 @@ ToDoList:
 
 Implement:
 
-- Your trips
-- Flight status date
-- Flight status number
-
 - Trip Cancellation and Change
 
 Low priority:

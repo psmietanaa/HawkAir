@@ -17,7 +17,7 @@ def buildFlight(flights, date):
             'Duration': str(flight['Duration'])[:-3] + "h",
             'ArrivalTime': str(flight['DepartTime'] + flight['Duration'])[:-3],
             'AvailableEconomySeats': flight['AvailableEconomySeats'],
-            'AvailableFirstClassSeats': flight['AvailableFirstClassSeats']            
+            'AvailableFirstClassSeats': flight['AvailableFirstClassSeats']
         }
         results.append(result)
     return results
@@ -31,6 +31,17 @@ def buildTrips(trips):
             flights[trip['BookingID']].append([trip['From'], trip['To'], trip['FlightDate'].strftime("%m/%d/%Y"), str(trip['DepartTime'])[:-3], trip['Class'], trip['Passenger'], trip['FlightID'], str(trip['Duration'])[:-3] + "h"])
         else:
             flights[trip['BookingID']].append([trip['From'], trip['To'], trip['FlightDate'].strftime("%m/%d/%Y"), str(trip['DepartTime'])[:-3], trip['Class'], trip['Passenger'], trip['FlightID'], str(trip['Duration'])[:-3] + "h"])
+    return flights
+
+# This function builds flight status
+def buildStatus(trips):
+    flights = {}
+    for trip in trips:
+        if trip['FlightID'] not in flights:
+            flights[trip['FlightID']] = []
+            flights[trip['FlightID']].append([trip['From'], trip['To'], trip['FlightDate'].strftime("%m/%d/%Y"), str(trip['DepartTime'])[:-3], trip['FlightID'], trip['AircraftID'], trip['FlightStatus'], str(trip['Duration'])[:-3] + "h"])
+        else:
+            flights[trip['FlightID']].append([trip['From'], trip['To'], trip['FlightDate'].strftime("%m/%d/%Y"), str(trip['DepartTime'])[:-3], trip['FlightID'], trip['AircraftID'], trip['FlightStatus'], str(trip['Duration'])[:-3] + "h"])
     return flights
 
 # This function generates a BookingID that has not been used

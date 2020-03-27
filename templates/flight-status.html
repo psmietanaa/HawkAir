@@ -1,0 +1,67 @@
+<!-- This line loads base.html which is present on every page -->
+{% extends "base.html" %}
+
+<!-- Page Content -->
+{% block content %}
+    <div class="container py-5">
+        <!-- Your trip -->
+        {% if trips %}
+        <div class="row justify-content-center pb-3">
+            <div class="col-md-8">
+                <!-- Flights list -->
+                <h3>Flight Status:</h3>
+                <hr>
+                {% for key, value in trips.items() %}
+                    <div class="row">
+                        <div class="col">
+                            <h4><span class="badge badge-warning mt-1 mb-2">{{ key }}</span></h4>
+                            {% for v in value %}
+                            <div class="card">
+                                <h5 class="card-header">Flight {{ loop.index }}</h5>
+                                <table class="table" style="table-layout: fixed;">
+                                    <tr>
+                                        <th>From</th>
+                                        <th>To</th>
+                                        <th>Date</th>
+                                        <th>Departure Time</th>
+                                    </tr>
+                                    <tr>
+                                        <td>{{ v[0] }}</td>
+                                        <td>{{ v[1] }}</td>
+                                        <td>{{ v[2] }}</td>
+                                        <td>{{ v[3] }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Flight Number</th>
+                                        <th>Aircraft</th>
+                                        <th>Flight Status</th>
+                                        <th>Duration</th>
+                                    </tr>
+                                    <tr>
+                                        <td>{{ v[4] }}</td>
+                                        <td>{{ v[5] }}</td>
+                                        <td>{{ v[6] }}</td>
+                                        <td>{{ v[7] }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="row justify-content-center">
+            <div class="col-md-10 text-center">
+                <h3>Looks like the information you entered does not match our records.<br>Click <a href="/" class="badge badge-warning">Here</a> to go back to the homepage!</h3>
+                <hr>
+                <img class="mx-auto d-block py-3" src="/static/images/confused.png">
+            </div>
+        </div>
+        {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -21,6 +21,7 @@
         {% if flights %}
         <form method="POST">
             <div class="accordion" id="myAccordion">
+                {% set counter = [0] %}
                 {% for i in range(flights | length) %}
                 <div class="card">
                     <div class="card-header" id="heading-{{ i + 1 }}">
@@ -63,15 +64,16 @@
                                                 <div class="funkyradio">
                                                     {% if loop.index0 == 0 %}
                                                     <div class="funkyradio-warning">
-                                                        <input type="radio" name="flight-{{ i }}" id="option-{{ loop.index0 }}" value="{{ loop.index0 }}" checked/>
-                                                        <label for="option-{{ loop.index0 }}">&nbsp;&nbsp;Select&nbsp;&nbsp;&nbsp;</label>
+                                                        <input type="radio" name="flight-{{ i }}" id="option-{{ counter[0] }}" value="{{ loop.index0 }}" checked/>
+                                                        <label for="option-{{ counter[0] }}">&nbsp;&nbsp;Select&nbsp;&nbsp;&nbsp;</label>
                                                     </div>
                                                     {% else %}
                                                     <div class="funkyradio-warning">
-                                                        <input type="radio" name="flight-{{ i }}" id="option-{{ loop.index0 }}" value="{{ loop.index0 }}" />
-                                                        <label for="option-{{ loop.index0 }}">&nbsp;&nbsp;Select&nbsp;&nbsp;&nbsp;</label>
+                                                        <input type="radio" name="flight-{{ i }}" id="option-{{ counter[0] }}" value="{{ loop.index0 }}" />
+                                                        <label for="option-{{ counter[0] }}">&nbsp;&nbsp;Select&nbsp;&nbsp;&nbsp;</label>
                                                     </div>
                                                     {% endif %}
+                                                    {% if counter.append(counter.pop() + 1) %}{% endif %}
                                                 </div>
                                             </div>
                                         </div>

@@ -66,18 +66,19 @@ END //
 DELIMITER ;
 
 DELIMITER //
-CREATE PROCEDURE FindTrip(IN fName VARCHAR(45), IN lName VARCHAR(45), IN bookingNumber VARCHAR(6))
+CREATE PROCEDURE YourTrip(IN fName VARCHAR(45), IN lName VARCHAR(45), IN bookingNumber VARCHAR(6))
 BEGIN
     SELECT bookings.BookingID, flights.From, flights.To, bookings.FlightDate, flights.DepartTime, flights.FlightID, flights.Duration, bookings.Class, bookings.Passenger
     FROM bookings, flights, users
-    WHERE bookings.FlightID = flights.FlightID AND bookings.UserID = users.UserID AND users.FirstName = fname AND users.LastName = lname AND bookings.BookingID = bookingNumber;
+    WHERE bookings.FlightID = flights.FlightID AND bookings.UserID = users.UserID AND
+        UCASE(users.FirstName) = UCASE(fname) AND UCASE(users.LastName) = UCASE(lname) AND UCASE(bookings.BookingID) = UCASE(bookingNumber);
 END //
 DELIMITER ;
 
 DELIMITER //
 CREATE PROCEDURE GetFlightsStatusDate(IN fromCity VARCHAR(3), IN toCity VARCHAR(3), IN fDate Date)
 BEGIN
-    SELECT flights.FlightID
+    SELECT bookings.BookingID, flights.From, flights.To, bookings.FlightDate, flights.DepartTime, flights.FlightID, flights.Duration, flights.AircraftID, flights.FlightStatus
     FROM bookings, flights
     WHERE bookings.FlightID = flights.FlightID AND flights.From = fromCity AND flights.To = toCity AND bookings.FlightDate = fDate ORDER BY flights.DepartTime;
 END //
@@ -86,9 +87,9 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE GetFlightsStatusNumber(IN flightNumber VARCHAR(6), IN fDate Date)
 BEGIN
-    SELECT flights.FlightID
+    SELECT bookings.BookingID, flights.From, flights.To, bookings.FlightDate, flights.DepartTime, flights.FlightID, flights.Duration, flights.AircraftID, flights.FlightStatus
     FROM bookings, flights
-    WHERE bookings.FlightID = flights.FlightID AND flights.FlightID = flightNumber AND bookings.FlightDate = fDate ORDER BY flights.DepartTime;
+    WHERE bookings.FlightID = flights.FlightID AND UCASE(flights.FlightID) = UCASE(flightNumber) AND bookings.FlightDate = fDate ORDER BY flights.DepartTime;
 END //
 DELIMITER ;
 

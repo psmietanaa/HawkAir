@@ -26,9 +26,20 @@ def before_request():
         cursor.callproc("ValidateUser", [session.get('username')])
         found = cursor.fetchone()
         cursor.close()
+        # If not found
         if not found:
+            # Pop the user from session
             session.pop("username", None)
             session.pop("userID", None)
+            # Pop all the cookies used to create booking
+            session.pop("selectFlight", None)
+            session.pop("buildFlight", None)
+            session.pop("chosenFlight", None)
+            session.pop("chooseFares", None)
+            session.pop("passengers", None)
+            session.pop("passengerDetails", None)
+            session.pop("payment", None)
+            session.pop("bookingID", None)
     except:
         abort(500)
 
@@ -79,11 +90,47 @@ def index():
             flash("Please log in first!", "warning")
             return redirect(url_for("login", next=url_for("selectFlight")))
     elif yourtrip.submit3.data and yourtrip.validate_on_submit():
-        return yourtrip.data
+        data = yourtrip.data
+        try:
+            # Get trip info for user
+            cursor = mysql.connection.cursor()
+            cursor.callproc("YourTrip", [data['firstName3'], data['lastName3'], data['bookingNumber3']])
+            trips = cursor.fetchall()
+            cursor.close()
+        except:
+            abort(500)
+        # Build flights if trips are not empty
+        if trips:
+            trips = buildTrips(trips)
+        return render_template("your-trip.html", title="Your Trip", trips=trips)
     elif flightstatusDate.submit4.data and flightstatusDate.validate_on_submit():
-        return flightstatusDate.data
+        data = flightstatusDate.data
+        try:
+            # Get flight status info for user
+            cursor = mysql.connection.cursor()
+            cursor.callproc("GetFlightsStatusDate", [data['fromCity4'], data['toCity4'], data['date4']])
+            trips = cursor.fetchall()
+            cursor.close()
+        except:
+            abort(500)
+        # Build flights if trips are not empty
+        if trips:
+            trips = buildStatus(trips)
+        return render_template("flight-status-date.html", title="Flight Status", trips=trips)
     elif flightstatusNumber.submit5.data and flightstatusNumber.validate_on_submit():
-        return flightstatusNumber.data
+        data = flightstatusNumber.data
+        try:
+            # Get flight status info for user
+            cursor = mysql.connection.cursor()
+            cursor.callproc("GetFlightsStatusNumber", [data['flightNumber5'], data['date5']])
+            trips = cursor.fetchall()
+            cursor.close()
+        except:
+            abort(500)
+        # Build flights if trips are not empty
+        if trips:
+            trips = buildStatus(trips)
+        return render_template("flight-status.html", title="Flight Status", trips=trips)
     return render_template("index.html", title="Home", index=True, news=news, roundtrip=roundtrip, oneway=oneway, yourtrip=yourtrip, flightstatusDate=flightstatusDate, flightstatusNumber=flightstatusNumber)
 
 # Select flight
@@ -202,17 +249,6 @@ def passengers():
 # Checkout
 @app.route("/payment", methods=["GET", "POST"])
 def payment():
-    if "bookingID" in session:
-        # Pop all the cookies used to create booking
-        session.pop("selectFlight", None)
-        session.pop("buildFlight", None)
-        session.pop("chosenFlight", None)
-        session.pop("chooseFares", None)
-        session.pop("passengers", None)
-        session.pop("passengerDetails", None)
-        session.pop("payment", None)
-        session.pop("bookingID", None)
-        return redirect(url_for("index"))
     if "payment" in session:
         data = session.get("payment", None)
         # Sum up all the flights
@@ -278,22 +314,13 @@ def confirmation():
         plaintext = build_booking_plaintext(session['bookingID'], bookings[session['bookingID']])
         html = build_booking_html(session['bookingID'], bookings[session['bookingID']])
         response = send_mail("Your Booking Confirmation", info['Email'], plaintext, html)
-        # Pop all the cookies used to create booking
-        session.pop("selectFlight", None)
-        session.pop("buildFlight", None)
-        session.pop("chosenFlight", None)
-        session.pop("chooseFares", None)
-        session.pop("passengers", None)
-        session.pop("passengerDetails", None)
-        session.pop("payment", None)
-        session.pop("bookingID", None)
         # Check the response and give feedback to the user
         if response == 200:
             flash("Email with your booking confirmation has been sent! Check you inbox.", "success")
-            return redirect(url_for("index"))
+            return render_template("confirmation.html", title="Your Booking Confirmation", bookingID=session['bookingID'], bookings=bookings)
         else:
             flash("There was an error when sending the email. Please try again.", "danger")
-            return redirect(url_for("index"))
+            return render_template("confirmation.html", title="Your Booking Confirmation", bookingID=session['bookingID'], bookings=bookings)
     elif "bookingID" in session:
         bookingID = session.get("bookingID", None)
         # Get all booked flights
@@ -307,9 +334,27 @@ def confirmation():
         # Build bookings if not empty
         if bookings:
             bookings = buildTrips(bookings)
+        # Pop all the cookies used to create booking
+        session.pop("selectFlight", None)
+        session.pop("buildFlight", None)
+        session.pop("chosenFlight", None)
+        session.pop("chooseFares", None)
+        session.pop("passengers", None)
+        session.pop("passengerDetails", None)
+        session.pop("payment", None)
         return render_template("confirmation.html", title="Your Booking Confirmation", bookingID=bookingID, bookings=bookings)
     else:
         return redirect(url_for("index"))
+
+# Your trip
+@app.route("/your-trip")
+def yourTrip():
+    return redirect(url_for("index"))
+
+# Flight status
+@app.route("/flight-status")
+def flightStatusDate():
+    return redirect(url_for("index"))
 
 # About us page
 @app.route("/about-us")
@@ -470,11 +515,12 @@ def multicity():
     if form.validate_on_submit():
         # Build flights based on the form
         flights = form.flights.data
+        passengers = form.passengers.data
         data = []
         for flight in flights:
-            data.append({'from': flight['fromCity'], 'to': flight['toCity'], 'passengers': form.passengers.data, 'date': str(flight['departDate'])})
+            data.append({'from': flight['fromCity'], 'to': flight['toCity'], 'passengers': passengers, 'date': str(flight['departDate'])})
         session['selectFlight'] = data
-        session['passengers'] = int(data['passengers'])
+        session['passengers'] = int(passengers)
         if "username" in session:
             return redirect(url_for("selectFlight"))
         else:
