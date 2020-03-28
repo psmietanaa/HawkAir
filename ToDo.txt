@@ -2,8 +2,6 @@ ToDoList:
 
 Implement:
 
-- Trip Cancellation and Change
-
 Low priority:
 - User ID retrieval policy
 - Password change policy
@@ -11,7 +9,6 @@ Low priority:
 
 Sriram:
 - Query #11
-- Query #14
 
 Phase 2:
 - Hub system

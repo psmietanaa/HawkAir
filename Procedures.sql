@@ -124,7 +124,7 @@ CREATE PROCEDURE MyInfo(IN user VARCHAR(45))
 BEGIN
     SELECT *
     FROM users
-    WHERE users.Username = user;
+    WHERE Username = user;
 END //
 DELIMITER ;
 
@@ -134,6 +134,32 @@ BEGIN
     SELECT bookings.BookingID, flights.From, flights.To, bookings.FlightDate, flights.DepartTime, flights.FlightID, flights.Duration, bookings.Class, bookings.Passenger
     FROM bookings, flights, users
     WHERE bookings.FlightID = flights.FlightID AND bookings.UserID = users.UserID AND users.Username = user;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE ValidateBookingChange(IN user VARCHAR(45), IN bookingNumber VARCHAR(6), IN flightNumber VARCHAR(6), IN passengerName VARCHAR(100))
+BEGIN
+    SELECT bookings.BookingID
+    FROM bookings, users
+    WHERE bookings.UserID = users.UserID AND users.Username = user AND bookings.BookingID = bookingNumber AND bookings.FlightID = flightNumber AND bookings.Passenger = passengerName AND DATEDIFF(bookings.FlightDate,CURDATE()) >= 2;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE UpdateBooking(IN bookingNumber VARCHAR(6), IN flightNumber VARCHAR(6), IN passengerName VARCHAR(100), IN fDate DATE, IN newBookingNumber VARCHAR(6), IN newFlightNumber VARCHAR(6), IN newDate DATE)
+BEGIN
+    UPDATE bookings
+    SET BookingID = newBookingNumber, FlightID = newFlightNumber, FlightDate = newDate
+    WHERE bookings.BookingID = bookingNumber AND bookings.FlightID = flightNumber AND Passenger = passengerName AND FlightDate = fDate;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE DeleteBooking(IN bookingNumber VARCHAR(6), IN flightNumber VARCHAR(6), IN passengerName VARCHAR(100))
+BEGIN
+    DELETE FROM bookings
+    WHERE BookingID = bookingNumber AND FlightID = flightNumber AND Passenger = passengerName;
 END //
 DELIMITER ;
 

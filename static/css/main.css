@@ -17,7 +17,7 @@ body > div.container {
 /** Active pills are gold **/
 .nav-pills .nav-link.active, .navbar-dark .navbar-nav .nav-link.active, .nav-pills .show > .nav-link, .navbar-dark .navbar-nav .show > .nav-link, .dropdown-item:active {
     background-color: #FFCE07;
-    color: #262626
+    color: #262626;
 }
 
 /** Other pills are grey **/

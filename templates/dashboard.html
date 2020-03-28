@@ -4,6 +4,23 @@
 <!-- Page Content -->
 {% block content %}
     <div class="container py-5">
+        
+        <!-- Flash Messages Here -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="row">
+                        <div class="col">
+                            <div class="alert alert-{{category}} alert-dismissible fade show" id="noPrintAlert" role="alert">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
         <!-- Dashboard -->
         <div class="row">
             <div class="col-md-8">
@@ -11,6 +28,7 @@
                     <!-- Flights list -->
                     <h3>Here is a list of your flights:</h3>
                     <hr>
+                    {% set counter = [0] %}
                     {% for key, value in trips.items() %}
                         <div class="row">
                             <div class="col">
@@ -45,11 +63,66 @@
                                         </tr>
                                     </table>
                                     <div class="card-footer text-right">
-                                        <a href="#" class="btn btn-warning btn-sm px-3">Change</a>
-                                        <a href="#" class="btn btn-danger btn-sm px-3">Cancel</a>
+                                        <!-- Change flight buttom -->
+                                        <button type="button" class="btn btn-warning btn-sm px-3" data-toggle="modal" data-target="#changeModal-{{ counter[0] }}">Change</button>
+                                        
+                                        <!-- Change flight modal -->
+                                        <div class="modal fade" id="changeModal-{{ counter[0] }}" role="dialog">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <form method="POST" action="{{ url_for('changeBooking', bookingID=key, flightID=v[6], passengerName=v[5], fromCity=v[0], toCity=v[1], date=v[2]) }}">
+                                                        <div class="modal-header text-center">
+                                                            <h5 class="modal-title w-100">Change Flight</h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body text-center">
+                                                            <p>Are you sure you want to change your flight?<br>If yes, then please pick a date for your new flight:</p>
+                                                            <div class="row justify-content-center">
+                                                                <div class="form-group">
+                                                                    <div class="form-group required">
+                                                                        <input class="form-control" min="{{ minChangeBookingDate }}" max="{{ maxChangeBookingDate }}" name="newDate" required="1" type="date">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer justify-content-center">
+                                                            <input class="btn btn-warning" type="submit" value="Yes">
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Cancel flight buttom -->
+                                        <button type="button" class="btn btn-danger btn-sm px-3" data-toggle="modal" data-target="#cancelModal-{{ counter[0] }}">Cancel</button>
+                                        
+                                        <!-- Cancel flight modal -->
+                                        <div class="modal fade" id="cancelModal-{{ counter[0] }}" role="dialog">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header text-center">
+                                                        <h5 class="modal-title w-100">Cancel Flight</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body text-center">
+                                                        Are you sure you want to cancel your flight?
+                                                    </div>
+                                                    <div class="modal-footer justify-content-center">
+                                                        <a href="{{ url_for('deleteBooking', bookingID=key, flightID=v[6], passengerName=v[5]) }}" class="btn btn-danger">Yes</a>
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <p>
+                                {% if counter.append(counter.pop() + 1) %}{% endif %}
                                 {% endfor %}
                             </div>
                         </div>

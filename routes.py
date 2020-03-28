@@ -60,6 +60,7 @@ def index():
     yourtrip = YourTripForm()
     flightstatusDate = FlightStatusDateForm()
     flightstatusNumber = FlightStatusNumberForm()
+    session.pop("changeFlight", None)
     # If a user submits one of the forms
     # Naming has to include a form number at the end to have multiple forms on one page
     if roundtrip.submit1.data and roundtrip.validate_on_submit():
@@ -79,6 +80,7 @@ def index():
     elif oneway.submit2.data and oneway.validate_on_submit():
         # Build flights based on the form
         data = oneway.data
+        print(data, flush=True)
         flights = []
         flights.append({'from': data['fromCity2'], 'to': data['toCity2'], 'passengers': data['passengers2'], 'date': str(data['departDate2'])})
         session['selectFlight'] = flights
@@ -136,7 +138,7 @@ def index():
 # Select flight
 @app.route("/select-flight", methods=["GET", "POST"])
 def selectFlight(flights = []):
-    # If user already selected flights
+    # If user selected flights
     if request.method == "POST":
         flights = session.get("buildFlight", None)
         data = getValues(request.form)
@@ -146,7 +148,34 @@ def selectFlight(flights = []):
             index = int(data[i])
             chosen.append(flights[i][index])
         session['chosenFlight'] = chosen
-        return redirect(url_for("chooseFares"))
+        if "changeFlight" in session:
+            try:
+                # Get list of all taken bookingIDs
+                cursor = mysql.connection.cursor()
+                cursor.callproc("GetBookingIDs")
+                ids = cursor.fetchall()
+                cursor.close()
+            except:
+                abort(500)
+            # Generate a unique bookingID
+            newBookingID = generateBookingID(ids)
+            changeFlightDetails = session.get("changeFlightDetails", None)
+            chosenFlight = session.get("chosenFlight", None)[0]
+            try:
+                cursor = mysql.connection.cursor()
+                cursor.callproc("UpdateBooking", [changeFlightDetails['bookingID'], changeFlightDetails['flightID'], changeFlightDetails['passenger'], changeFlightDetails['date'], newBookingID, chosenFlight['FlightID'], chosenFlight['Date']])
+                mysql.connection.commit()
+                cursor.close()
+            except:
+                abort(500)
+            # If success redirect to dashboard
+            session.pop("selectFlight", None)
+            session.pop("changeFlight", None)
+            session.pop("changeFlightDetails", None)
+            flash('Booking successfully changed.', 'success')
+            return redirect(url_for("dashboard"))
+        else:
+            return redirect(url_for("chooseFares"))
     elif "selectFlight" in session:
         data = session.get("selectFlight", None)
         passengers = session.get("passengers", None)
@@ -184,7 +213,7 @@ def selectFlight(flights = []):
 # Choose fares
 @app.route("/choose-fares", methods=["GET", "POST"])
 def chooseFares():
-    # If user already chose fares
+    # If user chose fares
     if request.method == "POST":
         data = getValues(request.form)
         fares = session.get("chooseFares", None)
@@ -237,7 +266,7 @@ def passengers():
         if len(form.passengers) < passengers:
             for i in range(0, passengers):
                 form.passengers.append_entry()
-        # If user already entered passengers details
+        # If user entered passengers details
         if form.validate_on_submit():
             data = form.passengers.data
             session['passengerDetails'] = data
@@ -257,7 +286,7 @@ def payment():
             total += int(flight[2])
         # Payment form
         form = PaymentForm()
-        # If user already entered payment details
+        # If user entered payment details
         if form.validate_on_submit():
             # Authenticate payment
             authenticatePayment()
@@ -390,7 +419,7 @@ def contactUs():
 # Login page
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    # Check if user is already logged in
+    # Check if user is logged in
     if "username" in session:
         return redirect(url_for("dashboard"))
     # Form displayed on this page
@@ -449,7 +478,7 @@ def login():
 # Register page
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    # Check if user is already logged in
+    # Check if user is logged in
     if "username" in session:
         return redirect(url_for("dashboard"))
     # Form displayed on the page
@@ -474,13 +503,10 @@ def register():
 
 
 # Dashboard
-@app.route("/dashboard")
+@app.route("/dashboard", methods=["GET", "POST"])
 def dashboard():
-    # Check if user is already logged in
-    if "username" not in session:
-        flash("Please log in first!", "warning")
-        return redirect(url_for("login", next=request.url))
-    else:
+    # Check if user is logged in
+    if "username" in session:
         try:
             # Get info and trips for this user
             cursor = mysql.connection.cursor()
@@ -495,7 +521,84 @@ def dashboard():
         # Build flights if trips are not empty
         if trips:
             trips = buildTrips(trips)
-        return render_template("dashboard.html", title="Dashboard", dashboard=True, info=info, trips=trips)
+        return render_template("dashboard.html", title="Dashboard", dashboard=True, info=info, trips=trips, minChangeBookingDate=minChangeBookingDate(), maxChangeBookingDate=maxChangeBookingDate())
+    else:
+        flash("Please log in first!", "warning")
+        return redirect(url_for("login", next=request.url))
+
+@app.route("/dashboard/change", methods=["GET", "POST"])
+def changeBooking():
+    # Check if user is logged in
+    if "username" in session:
+        bookingID = request.args.get("bookingID")
+        flightID = request.args.get("flightID")
+        passengerName = request.args.get("passengerName")
+        fromCity = request.args.get("fromCity")
+        toCity = request.args.get("toCity")
+        date = request.args.get("date")
+        newDate = request.form.get("newDate")
+        if bookingID == None or flightID == None or passengerName == None:
+            return redirect(url_for("dashboard"))
+        else:
+            try:
+                # Check if user owns that booking
+                cursor = mysql.connection.cursor()
+                cursor.callproc("ValidateBookingChange", [session['username'], bookingID, flightID, passengerName])
+                found = cursor.fetchone()
+                cursor.close()
+            except:
+                abort(500)
+            # Change flight is allowed if found
+            if found:
+                # Redirect just to seat selection
+                flights = []
+                flights.append({'from': fromCity, 'to': toCity, 'passengers': 1, 'date': newDate})
+                session['selectFlight'] = flights
+                session['passengers'] = 1                
+                session['changeFlight'] = True
+                session['changeFlightDetails'] = {'bookingID': bookingID, 'flightID': flightID, 'passenger': passengerName, 'date': date}
+                return redirect(url_for("selectFlight"))
+            else:
+                flash('You cannot change this flight.', 'danger')
+                return redirect(url_for("dashboard"))
+    else:
+        return redirect(url_for("login", next=request.url))
+
+@app.route("/dashboard/delete", methods=["GET", "POST"])
+def deleteBooking():
+    # Check if user is logged in
+    if "username" in session:
+        bookingID = request.args.get("bookingID")
+        flightID = request.args.get("flightID")
+        passengerName = request.args.get("passengerName")
+        if bookingID == None or flightID == None or passengerName == None:
+            return redirect(url_for("dashboard"))
+        else:
+            try:
+                # Check if user owns that booking
+                cursor = mysql.connection.cursor()
+                cursor.callproc("ValidateBookingChange", [session['username'], bookingID, flightID, passengerName])
+                found = cursor.fetchone()
+                cursor.close()
+            except:
+                abort(500)
+            # Cancel flight is allowed
+            if found:
+                try:
+                    # Delete booking if found
+                    cursor = mysql.connection.cursor()
+                    cursor.callproc("DeleteBooking", [bookingID, flightID, passengerName])
+                    mysql.connection.commit()
+                    cursor.close()
+                except:
+                    abort(500)
+                flash('Booking successfully deleted.', 'success')
+                return redirect(url_for("dashboard"))
+            else:
+                flash('You cannot cancel this flight.', 'danger')
+                return redirect(url_for("dashboard"))
+    else:
+        return redirect(url_for("login", next=request.url))
 
 # Logout
 @app.route("/logout")

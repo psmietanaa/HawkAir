@@ -21,7 +21,7 @@ securityQuestions = [("What was your favorite sport in high school?", "What was 
                      ("What was the color of your first car?", "What was the color of your first car?"),
                      ("What is your favorite team?", "What is your favorite team?"),
                      ("In what city were you born?", "In what city were you born?")]
-creditCardType = [("Mastercard", "Mastercard"), ("Visa", "Visa")]
+creditCardTypes = [("Mastercard", "Mastercard"), ("Visa", "Visa")]
 expirationMonths = [(str(i), str(i)) for i in range(1, 13)]
 expirationYears = [(str(datetime.date.today().year + i), str(datetime.date.today().year + i)) for i in range(0, 5)]
 passengersRange = [(str(i), str(i)) for i in range(1, 10)]
@@ -40,15 +40,16 @@ with app.app_context():
 # Date must be a future date
 def FutureDate(form, field):
     today = datetime.date.today()
-    if field.data < today:
-        raise ValidationError("Date must be a future date.")
+    margin = datetime.timedelta(weeks=20)
+    if not (today <= field.data <= today + margin):
+        raise ValidationError("Date must be a future date within 6 months.")
 
 class RoundTripForm(FlaskForm):
     fromCity1 = SelectField("<strong>From</strong>", choices=fromCities)
     toCity1 = SelectField("<strong>To</strong>", choices=toCities)
     passengers1 = SelectField("<strong>Number of Passengers</strong>", choices=passengersRange)
-    departDate1 = DateField("<strong>Depart</strong>", format="%Y-%m-%d", validators=[InputRequired(), FutureDate])
-    returnDate1 = DateField("<strong>Return</strong>", format="%Y-%m-%d", validators=[InputRequired(), FutureDate])
+    departDate1 = DateField("<strong>Depart</strong>", format="%Y-%m-%d", validators=[InputRequired(), FutureDate], render_kw={"min": datetime.date.today(), "max": datetime.date.today() + datetime.timedelta(weeks=20)})
+    returnDate1 = DateField("<strong>Return</strong>", format="%Y-%m-%d", validators=[InputRequired(), FutureDate], render_kw={"min": datetime.date.today(), "max": datetime.date.today() + datetime.timedelta(weeks=20)})
     submit1 = SubmitField("Search")
     
     # Return date must be after departure date
@@ -67,7 +68,7 @@ class OneWayForm(FlaskForm):
     fromCity2 = SelectField("<strong>From</strong>", choices=fromCities)
     toCity2 = SelectField("<strong>To</strong>", choices=toCities)
     passengers2 = SelectField("<strong>Number of passengers</strong>", choices=passengersRange)
-    departDate2 = DateField("<strong>Depart</strong>", format="%Y-%m-%d", validators=[InputRequired(), FutureDate])
+    departDate2 = DateField("<strong>Depart</strong>", format="%Y-%m-%d", validators=[InputRequired(), FutureDate], render_kw={"min": datetime.date.today(), "max": datetime.date.today() + datetime.timedelta(weeks=20)})
     submit2 = SubmitField("Search")
     
     # From and To cannot be the same
@@ -87,6 +88,27 @@ class Passenger(Form):
 class PassengersForm(FlaskForm):
     passengers = FieldList(FormField(Passenger))
     submit = SubmitField("Continue")
+    
+    # Check if fields are unique
+    def validate(self):
+        if not Form.validate(self):
+            return False
+        result = True
+        seenNames = set()
+        seenPassports = set()
+        for field in self.passengers:
+            if (field.firstName.data + " " + field.lastName.data) in seenNames:
+                field.firstName.errors.append("Two passengers cannot have the same name")
+                field.lastName.errors.append("Two passengers cannot have the same name")
+                result = False
+            else:
+                seenNames.add(field.firstName.data + " " + field.lastName.data)
+            if field.passport.data in seenPassports:
+                field.passport.errors.append("Two passengers cannot have the same passport number")
+                result = False
+            else:
+                seenPassports.add(field.passport.data)
+        return result
 
 class YourTripForm(FlaskForm):
     firstName3 = StringField("<strong>First Name</strong>", validators=[InputRequired(), Length(min=4, max=45), Alpha()])
@@ -116,14 +138,14 @@ class FlightStatusNumberForm(FlaskForm):
 
 class PaymentForm(FlaskForm):
     cardNumber = StringField("<strong>Card Number</strong>", validators=[InputRequired(), Regexp(cardNumberRegex, message="Must only contain numbers and dashes.")])
-    cardType = SelectField("<strong>Card Type</strong>", choices=creditCardType)
+    cardType = SelectField("<strong>Card Type</strong>", choices=creditCardTypes)
     expirationMonth = SelectField("<strong>Expiration Month</strong>", choices=expirationMonths)
     expirationYear = SelectField("<strong>Expiration Year</strong>", choices=expirationYears)
     cvv = StringField("<strong>CVV</strong>", validators=[InputRequired(), Length(min=3, max=3, message="Field must be 3 digits long."), Integer()])
     name = StringField("<strong>Name on the Card</strong>", validators=[InputRequired(), Length(min=4, max=100), AlphaSpace()])
     submit = SubmitField("Pay")
     
-    # Convert card number
+    # Convert card number to numbers only
     def validate(self):
         if not FlaskForm.validate(self):
             return False
@@ -152,7 +174,7 @@ class RegisterForm(FlaskForm):
     lastName = StringField("<strong>Last Name *</strong>", validators=[InputRequired(), Length(min=4, max=45), Alpha()])
     preferredName = StringField("<strong>Preferred Name</strong>", validators=[Optional(), Length(min=1, max=45), Alpha()])
     sex = SelectField("<strong>Sex *</strong>", choices=sexes)
-    dateOfBirth = DateField("<strong>Date of Birth *</strong>", format="%Y-%m-%d", validators=[InputRequired()])
+    dateOfBirth = DateField("<strong>Date of Birth *</strong>", format="%Y-%m-%d", validators=[InputRequired()], render_kw={"min": "1990-01-01", "max": datetime.date.today()})
     street = StringField("<strong>Street *</strong>", validators=[InputRequired(), Length(min=4, max=100), Regexp(streetRegex, message="Must only contain alpha characters, numbers, spaces and periods.")])
     city = StringField("<strong>City *</strong>", validators=[InputRequired(), Length(min=4, max=45), AlphaSpace()])
     zipCode = StringField("<strong>Zip Code *</strong>", validators=[InputRequired(), Length(min=4, max=10), Integer()])
@@ -190,7 +212,7 @@ class RegisterForm(FlaskForm):
 class MulticityFlight(Form):
     fromCity = SelectField("<strong>From *</strong>", choices=fromCities)
     toCity = SelectField("<strong>To *</strong>", choices=toCities)
-    departDate = DateField("<strong>Depart *</strong>", format="%Y-%m-%d", validators=[InputRequired(), FutureDate])
+    departDate = DateField("<strong>Depart *</strong>", format="%Y-%m-%d", validators=[InputRequired(), FutureDate], render_kw={"min": datetime.date.today(), "max": datetime.date.today() + datetime.timedelta(weeks=20)})
     
     # From and To cannot be the same
     def validate(self):

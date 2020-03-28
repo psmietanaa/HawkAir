@@ -62,10 +62,10 @@
                         </div>
                         <div class="row">
                             <div class="form-group col-md-4">
-                                {{ wtf.form_field(roundtrip.departDate1, class='form-control', min="0001-01-01", max="9999-12-31", placeholder='') }}
+                                {{ wtf.form_field(roundtrip.departDate1, class='form-control', placeholder='') }}
                             </div>
                             <div class="form-group col-md-4">
-                                {{ wtf.form_field(roundtrip.returnDate1, class='form-control', min="0001-01-01", max="9999-12-31", placeholder='') }}
+                                {{ wtf.form_field(roundtrip.returnDate1, class='form-control', placeholder='') }}
                             </div>
                             <div class="form-group col-md-4 pt-4">
                                 {{ wtf.form_field(roundtrip.submit1, class='form-control btn-warning mt-2', placeholder='') }}
@@ -93,7 +93,7 @@
                         </div>
                         <div class="row">
                             <div class="form-group col-md-4">
-                                {{ wtf.form_field(oneway.departDate2, class='form-control', min="0001-01-01", max="9999-12-31", placeholder='') }}
+                                {{ wtf.form_field(oneway.departDate2, class='form-control', placeholder='') }}
                             </div>
                             <div class="form-group col-md-4">
                             </div>
@@ -147,7 +147,7 @@
                                 {{ wtf.form_field(flightstatusDate.toCity4, class='form-control', placeholder='') }}
                             </div>
                             <div class="form-group col-md-4">
-                                {{ wtf.form_field(flightstatusDate.date4, class='form-control', min="0001-01-01", max="9999-12-31", placeholder='') }}
+                                {{ wtf.form_field(flightstatusDate.date4, class='form-control', placeholder='') }}
                             </div>
                         </div>
                         <div class="row">
@@ -173,7 +173,7 @@
                                 {{ wtf.form_field(flightstatusNumber.flightNumber5, class='form-control', placeholder='ex. AA2470') }}
                             </div>
                             <div class="form-group col-md-4">
-                                {{ wtf.form_field(flightstatusNumber.date5, class='form-control', min="0001-01-01", max="9999-12-31", placeholder='') }}
+                                {{ wtf.form_field(flightstatusNumber.date5, class='form-control', placeholder='') }}
                             </div>
                             <div class="form-group col-md-4 pt-4">
                                 {{ wtf.form_field(flightstatusNumber.submit5, class='form-control btn-warning mt-2', placeholder='') }}

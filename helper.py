@@ -10,7 +10,7 @@ def buildFlight(flights, date):
         result = {
             'From': flight['From'],
             'To': flight['To'],
-            'Date': datetime.datetime.strptime(date, "%Y-%m-%d").strftime("%m/%d/%Y"),
+            'Date': date,
             'DepartTime': str(flight['DepartTime'])[:-3],
             'FlightID': flight['FlightID'],
             'AircraftID': flight['AircraftID'],
@@ -28,9 +28,9 @@ def buildTrips(trips):
     for trip in trips:
         if trip['BookingID'] not in flights:
             flights[trip['BookingID']] = []
-            flights[trip['BookingID']].append([trip['From'], trip['To'], trip['FlightDate'].strftime("%m/%d/%Y"), str(trip['DepartTime'])[:-3], trip['Class'], trip['Passenger'], trip['FlightID'], str(trip['Duration'])[:-3] + "h"])
+            flights[trip['BookingID']].append([trip['From'], trip['To'], trip['FlightDate'].strftime("%Y-%m-%d"), str(trip['DepartTime'])[:-3], trip['Class'], trip['Passenger'], trip['FlightID'], str(trip['Duration'])[:-3] + "h"])
         else:
-            flights[trip['BookingID']].append([trip['From'], trip['To'], trip['FlightDate'].strftime("%m/%d/%Y"), str(trip['DepartTime'])[:-3], trip['Class'], trip['Passenger'], trip['FlightID'], str(trip['Duration'])[:-3] + "h"])
+            flights[trip['BookingID']].append([trip['From'], trip['To'], trip['FlightDate'].strftime("%Y-%m-%d"), str(trip['DepartTime'])[:-3], trip['Class'], trip['Passenger'], trip['FlightID'], str(trip['Duration'])[:-3] + "h"])
     return flights
 
 # This function builds flight status
@@ -39,9 +39,9 @@ def buildStatus(trips):
     for trip in trips:
         if trip['FlightID'] not in flights:
             flights[trip['FlightID']] = []
-            flights[trip['FlightID']].append([trip['From'], trip['To'], trip['FlightDate'].strftime("%m/%d/%Y"), str(trip['DepartTime'])[:-3], trip['FlightID'], trip['AircraftID'], trip['FlightStatus'], str(trip['Duration'])[:-3] + "h"])
+            flights[trip['FlightID']].append([trip['From'], trip['To'], trip['FlightDate'].strftime("%Y-%m-%d"), str(trip['DepartTime'])[:-3], trip['FlightID'], trip['AircraftID'], trip['FlightStatus'], str(trip['Duration'])[:-3] + "h"])
         else:
-            flights[trip['FlightID']].append([trip['From'], trip['To'], trip['FlightDate'].strftime("%m/%d/%Y"), str(trip['DepartTime'])[:-3], trip['FlightID'], trip['AircraftID'], trip['FlightStatus'], str(trip['Duration'])[:-3] + "h"])
+            flights[trip['FlightID']].append([trip['From'], trip['To'], trip['FlightDate'].strftime("%Y-%m-%d"), str(trip['DepartTime'])[:-3], trip['FlightID'], trip['AircraftID'], trip['FlightStatus'], str(trip['Duration'])[:-3] + "h"])
     return flights
 
 # This function generates a BookingID that has not been used
@@ -54,7 +54,15 @@ def generateBookingID(ids):
 # Convert date object to day of the week
 def toWeekday(date):
     date = datetime.datetime.strptime(date, "%Y-%m-%d")
-    return date.strftime('%A')
+    return date.strftime("%A")
+
+def minChangeBookingDate():
+    today = datetime.date.today() + datetime.timedelta(days=2)
+    return today.strftime("%Y-%m-%d")
+
+def maxChangeBookingDate():
+    today = datetime.date.today() + datetime.timedelta(weeks=20)
+    return today.strftime("%Y-%m-%d")
 
 # Get values from MySQL cursor
 def getValues(multiDict):
