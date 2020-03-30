@@ -1,9 +1,9 @@
-ToDoList:
+To Do List:
 
 Implement:
 
 Low priority:
-- User ID retrieval policy
+- Username / password retrieval policy
 - Password change policy
 - Admin portal
 
