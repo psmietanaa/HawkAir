@@ -1,11 +1,8 @@
 To Do List:
 
-Implement:
-
 Low priority:
 - Username / password retrieval policy
 - Password change policy
-- Admin portal
 
 Sriram:
 - Query #11

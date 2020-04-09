@@ -244,42 +244,29 @@ INSERT INTO `HawkAir`.`Aircrafts` VALUES
 -- ORD -> LAX
 -- ORD -> DEN, ORD -> DEN, ORD -> DEN
 INSERT INTO `HawkAir`.`Flights` VALUES
-('AA2470','Airbus 319','ORD','LAX','18:00','2:08','On time',350,650),
-('AA4594','Airbus 330','ORD','DEN','7:57','1:52','On time',160,240),
-('AA5144','Airbus 330','ORD','DEN','14:57','1:52','On time',170,250),
-('AA8623','Airbus 330','ORD','DEN','19:25','1:52','On time',150,280),
-('AA3287','Airbus 330','DEN','ORD','12:30','1:52','On time',195,270);
+('AA2470','Airbus 319','ORD','LAX',1,'18:00','2:08','On time',350,650),
+('AA4594','Airbus 330','ORD','DEN',1,'7:57','1:52','On time',160,240),
+('AA5144','Airbus 330','ORD','DEN',1,'14:57','1:52','On time',170,250),
+('AA8623','Airbus 330','ORD','DEN',1,'19:25','1:52','On time',150,280),
+('AA3287','Airbus 330','DEN','ORD',1,'12:30','1:52','On time',195,270);
 
 -- Flights for testing round trips
 INSERT INTO `HawkAir`.`Flights` VALUES
 -- CID -> ORD, ORD -> CID
-('AA8901','Airbus 319','CID','ORD','6:00','0:50','On time',130,230),
-('AA2419','Airbus 319','ORD','CID','8:20','0:50','On time',160,240),
+('AA8901','Airbus 319','CID','ORD',1,'6:00','0:50','On time',130,230),
+('AA2419','Airbus 319','ORD','CID',1,'8:20','0:50','On time',160,240),
 -- CID -> ORD-> JFK, JFK -> ORD -> CID
-('AA6846','Boeing 737','ORD','JFK','8:45','2:40','On time',230,520),
-('AA5572','Boeing 737','JFK','ORD','12:50','2:40','On time',250,540),
-('AA9912','Airbus 319','ORD','CID','17:15','0:50','On time',145,255),
+('AA6846','Boeing 737','ORD','JFK',1,'8:45','2:40','On time',230,520),
+('AA5572','Boeing 737','JFK','ORD',1,'12:50','2:40','On time',250,540),
+('AA9912','Airbus 319','ORD','CID',1,'17:15','0:50','On time',145,255),
 -- CID -> ORD -> JFK -> MIA, MIA -> JFK -> ORD -> CID
-('AA6881','Boeing 787','JFK','MIA','12:50','2:00','On time',340,780),
-('AA1320','Boeing 787','MIA','JFK','16:05','2:00','On time',355,660),
-('AA2711','Boeing 737','JFK','ORD','19:35','2:40','On time',310,490),
-('AA8321','Airbus 319','ORD','CID','22:20','0:50','On time',120,270);
+('AA6881','Boeing 787','JFK','MIA',1,'12:50','2:00','On time',340,780),
+('AA1320','Boeing 787','MIA','JFK',1,'16:05','2:00','On time',355,660),
+('AA2711','Boeing 737','JFK','ORD',1,'19:35','2:40','On time',310,490),
+('AA8321','Airbus 319','ORD','CID',1,'22:20','0:50','On time',120,270);
 
 INSERT INTO `HawkAir`.`Schedule` VALUES
-(1,1,1,1,1,1,1,'AA2470'),
-(1,1,1,1,1,1,1,'AA4594'),
-(1,1,1,1,1,1,1,'AA5144'),
-(1,1,1,1,1,1,1,'AA8623'),
-(1,1,1,1,1,1,1,'AA3287'),
-(1,1,1,1,1,1,1,'AA8901'),
-(1,1,1,1,1,1,1,'AA2419'),
-(1,1,1,1,1,1,1,'AA6846'),
-(1,1,1,1,1,1,1,'AA5572'),
-(1,1,1,1,1,1,1,'AA9912'),
-(1,1,1,1,1,1,1,'AA6881'),
-(1,1,1,1,1,1,1,'AA1320'),
-(1,1,1,1,1,1,1,'AA2711'),
-(1,1,1,1,1,1,1,'AA8321');
+(1,1,1,1,1,1,1,1);
 
 INSERT INTO `HawkAir`.`Bookings` VALUES
 ('ABCDEF','Roger McCubbin','2020-03-24','First Class',NULL,100001,'AA2470'),
