@@ -164,21 +164,14 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `HawkAir`.`Bookings` (
   `BookingID` VARCHAR(6) NOT NULL,
   `UserID` INT NOT NULL,
-  `FlightID` VARCHAR(6) NOT NULL,
-  `FlightDate` DATE NOT NULL,
   INDEX `fk_Booking_UserInformation1_idx` (`UserID` ASC) VISIBLE,
-  INDEX `fk_Booking_Flights1_idx` (`FlightID` ASC) VISIBLE,
   PRIMARY KEY (`BookingID`),
   CONSTRAINT `fk_Booking_UserInformation1`
     FOREIGN KEY (`UserID`)
     REFERENCES `HawkAir`.`Users` (`UserID`)
     ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `fk_Booking_Flights1`
-    FOREIGN KEY (`FlightID`)
-    REFERENCES `HawkAir`.`Flights` (`FlightID`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
+    ON UPDATE CASCADE
+)
 ENGINE = InnoDB;
 
 
@@ -247,10 +240,17 @@ CREATE TABLE IF NOT EXISTS `HawkAir`.`MultipleBookings` (
   `Passenger` VARCHAR(100) NOT NULL,
   `Class` VARCHAR(20) NOT NULL,
   `SeatNumber` VARCHAR(5) NOT NULL,
+  `FlightID` VARCHAR(6) NOT NULL,
+  `FlightDate` DATE NOT NULL,
   INDEX `fk_MultipleBookings_Bookings1_idx` (`BookingID` ASC) VISIBLE,
   CONSTRAINT `fk_MultipleBookings_Bookings1`
     FOREIGN KEY (`BookingID`)
     REFERENCES `HawkAir`.`Bookings` (`BookingID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,  
+    CONSTRAINT `fk_MultipleBooking_Flights1`
+    FOREIGN KEY (`FlightID`)
+    REFERENCES `HawkAir`.`Flights` (`FlightID`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
@@ -320,11 +320,9 @@ AFTER INSERT ON Multiplebookings FOR EACH ROW
     UPDATE Hawkadvantage set
 	Hawkadvantage.miles = IF(new.class = 'First Class',
         Hawkadvantage.miles + floor((select PriceFirstClass from Fares where Fares.FareID = 
-									(select FareID from Flights where Flights.FlightID = 
-									(select FlightID from Bookings where Bookings.BookingID = NEW.BookingID)))/10),
+									(select FareID from Flights where Flights.FlightID = new.FlightID))/10),
         Hawkadvantage.miles + floor((select PriceEconomy from Fares where Fares.FareID = 
-									(select FareID from Flights where Flights.FlightID = 
-									(select FlightID from Bookings where Bookings.BookingID = NEW.BookingID)))/10))
+									(select FareID from Flights where Flights.FlightID = new.FlightID))/10))
     WHERE (select UserID from Bookings where Bookings.BookingID = NEW.BookingID) = Hawkadvantage.UserID;
 
 CREATE TRIGGER  trigger_Multiplebookings_users_delete
@@ -332,13 +330,11 @@ BEFORE DELETE ON Multiplebookings FOR EACH ROW
     UPDATE Hawkadvantage set
 	Hawkadvantage.miles = IF(OLD.class = 'First Class',
         Hawkadvantage.miles - floor((select PriceFirstClass from Fares where Fares.FareID = 
-									(select FareID from Flights where Flights.FlightID = 
-									(select FlightID from Bookings where Bookings.BookingID = OLD.BookingID)))/10),
+									(select FareID from Flights where Flights.FlightID = old.FlightID))/10),
         Hawkadvantage.miles - floor((select PriceEconomy from Fares where Fares.FareID = 
-									(select FareID from Flights where Flights.FlightID = 
-									(select FlightID from Bookings where Bookings.BookingID = OLD.BookingID)))/10))
+									(select FareID from Flights where Flights.FlightID = old.FlightID))/10))
     WHERE (select UserID from Bookings where Bookings.BookingID = OLD.BookingID) = Hawkadvantage.UserID and
-		   CURDATE() < (select FlightDate from Bookings where Bookings.BookingID = OLD.BookingID);
+		   CURDATE() < old.FlightDate;
 
 
 -- -----------------------------------------------------
@@ -413,12 +409,6 @@ INSERT INTO `HawkAir`.`Route` VALUES
 (2,'ORD','DEN','1:52'),
 (3,'DEN','ORD','1:52');
 
-INSERT INTO `HawkAir`.`Flights` VALUES
-('AA2470','Airbus 319',1,1,1,'18:00','On time'),
-('AA4594','Airbus 330',2,1,2,'7:57','On time'),
-('AA5144','Airbus 330',2,1,3,'14:57','On time'),
-('AA8623','Airbus 330',2,1,4,'19:25','On time'),
-('AA3287','Airbus 330',3,1,5,'12:30','On time');
 
 INSERT INTO `HawkAir`.`Fares` VALUES
 (NULL,350,650),
@@ -426,6 +416,18 @@ INSERT INTO `HawkAir`.`Fares` VALUES
 (NULL,170,250),
 (NULL,150,280),
 (NULL,195,270);
+
+
+INSERT INTO `HawkAir`.`Schedule` VALUES
+(1,1,1,1,1,1,1,1);
+
+INSERT INTO `HawkAir`.`Flights` VALUES
+('AA2470','Airbus 319',1,1,1,'18:00','On time'),
+('AA4594','Airbus 330',2,1,2,'7:57','On time'),
+('AA5144','Airbus 330',2,1,3,'14:57','On time'),
+('AA8623','Airbus 330',2,1,4,'19:25','On time'),
+('AA3287','Airbus 330',3,1,5,'12:30','On time');
+
 
 /*
 -- Flights for testing round trips
@@ -444,20 +446,18 @@ INSERT INTO `HawkAir`.`Flights` VALUES
 ('AA8321','Airbus 319','ORD','CID',1,'22:20','0:50','On time',120,270);
 */
 
-INSERT INTO `HawkAir`.`Schedule` VALUES
-(1,1,1,1,1,1,1,1);
 
 INSERT INTO `HawkAir`.`Bookings` VALUES
-('ABCDEF',1,'AA2470','2020-03-24'),
-('QWERTY',2,'AA2470','2020-03-21'),
-('ASDFGH',3,'AA8623','2020-03-19'),
-('ZXCVBN',3,'AA3287','2020-03-31');
+('ABCDEF',1),
+('QWERTY',2),
+('ASDFGH',3),
+('ZXCVBN',3);
 
 INSERT INTO `HawkAir`.`MultipleBookings` VALUES
-('ABCDEF','Roger McCubbin','First Class',20),
-('QWERTY','Linda Knox','First Class',10),
-('ASDFGH','Jessica McCarthy','First Class',6),
-('ZXCVBN','Jessica McCarthy','Economy',88);
+('ABCDEF','Roger McCubbin','First Class',20,'AA2470','2020-05-24'),
+('QWERTY','Linda Knox','First Class',10,'AA2470','2020-05-21'),
+('ASDFGH','Jessica McCarthy','First Class',6,'AA8623','2020-05-19'),
+('ZXCVBN','Jessica McCarthy','Economy',88,'AA3287','2020-05-31');
 
 -- Login: admin
 -- Password: password
