@@ -99,7 +99,7 @@ ENGINE = InnoDB;
 -- Table `HawkAir`.`Route`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `HawkAir`.`Route` (
-  `RouteID` INT NOT NULL,
+  `RouteID` INT NOT NULL AUTO_INCREMENT,
   `From` VARCHAR(3) NOT NULL,
   `To` VARCHAR(3) NOT NULL,
   `Duration` TIME NOT NULL,
@@ -405,9 +405,15 @@ INSERT INTO `HawkAir`.`Aircrafts` VALUES
 -- ORD -> LAX
 -- ORD -> DEN, ORD -> DEN, ORD -> DEN
 INSERT INTO `HawkAir`.`Route` VALUES
-(1,'ORD','LAX','2:08'),
-(2,'ORD','DEN','1:52'),
-(3,'DEN','ORD','1:52');
+(NULL,'ORD','LAX','2:08'),
+(NULL,'ORD','DEN','1:52'),
+(NULL,'DEN','ORD','1:52'),
+(NULL,'CID','ORD','0:50'),
+(NULL,'ORD','CID','0:50'),
+(NULL,'ORD','JFK','2:40'),
+(NULL,'JFK','ORD','2:40'),
+(NULL,'JFK','MIA','2:00'),
+(NULL,'MIA','JFK','2:00');
 
 
 INSERT INTO `HawkAir`.`Fares` VALUES
@@ -415,7 +421,16 @@ INSERT INTO `HawkAir`.`Fares` VALUES
 (NULL,160,240),
 (NULL,170,250),
 (NULL,150,280),
-(NULL,195,270);
+(NULL,195,270),
+(NULL,130,230),
+(NULL,160,240),
+(NULL,230,520),
+(NULL,250,540),
+(NULL,145,255),
+(NULL,340,780),
+(NULL,355,660),
+(NULL,310,490),
+(NULL,120,270);
 
 
 INSERT INTO `HawkAir`.`Schedule` VALUES
@@ -428,23 +443,21 @@ INSERT INTO `HawkAir`.`Flights` VALUES
 ('AA8623','Airbus 330',2,1,4,'19:25','On time'),
 ('AA3287','Airbus 330',3,1,5,'12:30','On time');
 
-
-/*
 -- Flights for testing round trips
 INSERT INTO `HawkAir`.`Flights` VALUES
 -- CID -> ORD, ORD -> CID
-('AA8901','Airbus 319','CID','ORD',1,'6:00','0:50','On time',130,230),
-('AA2419','Airbus 319','ORD','CID',1,'8:20','0:50','On time',160,240),
+('AA8901','Airbus 319',4,1,6,'6:00','On time'),
+('AA2419','Airbus 319',5,1,7,'8:20','On time'),
 -- CID -> ORD-> JFK, JFK -> ORD -> CID
-('AA6846','Boeing 737','ORD','JFK',1,'8:45','2:40','On time',230,520),
-('AA5572','Boeing 737','JFK','ORD',1,'12:50','2:40','On time',250,540),
-('AA9912','Airbus 319','ORD','CID',1,'17:15','0:50','On time',145,255),
+('AA6846','Boeing 737',6,1,8,'8:45','On time'),
+('AA5572','Boeing 737',7,1,9,'12:50','On time'),
+('AA9912','Airbus 319',5,1,10,'17:15','On time'),
 -- CID -> ORD -> JFK -> MIA, MIA -> JFK -> ORD -> CID
-('AA6881','Boeing 787','JFK','MIA',1,'12:50','2:00','On time',340,780),
-('AA1320','Boeing 787','MIA','JFK',1,'16:05','2:00','On time',355,660),
-('AA2711','Boeing 737','JFK','ORD',1,'19:35','2:40','On time',310,490),
-('AA8321','Airbus 319','ORD','CID',1,'22:20','0:50','On time',120,270);
-*/
+('AA6881','Boeing 787',8,1,11,'12:50','On time'),
+('AA1320','Boeing 787',9,1,12,'16:05','On time'),
+('AA2711','Boeing 737',7,1,13,'19:35','On time'),
+('AA8321','Airbus 319',5,1,14,'22:20','On time');
+
 
 
 INSERT INTO `HawkAir`.`Bookings` VALUES
