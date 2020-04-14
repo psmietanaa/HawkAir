@@ -14,13 +14,7 @@ phoneRegex = re.compile("\s*\d*[-+.]*")
 cardNumberRegex = re.compile("^(\d{4}[- ]){3}\d{4}|\d{16}$")
 
 # Select field options used in the forms
-titles = [("", ""), ("Mr", "Mr"), ("Ms", "Ms"), ("Mrs", "Mrs"), ("Mx", "Mx")]
 sexes = [("Male", "Male"), ("Female", "Female")]
-securityQuestions = [("What was your favorite sport in high school?", "What was your favorite sport in high school?"),
-                     ("What is your pet's name?", "What is your pet's name?"),
-                     ("What was the color of your first car?", "What was the color of your first car?"),
-                     ("What is your favorite team?", "What is your favorite team?"),
-                     ("In what city were you born?", "In what city were you born?")]
 creditCardTypes = [("Mastercard", "Mastercard"), ("Visa", "Visa")]
 expirationMonths = [(str(i), str(i)) for i in range(1, 13)]
 expirationYears = [(str(datetime.date.today().year + i), str(datetime.date.today().year + i)) for i in range(0, 5)]
@@ -28,13 +22,20 @@ passengersRange = [(str(i), str(i)) for i in range(1, 10)]
 flightStatusDates = [((datetime.date.today() + datetime.timedelta(days=i)).strftime("%Y-%m-%d"), (datetime.date.today() + datetime.timedelta(days=i)).strftime("%A, %B %d")) for i in range(0, 3)]
 
 # Get departure and arrival city locations from database
+# Get titles and security questions from database
 with app.app_context():
     cursor = mysql.connection.cursor()
     cursor.callproc("GetDepartLocations")
-    fromCities = [(city['From'], city['From']) for city in cursor.fetchall()]
+    fromCities = [(entry['From'], entry['From']) for entry in cursor.fetchall()]
     cursor.nextset()
     cursor.callproc("GetArrivalLocations")
-    toCities = [(city['To'], city['To']) for city in cursor.fetchall()]
+    toCities = [(entry['To'], entry['To']) for entry in cursor.fetchall()]
+    cursor.nextset()
+    cursor.callproc("GetTitles")
+    titles = [(str(entry['TitleID']), entry['Title']) for entry in cursor.fetchall()]
+    cursor.nextset()
+    cursor.callproc("GetSecurityQuestions")
+    securityQuestions = [(str(entry['SecurityQuestionID']), entry['SecurityQuestion']) for entry in cursor.fetchall()]
     cursor.close()
 
 # Date must be a future date

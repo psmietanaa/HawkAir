@@ -4,11 +4,8 @@ Low priority:
 - Username / password retrieval policy
 - Password change policy
 
-Sriram:
-- Query #11
-
 Phase 2:
-- Hub system
+- Hub system (Sriram Query #11)
 
 Phase 3:
 - Seat selection

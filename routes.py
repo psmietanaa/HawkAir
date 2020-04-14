@@ -149,21 +149,11 @@ def selectFlight(flights = []):
             chosen.append(flights[i][index])
         session['chosenFlight'] = chosen
         if "changeFlight" in session:
-            try:
-                # Get list of all taken bookingIDs
-                cursor = mysql.connection.cursor()
-                cursor.callproc("GetBookingIDs")
-                ids = cursor.fetchall()
-                cursor.close()
-            except:
-                abort(500)
-            # Generate a unique bookingID
-            newBookingID = generateBookingID(ids)
             changeFlightDetails = session.get("changeFlightDetails", None)
             chosenFlight = session.get("chosenFlight", None)[0]
             try:
                 cursor = mysql.connection.cursor()
-                cursor.callproc("UpdateBooking", [changeFlightDetails['bookingID'], changeFlightDetails['flightID'], changeFlightDetails['passenger'], changeFlightDetails['date'], newBookingID, chosenFlight['FlightID'], chosenFlight['Date']])
+                cursor.callproc("UpdateBooking", [changeFlightDetails['bookingID'], changeFlightDetails['flightID'], changeFlightDetails['passenger'], changeFlightDetails['date'], chosenFlight['FlightID'], chosenFlight['Date']])
                 mysql.connection.commit()
                 cursor.close()
             except:
@@ -305,11 +295,18 @@ def payment():
             passengers = session.get("passengerDetails", None)
             payment = session.get("payment", None)
             # Book flights for each passengers
+            try:
+                cursor = mysql.connection.cursor()
+                cursor.callproc("CreateBooking", [bookingID, userID])
+                mysql.connection.commit()
+                cursor.close()
+            except:
+                abort(500)            
             for i in range(0, len(selectFlight)):
                 for j in range(0, len(passengers)):
                     try:
                         cursor = mysql.connection.cursor()
-                        cursor.callproc("CreateBooking", [bookingID, passengers[j]['firstName'] + " " + passengers[j]['lastName'], selectFlight[i]['date'], payment[i][1], userID, payment[i][0]])
+                        cursor.callproc("CreateMultipleBookings", [bookingID, payment[i][0], selectFlight[i]['date'], passengers[j]['firstName'] + " " + passengers[j]['lastName'], payment[i][1]])
                         mysql.connection.commit()
                         cursor.close()
                     except:
@@ -488,7 +485,7 @@ def register():
         try:
             data = request.form
             cursor = mysql.connection.cursor()
-            hashedPassword = hashPassword(form.password.data)
+            hashedPassword = hashPassword(data['password'])
             cursor.callproc("CreateUser", [data['title'], data['firstName'], data['middleName'], data['lastName'],
                                            data['preferredName'], data['sex'], data['dateOfBirth'], data['street'], data['city'],
                                            data['zipCode'], data['state'], data['country'], data['phone'], data['email'],
@@ -639,7 +636,7 @@ def admin():
     # If a user submits the form
     if form.validate_on_submit():
         hashedPassword = hashPassword(form.password.data)
-        return form.data
+        return "Not implemented"
     return render_template("admin.html", title="Admin", form=form)
 
 # Error 404
