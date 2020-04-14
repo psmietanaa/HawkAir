@@ -408,6 +408,13 @@ INSERT INTO `HawkAir`.`Routes` VALUES
 (2,'ORD','DEN','1:52'),
 (3,'DEN','ORD','1:52');
 
+INSERT INTO `HawkAir`.`Flights` VALUES
+('AA2470','Airbus 319',1,1,1,'18:00','On time'),
+('AA4594','Airbus 330',2,1,2,'7:57','On time'),
+('AA5144','Airbus 330',2,1,3,'14:57','On time'),
+('AA8623','Airbus 330',2,1,4,'19:25','On time'),
+('AA3287','Airbus 330',3,1,5,'12:30','On time');
+
 -- Flights for testing round trips
 INSERT INTO `HawkAir`.`Routes` VALUES
 (4,'CID','ORD','0:50'),
