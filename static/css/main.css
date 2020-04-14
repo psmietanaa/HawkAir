@@ -78,7 +78,7 @@ a, a:hover {
 }
 
 /** Errors in the forms are red **/
-.has-error > label, .has-error > p, .has-error > input, .has-error > select{
+.has-error > label, .has-error > p, .has-error > input, .has-error > select {
     color: red;
 }
 
