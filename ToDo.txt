@@ -1,8 +1,7 @@
 To Do List:
 
 Low priority:
-- Username / password retrieval policy
-- Password change policy
+- Username retrieval policy
 
 Phase 2:
 - Hub system (Sriram Query #11)

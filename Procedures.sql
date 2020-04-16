@@ -136,6 +136,28 @@ DELIMITER ;
 # CALL ValidateUser('100001')
 
 DELIMITER //
+CREATE PROCEDURE ValidateEmail(IN email VARCHAR(100))
+BEGIN
+    SELECT users.UserID, users.Email
+    FROM users
+    WHERE users.Email = email;
+END //
+DELIMITER ;
+
+# CALL ValidateEmail('piotrromuald-smietana@uiowa.edu')
+
+DELIMITER //
+CREATE PROCEDURE ChangePassword(IN user VARCHAR(45), IN pass VARCHAR(64))
+BEGIN
+    UPDATE users
+    SET Password = pass
+    WHERE UserID = user;
+END //
+DELIMITER ;
+
+# CALL ChangePassword(100006, '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08')
+
+DELIMITER //
 CREATE PROCEDURE ValidateAdmin(IN user VARCHAR(45), IN pass VARCHAR(64))
 BEGIN
     SELECT *

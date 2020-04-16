@@ -29,7 +29,6 @@ def build_booking_plaintext(BookingID, flights):
         Passenger: %s
         Flight Number: %s
         Duration: %s
-        
         -------------------------------------------------------------
         """
         b = b % (index + 1, flight[0], flight[1], flight[2], flight[3], flight[4], flight[5], flight[6], flight[7])
@@ -40,7 +39,8 @@ def build_booking_plaintext(BookingID, flights):
     any questions about your flight or booking
     please contact us by calling +1 319-834-0276
     or email us at hawkair2020@gmail.com.
-    Have a nice day!"""
+    Have a nice day!
+    """
     return textwrap.dedent(header) + textwrap.dedent(body) + textwrap.dedent(footer)
 
 # This function builds the HTML template used to send booking confirmations
@@ -129,13 +129,14 @@ def build_booking_html(BookingID, flights):
         body += textwrap.dedent(b)
     # Build footer of the email
     footer = """\
-    <p>
-    Thank you for using our service. If you have any questions about your flight or booking<br>
-    please contact us by calling <a href="tel:3198340276">+1 319-834-0276</a> or email us at <a href="mailto:hawkair2020@gmail.com?Subject=Question" target="_top">hawkair2020@gmail.com</a><br>
-    Have a nice day!
-    </p>
+        <p>
+        Thank you for using our service. If you have any questions about your flight or booking<br>
+        please contact us by calling <a href="tel:3198340276">+1 319-834-0276</a> or email us at <a href="mailto:hawkair2020@gmail.com?Subject=Question" target="_top">hawkair2020@gmail.com</a><br>
+        Have a nice day!
+        </p>
     </body>
-    </html>"""
+    </html>
+    """
     return textwrap.dedent(header) + textwrap.dedent(body) + textwrap.dedent(footer)
 
 # This function builds the plaintext template used to send support information
@@ -164,7 +165,8 @@ def build_support_plaintext(firstName, lastName, email, subject, message):
     in 2-3 business days to your inquiry. If you 
     have an urgent matter, please call us or 
     see us in person by visiting our local office.
-    Have a nice day!"""
+    Have a nice day!
+    """
     return textwrap.dedent(header) + textwrap.dedent(body) + textwrap.dedent(footer)
 
 # This function builds the HTML template used to send support information
@@ -188,30 +190,102 @@ def build_support_html(firstName, lastName, email, subject, message):
     """
     # Build body of the email
     body = """\
-    <p><strong>First Name:</strong> %s
-    <br/>
-    <strong>Last Name:</strong> %s
-    <br/>
-    <strong>Email:</strong> %s
-    <br/>
-    <br/>
-    <strong>Subject:</strong> %s
-    <br/>
-    <strong>Message:</strong> %s
-    </p>
-    <hr width="600px" align="left">
+        <p><strong>First Name:</strong> %s
+        <br/>
+        <strong>Last Name:</strong> %s
+        <br/>
+        <strong>Email:</strong> %s
+        <br/>
+        <br/>
+        <strong>Subject:</strong> %s
+        <br/>
+        <strong>Message:</strong> %s
+        </p>
+        <hr width="600px" align="left">
     """
     body = body % (firstName, lastName, email, subject, message)
     # Build footer of the email
     footer = """\
-    <p>
-    We will try to get back to you soon as possible. Due to limited number of workers and huge <br>
-    demand for flying tickets, we usually respond in 2-3 business days to your inquiry. If you <br>
-    have an urgent matter, please call us or see us in person by visiting our local office. <br>
-    Have a nice day!
-    </p>
+        <p>
+        We will try to get back to you soon as possible. Due to limited number of workers and huge <br>
+        demand for flying tickets, we usually respond in 2-3 business days to your inquiry. If you <br>
+        have an urgent matter, please call us or see us in person by visiting our local office. <br>
+        Have a nice day!
+        </p>
     </body>
-    </html>"""
+    </html>
+    """
+    return textwrap.dedent(header) + textwrap.dedent(body) + textwrap.dedent(footer)
+
+def build_password_plaintext(link):
+    # Build header of the email
+    header = """\
+    Reset Your Password
+    -------------------------------------------------------------
+    """
+    # Build body of the email
+    body = """\
+    To reset your password, click the following link:
+    %s
+
+    Please note that for security purposes, this link will expire 
+    after 1 hour from the time it was sent.
+    If you cannot access this link, then copy and paste 
+    the entire URL into your browser.
+    -------------------------------------------------------------
+    """
+    body = body % (link)
+    # Build footer of the email
+    footer = """\
+    Thank you for using our service. If you have 
+    any questions about your flight or booking
+    please contact us by calling +1 319-834-0276
+    or email us at hawkair2020@gmail.com.
+    Have a nice day!
+    """
+    return textwrap.dedent(header) + textwrap.dedent(body) + textwrap.dedent(footer)
+
+def build_password_html(link):
+    # Build header of the email
+    header = """\
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+        body {
+            margin-top: 10px;
+        }
+        </style>
+    </head>
+    
+    <body>
+    """
+    # Build body of the email
+    body = """\
+        <img src="https://i.imgur.com/8kOruHF.png" alt="" width="200">
+        <hr width="600px" align="left">
+        <h3>Reset Your Password</h3>
+        <p>To reset your password, click on the following <a href="%s">link</a>:
+        <br><br>
+        Please note that for security purposes, this link will expire after 1 hour from the time it was sent.
+        <br>
+        If you cannot access this link, then copy and paste the entire URL into your browser.
+        </p>
+        <hr width="600px" align="left">
+        <p>
+    """
+    body = body % (link)
+    
+    # Build footer of the email
+    footer = """\
+        <p>
+        Thank you for using our service. If you have any questions about your flight or booking<br>
+        please contact us by calling <a href="tel:3198340276">+1 319-834-0276</a> or email us at <a href="mailto:hawkair2020@gmail.com?Subject=Question" target="_top">hawkair2020@gmail.com</a><br>
+        Have a nice day!
+        </p>
+    </body>
+    </html>
+    """
     return textwrap.dedent(header) + textwrap.dedent(body) + textwrap.dedent(footer)
 
 # Function used to send emails

@@ -337,16 +337,19 @@ def confirmation():
         # Build bookings if not empty
         if bookings:
             bookings = buildTrips(bookings)
-        plaintext = build_booking_plaintext(session['bookingID'], bookings[session['bookingID']])
-        html = build_booking_html(session['bookingID'], bookings[session['bookingID']])
-        response = send_mail("Your Booking Confirmation", info['Email'], plaintext, html)
-        # Check the response and give feedback to the user
-        if response == 200:
-            flash("Email with your booking confirmation has been sent! Check you inbox.", "success")
-            return render_template("confirmation.html", title="Your Booking Confirmation", bookingID=session['bookingID'], bookings=bookings)
+            plaintext = build_booking_plaintext(session['bookingID'], bookings[session['bookingID']])
+            html = build_booking_html(session['bookingID'], bookings[session['bookingID']])
+            response = send_mail("Your Booking Confirmation", info['Email'], plaintext, html)
+            # Check the response and give feedback to the user
+            if response == 200:
+                flash("Email with your booking confirmation has been sent! Check you inbox.", "success")
+                return render_template("confirmation.html", title="Your Booking Confirmation", bookingID=session['bookingID'], bookings=bookings)
+            else:
+                flash("There was an error when sending the email. Please try again.", "danger")
+                return render_template("confirmation.html", title="Your Booking Confirmation", bookingID=session['bookingID'], bookings=bookings)
         else:
             flash("There was an error when sending the email. Please try again.", "danger")
-            return render_template("confirmation.html", title="Your Booking Confirmation", bookingID=session['bookingID'], bookings=bookings)
+            return render_template("confirmation.html", title="Your Booking Confirmation", bookingID=session['bookingID'], bookings=bookings)            
     elif "bookingID" in session:
         bookingID = session.get("bookingID", None)
         # Get all booked flights
@@ -472,6 +475,67 @@ def login():
             flash("Invalid email or password! Please try again.", "danger")
     return render_template("login.html", title="Login / Register", login=True, form=form)
 
+# Logout
+@app.route("/logout")
+def logout():
+    # Delete this users cookie
+    session.pop("username", None)
+    session.pop("userID", None)
+    flash("You have been successfully logged out !", "success")
+    return redirect(url_for("index"))
+
+@app.route("/reset-password", methods=["GET", "POST"])
+def resetPassword():
+    # Check if user is logged in
+    if "username" in session:
+        return redirect(url_for("dashboard"))
+    # Form displayed on this page
+    form = RequestResetForm()
+    # If a user submits the form
+    if form.validate_on_submit():
+        try:
+            cursor = mysql.connection.cursor()
+            cursor.callproc("ValidateEmail", [form.email.data])
+            found = cursor.fetchone()
+            cursor.close()
+        except:
+            abort(500)
+        # Create a link valid for one hour
+        token = get_reset_token(found['UserID'])
+        link = url_for("newPassword", token=token, _external=True)
+        # Send email with password reset information
+        plaintext = build_password_plaintext(link)
+        html = build_password_html(link)
+        response = send_mail("Reset Your Password", form.email.data, plaintext, html)        
+        flash("An email has been sent with instructions to reset your password.", "success")
+        return redirect(url_for("login"))
+    return render_template("reset-password.html", title="Reset My Password", form=form)
+
+@app.route("/new-password/<token>", methods=['GET', 'POST'])
+def newPassword(token):
+    # Check if user is logged in
+    if "username" in session:
+        return redirect(url_for("dashboard"))
+    # Verify the token
+    UserID = verify_reset_token(token)
+    if UserID is None:
+        flash("That is an invalid or expired token", "danger")
+        return redirect(url_for('login'))
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        print(UserID, flush=True)
+        hashedPassword = hashPassword(form.password.data)
+        try:
+            cursor = mysql.connection.cursor()
+            cursor.callproc("ChangePassword", [UserID, hashedPassword])
+            mysql.connection.commit()
+            cursor.close()
+        except:
+            abort(500)
+        flash("Your password has been updated! You should be able to log in now.", "success")
+        return redirect(url_for("login"))
+    return render_template("new-password.html", title="Create New Password", form=form)
+
 # Register page
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -596,15 +660,6 @@ def deleteBooking():
                 return redirect(url_for("dashboard"))
     else:
         return redirect(url_for("login", next=request.url))
-
-# Logout
-@app.route("/logout")
-def logout():
-    # Delete this users cookie
-    session.pop("username", None)
-    session.pop("userID", None)
-    flash("You have been successfully logged out !", "success")
-    return redirect(url_for("index"))
 
 # Multicity page
 @app.route("/multicity", methods=["GET", "POST"])

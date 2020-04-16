@@ -1,7 +1,9 @@
 import datetime
 import hashlib
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from random import choice
 from string import ascii_uppercase
+from run import app, mysql
 
 # This function builds flights that are displayed when buying flights
 def buildFlight(flights, date):
@@ -71,6 +73,22 @@ def getValues(multiDict):
 # Hash a password using SHA256
 def hashPassword(password):
     return hashlib.sha256(password.encode()).hexdigest()
+
+def get_reset_token(UserID, expires_sec=3600):
+    s = Serializer(app.config['SECRET_KEY'], expires_sec)
+    return s.dumps({'UserID': UserID}).decode('utf-8')
+
+def verify_reset_token(token):
+    s = Serializer(app.config['SECRET_KEY'])
+    try:
+        UserID = s.loads(token)['UserID']
+        cursor = mysql.connection.cursor()
+        cursor.callproc("ValidateUser", [UserID])
+        found = cursor.fetchone()['UserID']
+        cursor.close()
+    except:
+        return None
+    return found
 
 # Authenticate the payment
 def authenticatePayment():

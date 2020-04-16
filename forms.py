@@ -161,6 +161,16 @@ class ContactForm(FlaskForm):
     subject = StringField("<strong>Subject</strong>", validators=[InputRequired(), Length(min=4, max=100), Regexp(textRegex, message="Input contains illegal characters.")])
     message = TextAreaField("<strong>Message</strong>", validators=[InputRequired(), Length(min=4, max=1000), Regexp(textRegex, message="Input contains illegal characters.")], render_kw={"rows": 6, "cols": 1})
     submit = SubmitField("Contact Us")
+    
+    # Check if user with that email exists
+    def validate_email(self, email):
+        with app.app_context():
+            cursor = mysql.connection.cursor()
+            cursor.callproc("ValidateEmail", [self.email.data])
+            found = cursor.fetchone()
+            cursor.close()
+        if found is None:
+            raise ValidationError('There is no account with that email.')    
 
 class LoginForm(FlaskForm):
     username = StringField("<strong>Username or HawkAdvantage</strong>", validators=[InputRequired(), Length(min=4, max=45), AlphaNumeric()])
@@ -209,6 +219,25 @@ class RegisterForm(FlaskForm):
             cursor.close()
         if alreadyExists:
             raise ValidationError("This username is taken. Please choose a different one.")
+
+class RequestResetForm(FlaskForm):
+    email = StringField("<strong>Email</strong>", validators=[InputRequired(), Email()])
+    submit = SubmitField("Send Reset Link")
+    
+    # Check if user with that email exists
+    def validate_email(self, email):
+        with app.app_context():
+            cursor = mysql.connection.cursor()
+            cursor.callproc("ValidateEmail", [self.email.data])
+            found = cursor.fetchone()
+            cursor.close()
+        if found is None:
+            raise ValidationError('There is no account with that email.')
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField("<strong>New Password</strong>", validators=[InputRequired(), Length(min=4, max=64), AlphaNumeric()])
+    repeatPassword = PasswordField("<strong>Confirm New Password</strong>",validators=[InputRequired(), Length(min=4, max=64), AlphaNumeric(), EqualTo("password", "Passwords must match.")])
+    submit = SubmitField("Create New Password")
 
 class MulticityFlight(Form):
     fromCity = SelectField("<strong>From *</strong>", choices=fromCities)
