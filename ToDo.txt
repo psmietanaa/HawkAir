@@ -1,8 +1,5 @@
 To Do List:
 
-Low priority:
-- Username retrieval policy
-
 Phase 2:
 - Hub system (Sriram Query #11)
 
