@@ -484,35 +484,69 @@ def logout():
     flash("You have been successfully logged out !", "success")
     return redirect(url_for("index"))
 
-@app.route("/reset-password", methods=["GET", "POST"])
-def resetPassword():
+@app.route("/forgot-username", methods=["GET", "POST"])
+def forgotUsername():
     # Check if user is logged in
     if "username" in session:
         return redirect(url_for("dashboard"))
     # Form displayed on this page
-    form = RequestResetForm()
+    form = ForgotUsernameForm()
     # If a user submits the form
     if form.validate_on_submit():
         try:
             cursor = mysql.connection.cursor()
-            cursor.callproc("ValidateEmail", [form.email.data])
+            cursor.callproc("RecoverCredentials", [form.email.data])
+            found = cursor.fetchone()
+            cursor.close()
+        except:
+            abort(500)
+        # Send email with username
+        plaintext = build_username_plaintext(found['Username'])
+        html = build_username_html(found['Username'])
+        response = send_mail("Forgot Username", form.email.data, plaintext, html)
+        # Check the response and give feedback to the user
+        if response == 200:
+            flash("An email has been sent with your username.", "success")
+            return redirect(url_for("login"))
+        else:
+            flash("There was an error when sending the email. Please try again.", "danger")
+            return redirect(url_for("forgotUsername"))
+    return render_template("forgot-username.html", title="Forgot Username", form=form)
+
+@app.route("/forgot-password", methods=["GET", "POST"])
+def forgotPassword():
+    # Check if user is logged in
+    if "username" in session:
+        return redirect(url_for("dashboard"))
+    # Form displayed on this page
+    form = ForgotPasswordForm()
+    # If a user submits the form
+    if form.validate_on_submit():
+        try:
+            cursor = mysql.connection.cursor()
+            cursor.callproc("RecoverCredentials", [form.email.data])
             found = cursor.fetchone()
             cursor.close()
         except:
             abort(500)
         # Create a link valid for one hour
         token = get_reset_token(found['UserID'])
-        link = url_for("newPassword", token=token, _external=True)
+        link = url_for("resetPassword", token=token, _external=True)
         # Send email with password reset information
         plaintext = build_password_plaintext(link)
         html = build_password_html(link)
-        response = send_mail("Reset Your Password", form.email.data, plaintext, html)        
-        flash("An email has been sent with instructions to reset your password.", "success")
-        return redirect(url_for("login"))
-    return render_template("reset-password.html", title="Reset My Password", form=form)
+        response = send_mail("Reset Your Password", form.email.data, plaintext, html)
+        # Check the response and give feedback to the user
+        if response == 200:
+            flash("An email has been sent with instructions to reset your password.", "success")
+            return redirect(url_for("login"))
+        else:
+            flash("There was an error when sending the email. Please try again.", "danger")
+            return redirect(url_for("forgotPassword"))
+    return render_template("forgot-password.html", title="Reset My Password", form=form)
 
-@app.route("/new-password/<token>", methods=['GET', 'POST'])
-def newPassword(token):
+@app.route("/reset-password/<token>", methods=['GET', 'POST'])
+def resetPassword(token):
     # Check if user is logged in
     if "username" in session:
         return redirect(url_for("dashboard"))
@@ -520,21 +554,21 @@ def newPassword(token):
     UserID = verify_reset_token(token)
     if UserID is None:
         flash("That is an invalid or expired token", "danger")
-        return redirect(url_for('login'))
+        return redirect(url_for("login"))
     form = ResetPasswordForm()
     if form.validate_on_submit():
         print(UserID, flush=True)
         hashedPassword = hashPassword(form.password.data)
         try:
             cursor = mysql.connection.cursor()
-            cursor.callproc("ChangePassword", [UserID, hashedPassword])
+            cursor.callproc("ResetPassword", [UserID, hashedPassword])
             mysql.connection.commit()
             cursor.close()
         except:
             abort(500)
         flash("Your password has been updated! You should be able to log in now.", "success")
         return redirect(url_for("login"))
-    return render_template("new-password.html", title="Create New Password", form=form)
+    return render_template("reset-password.html", title="Reset Your Password", form=form)
 
 # Register page
 @app.route("/register", methods=["GET", "POST"])
@@ -615,7 +649,7 @@ def changeBooking():
                 flights = []
                 flights.append({'from': fromCity, 'to': toCity, 'passengers': 1, 'date': newDate})
                 session['selectFlight'] = flights
-                session['passengers'] = 1                
+                session['passengers'] = 1
                 session['changeFlight'] = True
                 session['changeFlightDetails'] = {'bookingID': bookingID, 'flightID': flightID, 'passenger': passengerName, 'date': date}
                 return redirect(url_for("selectFlight"))

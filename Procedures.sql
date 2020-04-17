@@ -136,18 +136,18 @@ DELIMITER ;
 # CALL ValidateUser('100001')
 
 DELIMITER //
-CREATE PROCEDURE ValidateEmail(IN email VARCHAR(100))
+CREATE PROCEDURE RecoverCredentials(IN email VARCHAR(100))
 BEGIN
-    SELECT users.UserID, users.Email
+    SELECT users.UserID, users.Email, users.Username
     FROM users
     WHERE users.Email = email;
 END //
 DELIMITER ;
 
-# CALL ValidateEmail('piotrromuald-smietana@uiowa.edu')
+# CALL RecoverCredentials('piotrromuald-smietana@uiowa.edu')
 
 DELIMITER //
-CREATE PROCEDURE ChangePassword(IN user VARCHAR(45), IN pass VARCHAR(64))
+CREATE PROCEDURE ResetPassword(IN user VARCHAR(45), IN pass VARCHAR(64))
 BEGIN
     UPDATE users
     SET Password = pass

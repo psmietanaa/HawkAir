@@ -217,6 +217,70 @@ def build_support_html(firstName, lastName, email, subject, message):
     """
     return textwrap.dedent(header) + textwrap.dedent(body) + textwrap.dedent(footer)
 
+def build_username_plaintext(username):
+    # Build header of the email
+    header = """\
+    Forgot Username
+    -------------------------------------------------------------
+    """
+    # Build body of the email
+    body = """\
+    We received a request to recover a username associated with your account.
+    According to our records, your username is: %s
+    -------------------------------------------------------------
+    """
+    body = body % (username)
+    # Build footer of the email
+    footer = """\
+    Thank you for using our service. If you have 
+    any questions about your flight or booking
+    please contact us by calling +1 319-834-0276
+    or email us at hawkair2020@gmail.com.
+    Have a nice day!
+    """
+    return textwrap.dedent(header) + textwrap.dedent(body) + textwrap.dedent(footer)
+
+def build_username_html(username):
+    # Build header of the email
+    header = """\
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+        body {
+            margin-top: 10px;
+        }
+        </style>
+    </head>
+    
+    <body>
+    """
+    # Build body of the email
+    body = """\
+        <img src="https://i.imgur.com/8kOruHF.png" alt="" width="200">
+        <hr width="600px" align="left">
+        <h3>Forgot Username</h3>
+        <p>We received a request to recover a username associated with your account.
+        <br>
+        According to our records, your username is: <strong>%s</strong>
+        </p>
+        <hr width="600px" align="left">
+        <p>
+    """
+    body = body % (username)
+    
+    # Build footer of the email
+    footer = """\
+        <p>
+        Thank you for using our service. If you have any questions about your flight or booking<br>
+        please contact us by calling <a href="tel:3198340276">+1 319-834-0276</a> or email us at <a href="mailto:hawkair2020@gmail.com?Subject=Question" target="_top">hawkair2020@gmail.com</a><br>
+        Have a nice day!
+        </p>
+    </body>
+    </html>
+    """
+    return textwrap.dedent(header) + textwrap.dedent(body) + textwrap.dedent(footer)
+
 def build_password_plaintext(link):
     # Build header of the email
     header = """\
@@ -265,8 +329,8 @@ def build_password_html(link):
         <img src="https://i.imgur.com/8kOruHF.png" alt="" width="200">
         <hr width="600px" align="left">
         <h3>Reset Your Password</h3>
-        <p>To reset your password, click on the following <a href="%s">link</a>:
-        <br><br>
+        <p>To reset your password, click <a href="%s">here</a>
+        <br>
         Please note that for security purposes, this link will expire after 1 hour from the time it was sent.
         <br>
         If you cannot access this link, then copy and paste the entire URL into your browser.

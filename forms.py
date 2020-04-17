@@ -220,7 +220,21 @@ class RegisterForm(FlaskForm):
         if alreadyExists:
             raise ValidationError("This username is taken. Please choose a different one.")
 
-class RequestResetForm(FlaskForm):
+class ForgotUsernameForm(FlaskForm):
+    email = StringField("<strong>Email</strong>", validators=[InputRequired(), Email()])
+    submit = SubmitField("Send Username")
+    
+    # Check if user with that email exists
+    def validate_email(self, email):
+        with app.app_context():
+            cursor = mysql.connection.cursor()
+            cursor.callproc("RecoverCredentials", [self.email.data])
+            found = cursor.fetchone()
+            cursor.close()
+        if found is None:
+            raise ValidationError('There is no account with that email.')
+
+class ForgotPasswordForm(FlaskForm):
     email = StringField("<strong>Email</strong>", validators=[InputRequired(), Email()])
     submit = SubmitField("Send Reset Link")
     
@@ -228,7 +242,7 @@ class RequestResetForm(FlaskForm):
     def validate_email(self, email):
         with app.app_context():
             cursor = mysql.connection.cursor()
-            cursor.callproc("ValidateEmail", [self.email.data])
+            cursor.callproc("RecoverCredentials", [self.email.data])
             found = cursor.fetchone()
             cursor.close()
         if found is None:
