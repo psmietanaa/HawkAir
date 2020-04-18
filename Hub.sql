@@ -1,4 +1,4 @@
--- Query #11
+-- Flight Connections
 
 -- 0 connections
 -- Should be one result AA2470
@@ -23,7 +23,3 @@ JOIN (SELECT flights.FlightID, flights.DepartTime, routes.From, routes.To, route
 ON (f1.To = f2.From AND TIMEDIFF(f2.DepartTime, ADDTIME(f1.DepartTime, f1.Duration)) > '01:00:00' AND TIMEDIFF(f2.DepartTime, ADDTIME(f1.DepartTime, f1.Duration)) < '5:00:00' AND
     f2.To = f3.From AND TIMEDIFF(f3.DepartTime, ADDTIME(f2.DepartTime, f2.Duration)) > '01:00:00' AND TIMEDIFF(f3.DepartTime, ADDTIME(f2.DepartTime, f2.Duration)) < '5:00:00')
 WHERE f1.From = 'CID' AND f3.To = 'MIA';
-
--- Then we will need a query that checks if a first flight happens before the returning one
--- For example if an outgoing and incoming flight are on the same day, the query should only show options where outgoing flight happens before the returning one
--- Maybe do that check on our server after user selects flights. Probably the easiest solution

@@ -1,8 +1,8 @@
 import datetime
 import hashlib
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from random import choice
 from string import ascii_uppercase
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from run import app, mysql
 
 # This function builds flights that are displayed when buying flights
@@ -48,9 +48,9 @@ def buildStatus(trips):
 
 # This function generates a BookingID that has not been used
 def generateBookingID(ids):
-    bookingID = ''.join(choice(ascii_uppercase) for i in range(6))
+    bookingID = "".join(choice(ascii_uppercase) for i in range(6))
     while bookingID in ids:
-        bookingID = ''.join(choice(ascii_uppercase) for i in range(6))
+        bookingID = "".join(choice(ascii_uppercase) for i in range(6))
     return bookingID
 
 # Convert date object to day of the week
@@ -58,15 +58,31 @@ def toWeekday(date):
     date = datetime.datetime.strptime(date, "%Y-%m-%d")
     return date.strftime("%A")
 
+# Minimum date for a flight to be booked
 def minChangeBookingDate():
     today = datetime.date.today() + datetime.timedelta(days=2)
     return today.strftime("%Y-%m-%d")
 
+# Maximum date for a flight to be booked
 def maxChangeBookingDate():
     today = datetime.date.today() + datetime.timedelta(weeks=20)
     return today.strftime("%Y-%m-%d")
 
-# Get values from MySQL cursor
+# Validate a round trip
+# Returning flight must be after departing flight
+def validateRoundTrip(departDate, departTime, departDuration, returnDate, returnTime):
+    departDate = datetime.datetime.strptime(departDate, "%Y-%m-%d").date()
+    departTime = datetime.datetime.strptime(departTime, "%H:%M").time()
+    departDuration = ":".join((departDuration.split(":")[0].zfill(2), departDuration.split(":")[1]))
+    departDuration = datetime.datetime.strptime(departDuration, "%H:%Mh").time()
+    departDuration = datetime.timedelta(hours=departDuration.hour, minutes=departDuration.minute)
+    returnDate = datetime.datetime.strptime(returnDate, "%Y-%m-%d").date()
+    returnTime = datetime.datetime.strptime(returnTime, "%H:%M").time()
+    parsedDepart = datetime.datetime.combine(departDate, departTime) + departDuration
+    parsedReturn = datetime.datetime.combine(returnDate, returnTime)
+    return parsedDepart < parsedReturn
+
+# Get values from a MySQL cursor object
 def getValues(multiDict):
     return [value for value in multiDict.values()]
 
@@ -74,11 +90,13 @@ def getValues(multiDict):
 def hashPassword(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
-def get_reset_token(UserID, expires_sec=3600):
+# Generate token for resetting the password
+def getResetToken(UserID, expires_sec=3600):
     s = Serializer(app.config['SECRET_KEY'], expires_sec)
     return s.dumps({'UserID': UserID}).decode('utf-8')
 
-def verify_reset_token(token):
+# Verify that a token is valid for the user
+def verifyResetToken(token):
     s = Serializer(app.config['SECRET_KEY'])
     try:
         UserID = s.loads(token)['UserID']

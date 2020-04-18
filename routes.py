@@ -32,14 +32,14 @@ def before_request():
             session.pop("username", None)
             session.pop("userID", None)
             # Pop all the cookies used to create booking
-            session.pop("selectFlight", None)
-            session.pop("buildFlight", None)
-            session.pop("chosenFlight", None)
-            session.pop("chooseFares", None)
-            session.pop("passengers", None)
-            session.pop("passengerDetails", None)
-            session.pop("payment", None)
-            session.pop("bookingID", None)
+            # session.pop("selectFlight", None)
+            # session.pop("buildFlight", None)
+            # session.pop("chosenFlight", None)
+            # session.pop("chooseFares", None)
+            # session.pop("passengers", None)
+            # session.pop("passengerDetails", None)
+            # session.pop("payment", None)
+            # session.pop("bookingID", None)
     except:
         abort(500)
 
@@ -80,7 +80,6 @@ def index():
     elif oneway.submit2.data and oneway.validate_on_submit():
         # Build flights based on the form
         data = oneway.data
-        print(data, flush=True)
         flights = []
         flights.append({'from': data['fromCity2'], 'to': data['toCity2'], 'passengers': data['passengers2'], 'date': str(data['departDate2'])})
         session['selectFlight'] = flights
@@ -147,7 +146,18 @@ def selectFlight(flights = []):
         for i in range(0, len(data)):
             index = int(data[i])
             chosen.append(flights[i][index])
+        # Check if the returning flight is after departing flight for a round trip
+        if len(chosen) == 2:
+            departDate = chosen[0]['Date']
+            departTime = chosen[0]['DepartTime']
+            departDuration = chosen[0]['Duration']
+            returnDate = chosen[1]['Date']
+            returnTime = chosen[1]['DepartTime']
+            if not validateRoundTrip(departDate, departTime, departDuration, returnDate, returnTime):
+                flash("Returning flight must be after departing flight. Please select again.", "danger")
+                return redirect(url_for("selectFlight"))
         session['chosenFlight'] = chosen
+        # If a user is changing a flight
         if "changeFlight" in session:
             changeFlightDetails = session.get("changeFlightDetails", None)
             chosenFlight = session.get("chosenFlight", None)[0]
@@ -162,7 +172,7 @@ def selectFlight(flights = []):
             session.pop("selectFlight", None)
             session.pop("changeFlight", None)
             session.pop("changeFlightDetails", None)
-            flash('Booking successfully changed.', 'success')
+            flash("Booking successfully changed.", "success")
             return redirect(url_for("dashboard"))
         else:
             return redirect(url_for("chooseFares"))
@@ -458,13 +468,11 @@ def login():
                         return redirect(url_for("dashboard"))
                 else:
                     if next_url:
-                        # Make the session permanent
                         session.permanent = False
                         session['userID'] = found['UserID']
                         session['username'] = found['Username']
                         return redirect(next_url)
                     else:
-                        # Make the session permanent
                         session.permanent = False
                         session['userID'] = found['UserID']
                         session['username'] = found['Username']
@@ -530,7 +538,7 @@ def forgotPassword():
         except:
             abort(500)
         # Create a link valid for one hour
-        token = get_reset_token(found['UserID'])
+        token = getResetToken(found['UserID'])
         link = url_for("resetPassword", token=token, _external=True)
         # Send email with password reset information
         plaintext = build_password_plaintext(link)
@@ -551,13 +559,12 @@ def resetPassword(token):
     if "username" in session:
         return redirect(url_for("dashboard"))
     # Verify the token
-    UserID = verify_reset_token(token)
+    UserID = verifyResetToken(token)
     if UserID is None:
         flash("That is an invalid or expired token", "danger")
         return redirect(url_for("login"))
     form = ResetPasswordForm()
     if form.validate_on_submit():
-        print(UserID, flush=True)
         hashedPassword = hashPassword(form.password.data)
         try:
             cursor = mysql.connection.cursor()
