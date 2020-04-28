@@ -27,6 +27,7 @@ def buildFlight(flights, date):
 # This function builds trips that are displayed in dashboard and used in email
 def buildTrips(trips):
     flights = {}
+    trips = sorted(trips, key=lambda x: (x['FlightDate'], x['DepartTime']))
     for trip in trips:
         if trip['BookingID'] not in flights:
             flights[trip['BookingID']] = []

@@ -37,18 +37,6 @@ DELIMITER ;
 # CALL GetFare('AA2470')
 
 DELIMITER //
-CREATE PROCEDURE GetSeats(IN flightNumber VARCHAR(6), IN fDate DATE)
-BEGIN
-    SELECT aircrafts.EconomySeats - (SELECT COUNT(*) FROM multiplebookings WHERE multiplebookings.FlightID = flightNumber AND FlightDate = fDate AND Class = 'Economy') AS AvailableEconomySeats, 
-        aircrafts.FirstClassSeats - (SELECT COUNT(*) FROM multiplebookings WHERE multiplebookings.FlightID = flightNumber AND FlightDate = fDate AND Class = 'First Class') AS AvailableFirstClassSeats
-    FROM aircrafts, flights
-    WHERE aircrafts.AircraftID = flights.AircraftID AND flights.FlightID = flightNumber;
-END //
-DELIMITER ;
-
-# CALL GetSeats('AA2470', '2020-03-24')
-
-DELIMITER //
 CREATE PROCEDURE GetBookingIDs()
 BEGIN
     SELECT DISTINCT BookingID
