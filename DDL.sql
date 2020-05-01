@@ -346,24 +346,24 @@ INSERT INTO `HawkAir`.`Users` VALUES
 (100002,3,'Linda','','Knox','','Female','1970-10-12','630-875-1041','LindaJKnox@teleworm.us','Houghmed','75b1d1b804e4bb41b457f521508a01b870e1382370ef8f10a1f7442a13621007',2,'Simba'),
 (100003,1,'Jessica','','McCarthy','Jess','Female','1975-08-05','773-727-5516','jessicamccarthy99@amazon.com','Hatc1999','011bc4bea60b31e6181e5ff5e4036245b19d11de51f0f815e11e241d680b5bc1',3,'Chicago'),
 (100004,2,'Howard','William','Doublas','','Male','1976-06-06','312-525-7519','howdougl@gmail.com','Waseat','b3227450338443d6eb075389aa425ab21312178035b62996b842f43985f5e78e',3,'Red'),
-(100005,1,'Amanda','','Lewis','','Female','1994-08-03','360-623-1953','ama-lewis@amazon.com','Crinsonast','6a8ea85ce30bbb416b31b1aaaf9ef67ac6b5373a199698d999827565736a8267',5,'Packers'),
-(100006,1,'Piotr','Romuald','Smietana','Peter','Male','1998-04-27','319-834-0276','szoszon007@gmail.com', 'psmietana','9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08',1,'Tennis');
+(100005,1,'Amanda','','Lewis','','Female','1994-08-03','360-623-1953','ama-lewis@amazon.com','Crinsonast','6a8ea85ce30bbb416b31b1aaaf9ef67ac6b5373a199698d999827565736a8267',5,'Packers');
+#(100006,1,'Piotr','Romuald','Smietana','Peter','Male','1998-04-27','319-834-0276','szoszon007@gmail.com', 'psmietana','9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08',1,'Tennis');
 
 INSERT INTO `HawkAir`.`Addresses` VALUES
 (100001,'1087 Windy Ridge Road','Fort Wayne','46802','IN','United States'),
 (100002,'1345 Lewis Street','Bensenville','60106','IL','United States'),
 (100003,'900 Vesta Drive','Chicago','60631','IL','United States'),
 (100004,'3033 West Drive','Chicago','60661','IL','United States'),
-(100005,'680 Mutton Town Road','Centralia','98531','WA','United States'),
-(100006,'316 S Madison St, Apt 210', 'Iowa City','52240','IA','United States');
+(100005,'680 Mutton Town Road','Centralia','98531','WA','United States');
+#(100006,'316 S Madison St, Apt 210', 'Iowa City','52240','IA','United States');
 
 INSERT INTO `HawkAir`.`HawkAdvantage` VALUES
 (100001,0),
 (100002,0),
 (100003,0),
 (100004,0),
-(100005,0),
-(100006,0);
+(100005,0);
+#(100006,0);
 
 INSERT INTO `HawkAir`.`Airports` VALUES
 ('ORD','Chicago O''Hare International','Chicago','IL','United States'),

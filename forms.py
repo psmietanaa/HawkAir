@@ -185,7 +185,7 @@ class ContactForm(FlaskForm):
     def validate_email(self, email):
         with app.app_context():
             cursor = mysql.connection.cursor()
-            cursor.callproc("ValidateEmail", [self.email.data])
+            cursor.callproc("RecoverCredentials", [self.email.data])
             found = cursor.fetchone()
             cursor.close()
         if found is None:

@@ -108,7 +108,7 @@ def index():
         # Build flights if trips are not empty
         if trips:
             trips = buildStatus(trips)
-        return render_template("flight-status-date.html", title="Flight Status", trips=trips)
+        return render_template("flight-status.html", title="Flight Status", trips=trips)
     elif flightstatusNumber.submit5.data and flightstatusNumber.validate_on_submit():
         data = flightstatusNumber.data
         try:
@@ -409,7 +409,7 @@ def contactUs():
         # Build and send email
         plaintext = build_support_plaintext(firstName, lastName, email, subject, message)
         html = build_support_html(firstName, lastName, email, subject, message)
-        response = send_mail("Support Question", email, plaintext, html)
+        response = send_mail("Support Question", "hawkair2020@gmail.com", plaintext, html)
         # Check the response and give feedback to the user
         if response == 200:
             flash("Your contact form has been successfully submitted!", "success")
