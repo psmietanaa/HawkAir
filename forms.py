@@ -81,6 +81,25 @@ class OneWayForm(FlaskForm):
             return False
         return True
 
+class MulticityFlight(Form):
+    fromCity = SelectField("<strong>From *</strong>", choices=fromCities)
+    toCity = SelectField("<strong>To *</strong>", choices=toCities)
+    departDate = DateField("<strong>Depart *</strong>", format="%Y-%m-%d", validators=[InputRequired(), FutureDate], render_kw={"min": datetime.date.today(), "max": datetime.date.today() + datetime.timedelta(weeks=20)})
+    
+    # From and To cannot be the same
+    def validate(self):
+        if not FlaskForm.validate(self):
+            return False
+        elif self.fromCity.data == self.toCity.data:
+            self.toCity.errors.append("From and To cannot be the same.")
+            return False
+        return True
+    
+class MulticityForm(FlaskForm):
+    flights = FieldList(FormField(MulticityFlight), min_entries=1, max_entries=5)
+    passengers = SelectField("<strong>Number of passengers *</strong>", choices=passengersRange)
+    submit = SubmitField("Search")
+
 class Passenger(Form):
     firstName = StringField("<strong>First Name</strong>", validators=[InputRequired(), Length(min=4, max=45), Alpha()])
     lastName = StringField("<strong>Last Name</strong>", validators=[InputRequired(), Length(min=4, max=45), Alpha()])
@@ -111,6 +130,23 @@ class PassengersForm(FlaskForm):
                 seenPassports.add(field.passport.data)
         return result
 
+class PaymentForm(FlaskForm):
+    cardNumber = StringField("<strong>Card Number</strong>", validators=[InputRequired(), Regexp(cardNumberRegex, message="Must only contain numbers and dashes.")])
+    cardType = SelectField("<strong>Card Type</strong>", choices=creditCardTypes)
+    expirationMonth = SelectField("<strong>Expiration Month</strong>", choices=expirationMonths)
+    expirationYear = SelectField("<strong>Expiration Year</strong>", choices=expirationYears)
+    cvv = StringField("<strong>CVV</strong>", validators=[InputRequired(), Length(min=3, max=3, message="Field must be 3 digits long."), Integer()])
+    name = StringField("<strong>Name on the Card</strong>", validators=[InputRequired(), Length(min=4, max=100), AlphaSpace()])
+    submit = SubmitField("Pay")
+    
+    # Convert card number to numbers only
+    def validate(self):
+        if not FlaskForm.validate(self):
+            return False
+        else:
+            self.cardNumber.data = self.cardNumber.data.replace("-", "")
+            return True
+
 class YourTripForm(FlaskForm):
     firstName3 = StringField("<strong>First Name</strong>", validators=[InputRequired(), Length(min=4, max=45), Alpha()])
     lastName3 = StringField("<strong>Last Name</strong>", validators=[InputRequired(), Length(min=4, max=45), Alpha()])
@@ -137,23 +173,6 @@ class FlightStatusNumberForm(FlaskForm):
     date5 = SelectField("<strong>Date</strong>", choices=flightStatusDates)
     submit5 = SubmitField("Search")
 
-class PaymentForm(FlaskForm):
-    cardNumber = StringField("<strong>Card Number</strong>", validators=[InputRequired(), Regexp(cardNumberRegex, message="Must only contain numbers and dashes.")])
-    cardType = SelectField("<strong>Card Type</strong>", choices=creditCardTypes)
-    expirationMonth = SelectField("<strong>Expiration Month</strong>", choices=expirationMonths)
-    expirationYear = SelectField("<strong>Expiration Year</strong>", choices=expirationYears)
-    cvv = StringField("<strong>CVV</strong>", validators=[InputRequired(), Length(min=3, max=3, message="Field must be 3 digits long."), Integer()])
-    name = StringField("<strong>Name on the Card</strong>", validators=[InputRequired(), Length(min=4, max=100), AlphaSpace()])
-    submit = SubmitField("Pay")
-    
-    # Convert card number to numbers only
-    def validate(self):
-        if not FlaskForm.validate(self):
-            return False
-        else:
-            self.cardNumber.data = self.cardNumber.data.replace("-", "")
-            return True
-
 class ContactForm(FlaskForm):
     firstName = StringField("<strong>First Name</strong>", validators=[InputRequired(), Length(min=4, max=45), Alpha()])
     lastName = StringField("<strong>Last Name</strong>", validators=[InputRequired(), Length(min=4, max=45), Alpha()])
@@ -170,7 +189,7 @@ class ContactForm(FlaskForm):
             found = cursor.fetchone()
             cursor.close()
         if found is None:
-            raise ValidationError('There is no account with that email.')    
+            raise ValidationError('There is no account with that email.')
 
 class LoginForm(FlaskForm):
     username = StringField("<strong>Username or HawkAdvantage</strong>", validators=[InputRequired(), Length(min=4, max=45), AlphaNumeric()])
@@ -252,25 +271,6 @@ class ResetPasswordForm(FlaskForm):
     password = PasswordField("<strong>New Password</strong>", validators=[InputRequired(), Length(min=4, max=64), AlphaNumeric()])
     repeatPassword = PasswordField("<strong>Confirm New Password</strong>",validators=[InputRequired(), Length(min=4, max=64), AlphaNumeric(), EqualTo("password", "Passwords must match.")])
     submit = SubmitField("Create New Password")
-
-class MulticityFlight(Form):
-    fromCity = SelectField("<strong>From *</strong>", choices=fromCities)
-    toCity = SelectField("<strong>To *</strong>", choices=toCities)
-    departDate = DateField("<strong>Depart *</strong>", format="%Y-%m-%d", validators=[InputRequired(), FutureDate], render_kw={"min": datetime.date.today(), "max": datetime.date.today() + datetime.timedelta(weeks=20)})
-    
-    # From and To cannot be the same
-    def validate(self):
-        if not FlaskForm.validate(self):
-            return False
-        elif self.fromCity.data == self.toCity.data:
-            self.toCity.errors.append("From and To cannot be the same.")
-            return False
-        return True
-    
-class MulticityForm(FlaskForm):
-    flights = FieldList(FormField(MulticityFlight), min_entries=1, max_entries=5)
-    passengers = SelectField("<strong>Number of passengers *</strong>", choices=passengersRange)
-    submit = SubmitField("Search")
 
 class AdminForm(FlaskForm):
     username = StringField("<strong>Admin Username</strong>", validators=[InputRequired(), Length(min=4, max=45), AlphaNumeric()])

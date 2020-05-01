@@ -31,15 +31,6 @@ def before_request():
             # Pop the user from session
             session.pop("username", None)
             session.pop("userID", None)
-            # Pop all the cookies used to create booking
-            # session.pop("selectFlight", None)
-            # session.pop("buildFlight", None)
-            # session.pop("chosenFlight", None)
-            # session.pop("chooseFares", None)
-            # session.pop("passengers", None)
-            # session.pop("passengerDetails", None)
-            # session.pop("payment", None)
-            # session.pop("bookingID", None)
     except:
         abort(500)
 
@@ -359,7 +350,7 @@ def confirmation():
                 return render_template("confirmation.html", title="Your Booking Confirmation", bookingID=session['bookingID'], bookings=bookings)
         else:
             flash("There was an error when sending the email. Please try again.", "danger")
-            return render_template("confirmation.html", title="Your Booking Confirmation", bookingID=session['bookingID'], bookings=bookings)            
+            return render_template("confirmation.html", title="Your Booking Confirmation", bookingID=session['bookingID'], bookings=bookings)
     elif "bookingID" in session:
         bookingID = session.get("bookingID", None)
         # Get all booked flights
@@ -388,11 +379,13 @@ def confirmation():
 # Your trip
 @app.route("/your-trip")
 def yourTrip():
+    # Should not be accesses directly
     return redirect(url_for("index"))
 
 # Flight status
 @app.route("/flight-status")
 def flightStatusDate():
+    # Should not be accesses directly
     return redirect(url_for("index"))
 
 # About us page
